@@ -1,10 +1,25 @@
 <?php
 
 /**
+ * @file
+ *   conductor.module provides a workflow editor with a GUI (or it will).
+ */
+
+/**
  * Implements hook_ctools_plugin_api().
  */
-function hook_ctools_plugin_api() {
+function conductor_ctools_plugin_api() {
 }
 
-
+/*
+ * Implement hook_permission().
+ */
+function conductor_permission() {
+  return array(
+    'administer conductor workflows' => array(
+      'title' => t('Administer workflows'),
+      'description' => t('Access the conductor workflow administration pages.'),
+    ),
+  );
+}
 
