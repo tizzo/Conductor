@@ -3,7 +3,7 @@
 /**
  * Implements hook_schema().
  */
-function views_schema() {
+function conductor_schema() {
   $schema['conductor_workflow'] = array(
     'description' => 'Stores the general data for a view.',
     'export' => array(
@@ -58,8 +58,12 @@ function views_schema() {
     'primary key' => array('wid'),
     'unique keys' => array('name' => array('name')),
   );
+  /*
+  $schema['conductor_instance'] = array(
+  );
+  */
   $schema['conductor_state'] = array(
-    'description' => 
+    'description' => '',
     'fields' => array(
       'wsid' => array(
         'type' => 'serial',
@@ -68,9 +72,20 @@ function views_schema() {
         'description' => 'The workflow instance state ID of the field, defined by the database.',
         'no export' => TRUE,
       ),
-
-      ),
-    );
+    ),
   );
+  $schema['conductor_state_item'] = array(
+    'description' => '',
+    'fields' => array(
+      'wsid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => '',
+        'no export' => TRUE,
+      ),
+    ),
+  );
+
   return array();
 }
