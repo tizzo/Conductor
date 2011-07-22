@@ -6,11 +6,23 @@
  */
 
 /**
- * Implements hook_ctools_plugin_api().
+ * Implement hook_menu().
  */
-function conductor_ctools_plugin_api() {
+function conductor_menu() {
+  $items = array();
+  $items['conductor/ajax'] = array(
+    'title' => 'Conductor',
+    'page callback' => 'conductor_ajax',
+    'theme callback' => 'ajax_base_page_theme',
+    'delivery callback' => 'ajax_deliver',
+    'access callback' => TRUE,
+    'description' => 'Ajax callback for workflow loading.',
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/ajax.inc',
+  );
+  return $items;
 }
-
+ 
 /*
  * Implement hook_permission().
  */
@@ -23,3 +35,10 @@ function conductor_permission() {
   );
 }
 
+/**
+ * Menu callback to load a workflow via AJAX.
+ */
+function conductor_ajax() {
+  if (isset($_REQUEST['conductor_name'])) {
+  }
+}
