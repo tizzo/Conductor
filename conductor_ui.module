@@ -9,11 +9,46 @@
  * Implements hook_menu().
  */
 function conductor_ui_menu() {
-  $menu = array();
-  $menu['admin/structure/conductor'] = array(
-    'title' => 'Add new workflow',
-    'page callback' => '',
-    'file' => ''
+  $items = array();
+  $items['admin/structure/conductor'] = array(
+    'title' => 'Workflows',
+    'description' => 'Manage custom workflows',
+    'page callback' => 'conductor_ui_list',
+    'access arguments' => array('administer conductor workflows'),
+    'type' => MENU_NORMAL_ITEM,
   );
-  return $menu;
+  $items['admin/structure/conductor/list'] = array(
+    'title' => 'List workflows',
+    'page callback' => 'conductor_ui_list',
+    'access arguments' => array('administer conductor workflows'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+
+  );
+  $items['admin/structure/conductor/add'] = array(
+    'title' => 'Add new workflow',
+    'page callback' => 'conductor_ui_add_workflow',
+    'access arguments' => array('administer conductor workflows'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ * Page callback to list all workflows.
+ */
+function conductor_ui_list() {
+  return '';
+}
+
+/**
+ * Page callback to add a new workflow.
+ */
+function conductor_ui_add_workflow() {
+  drupal_set_title(t('Add a new Conductor workflow'));
+  $output = array();
+  $output['heading'] = array(
+    '#type' => 'markup',
+    '#markup' => 'add a workflow!',
+  );
+  return $output;
 }
