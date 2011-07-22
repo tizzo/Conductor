@@ -1,0 +1,4 @@
+name = Conductor
+description = Create arbitrary workflows to be performed on your site.
+package = Conductor
+core = 7.x

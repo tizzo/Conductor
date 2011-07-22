@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file conductor_ui.module
+ *   Provides the admin interface for Conductor.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function conductor_ui_menu() {
+  $menu = array();
+  $menu['admin/structure/conductor'] = array(
+    'title' => 'Add new workflow',
+    'page callback' => '',
+    'file' => ''
+  );
+  return $menu;
+}

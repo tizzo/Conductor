@@ -1,0 +1,7 @@
+name = Conductor UI
+description = Administrative interface to conductor. Without this module, you cannot create or edit your conductor workflows.
+package = Conductor
+core = 7.x
+configure = admin/structure/conductor
+dependencies[] = conductor
+

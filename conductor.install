@@ -1,0 +1,76 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function views_schema() {
+  $schema['conductor_workflow'] = array(
+    'description' => 'Stores the general data for a view.',
+    'export' => array(
+      'identifier' => 'conductor_workflow',
+      'bulk export' => TRUE,
+      'primary key' => 'wid',
+      'default hook' => 'conductor_default_workflows',
+      'admin_title' => 'human_name',
+      'admin_description' => 'description',
+      'api' => array(
+        'owner' => 'views',
+        'api' => 'conductor_workflow_default',
+        'minimum_version' => '1',
+        'current_version' => '1.0',
+      ),
+      'object' => 'workflow',
+      // TODO: We're gonna be needing to figure this stuff out...
+      // the callback to load the displays
+      'subrecords callback' => 'views_load_display_records',
+      // the variable that holds enabled/disabled status
+      'status' => 'views_defaults',
+      // CRUD callbacks
+      'create callback' => 'views_new_view',
+      'save callback' => 'views_save_view',
+      'delete callback' => 'views_delete_view',
+      'export callback' => 'views_export_view',
+      'cache defaults' => TRUE,
+      'default cache bin' => 'cache',
+    ),
+    'fields' => array(
+      'wid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The workflow ID of the field, defined by the database.',
+        'no export' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '32',
+        'default' => '',
+        'not null' => TRUE,
+        'description' => 'The unique name of the workflow. This is the primary field workflows are loaded from, and is used so that workflows may be internal and not necessarily in the database. May only be alphanumeric characters plus underscores.',
+      ),
+      'description' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'default' => '',
+        'description' => 'A description of the workflow for the admin interface.',
+      ),
+    ),
+    'primary key' => array('wid'),
+    'unique keys' => array('name' => array('name')),
+  );
+  $schema['conductor_state'] = array(
+    'description' => 
+    'fields' => array(
+      'wsid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The workflow instance state ID of the field, defined by the database.',
+        'no export' => TRUE,
+      ),
+
+      ),
+    );
+  );
+  return array();
+}
