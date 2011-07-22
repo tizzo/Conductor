@@ -45,10 +45,37 @@ function conductor_ui_list() {
  */
 function conductor_ui_add_workflow() {
   drupal_set_title(t('Add a new Conductor workflow'));
+  conductor_ui_add_js();
   $output = array();
-  $output['heading'] = array(
+  $output['workflow_editor'] = array(
+    '#type' => 'markup',
+    '#markup' => 'add a workflow! <div class="foo-bar ui-draggable">foo bar</div>',
+    '#prefix' => '<div id="conductor-workflow-editor">',
+    '#suffix' => '</div>',
+  );
+  $output['workflow_element_panel'] = array(
     '#type' => 'markup',
     '#markup' => 'add a workflow!',
+    '#prefix' => '<div id="conductor-workflow-toolbar">',
+    '#suffix' => '</div>',
   );
+  $workflow_elements = array();
+  foreach ($workflow_elements as $name => $element) {
+    $output['workflow_element_panel'][$name] = array();
+  }
   return $output;
+}
+
+/**
+ * Add required javascript for the conductor ui.
+ */
+function conductor_ui_add_js() {
+  drupal_add_js(drupal_get_path('module', 'conductor_ui') . '/js/conductor_ui.js');
+}
+
+/**
+ * Add required css for the conductor ui.
+ */
+function conductor_ui_add_css() {
+  drupal_add_css(drupal_get_path('module', 'conductor_ui') . '/css/conductor_ui.css');
 }
