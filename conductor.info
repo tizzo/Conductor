@@ -1,4 +1,6 @@
 name = Conductor
 description = Create arbitrary workflows to be performed on your site.
 package = Conductor
+dependencies[] = ctools
 core = 7.x
+files[] = plugins/activity/ConductorActivity.class.php
