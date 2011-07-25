@@ -34,6 +34,16 @@ function conductor_ui_menu() {
 }
 
 /**
+ * Implements hook_conductor_activity_process
+ * TODO: Test this!
+ */
+function conductor_ui_conductor_activity_process(&$plugin) {
+  $plugin += array(
+    'conductor-ui-template' => 'conductor_activity',
+  );
+}
+
+/**
  * Page callback to list all workflows.
  */
 function conductor_ui_list() {

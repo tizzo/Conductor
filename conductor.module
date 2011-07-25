@@ -79,6 +79,12 @@ function conductor_activity_process(&$plugin) {
     'category' => t('Miscellaneous'),
     'description' => '',
   );
+  drupal_alter('conductor_activity_process', $plugin);
+  foreach (module_implements('conductor_activity_process') as $module) {
+    // Enable other modules to modify the plugin data.
+    $function = $module . '_conductor_activity_process';
+    $function($plugin);
+  }
 }
 
 /**
