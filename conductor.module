@@ -6,7 +6,7 @@
  */
 
 /**
- * Implement hook_menu().
+ * Implements hook_menu().
  */
 function conductor_menu() {
   $items = array();
@@ -24,7 +24,7 @@ function conductor_menu() {
 }
  
 /*
- * Implement hook_permission().
+ * Implements hook_permission().
  */
 function conductor_permission() {
   return array(
@@ -33,6 +33,23 @@ function conductor_permission() {
       'description' => t('Access the conductor workflow administration pages.'),
     ),
   );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function conductor_theme() {
+  $theme = array();
+  ctools_include('plugins');
+  $activity_plugins = ctools_get_plugins('conductor', 'activity');
+  foreach ($activity_plugins as $activity_name => $activity_plugin) {
+    /*
+    TODO: add the ability to setup custom rendering for each of your plugins.
+    $theme['conductor_activity_' . $activity_name] = array(
+    );
+    */
+  }
+  return $theme;
 }
 
 /**
