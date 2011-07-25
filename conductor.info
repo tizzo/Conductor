@@ -4,4 +4,5 @@ package = Conductor
 dependencies[] = ctools
 core = 7.x
 files[] = includes/workflow.inc
-files[] = plugins/activity/ConductorActivity.class.php
+files[] = plugins/activity/activity/ConductorActivity.class.php
+files[] = plugins/activity/conditional/ConductorActivityConditional.class.php
