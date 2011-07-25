@@ -6,4 +6,4 @@ $plugin = array(
   'handler' => array(
     'class' => 'ConductorActivityConditional',
   ),  
-)
+);

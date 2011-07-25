@@ -6,4 +6,5 @@ $plugin = array(
   'handler' => array(
     'class' => 'ConductorActivity',
   ),  
+  'conductor-ui-template' => 'conductor_activity',
 );
