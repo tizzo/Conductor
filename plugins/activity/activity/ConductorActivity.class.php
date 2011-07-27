@@ -44,9 +44,4 @@ class ConductorActivity {
 
   public function run() {
   }
-
-  public function getId() {
-    // TODO: Consider whether this could be made any smarter...
-    return drupal_hash_base64($this) . REQUEST_TIME;
-  }
 }

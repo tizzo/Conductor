@@ -136,10 +136,13 @@ class ConductorWorkflow {
   /**
    * Create and add an activity with a handler to the workflow.
    */
-  function newActivity($activity) {
+  public function newActivity($activity) {
     $new_activity = conductor_get_activity_handler($activity);
     $this->activities[] = $new_activity;
     return $new_activity;
   }
-
+  
+  public function getActivities() {
+    return $this->activities;
+  }
 }
