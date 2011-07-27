@@ -25,7 +25,7 @@ function conductor_ui_menu() {
 
   );
   $items['admin/structure/conductor/add'] = array(
-    'title' => 'Add New Workflow',
+    'title' => 'Add A New Workflow',
     'page callback' => 'conductor_ui_add_workflow_callback',
     'access arguments' => array('administer conductor workflows'),
     'type' => MENU_LOCAL_TASK,
@@ -39,7 +39,10 @@ function conductor_ui_menu() {
 function conductor_ui_theme() {
   return array(
     'conductor_activity' => array(
-      'variables' => array('name' => ''),
+      'variables' => array(
+        'name' => '',
+        'class' => '',
+      ),
       'path' => drupal_get_path('module', 'conductor_ui') . '/theme',
       'template' => 'conductor-activity'
     ),
@@ -67,26 +70,71 @@ function conductor_ui_list() {
  * Page callback to add a new workflow.
  */
 function conductor_ui_add_workflow_callback() {
+
   drupal_set_title(t('Add a new Conductor workflow'));
   conductor_ui_add_js();
+  conductor_ui_add_css();
+
   $output = array();
-  $output['workflow_editor'] = array(
+  $output['workflow_element_panel'] = array(
+    '#prefix' => '<div id="conductor-ui-toolbar">',
+    '#suffix' => '</div>',
+  );
+  $output['workflow_element_panel']['add_activity'] = array(
     '#type' => 'markup',
-    '#markup' => theme('conductor_activity', array('name' => 'Something')),
+    '#markup' => t('Add an activity'),
+  );
+  $output['workflow_element_panel']['buttons'] = array(
+    '#prefix' => '<div id="toolbar-buttons">',
+    '#suffix' => '</div>',
+  );
+  $output['workflow_element_panel']['buttons']['save'] = array(
+    '#value' => t('Save'),
+    '#type' => 'button',
+  );
+  $output['workflow_element_panel']['buttons']['cancel'] = array(
+    '#value' => t('Cancel'),
+    '#type' => 'button',
+  );
+  $output['workflow_editor'] = array(
     '#prefix' => '<div id="conductor-workflow-editor">',
     '#suffix' => '</div>',
   );
-  $output['workflow_element_panel'] = array(
-    '#type' => 'markup',
-    '#markup' => 'add a workflow!',
-    '#prefix' => '<div id="conductor-workflow-toolbar">',
-    '#suffix' => '</div>',
-  );
-  $workflow_elements = array();
-  foreach ($workflow_elements as $name => $element) {
-    $output['workflow_element_panel'][$name] = array();
+  $activities = conductor_ui_dev_workflow()->getActivities();
+  $settings = array();
+  $css = '';
+  foreach ($activities as $name => $activity) {
+    $class_name = 'conductor-ui-activity-' . conductor_ui_css_safe_class($activity->name);
+    $settings['activities'][$name] = $activity;
+    $activity->css_class = $class_name;
+    $output['workflow_editor'][$name] = array(
+      '#name' => $activity->name,
+      '#class' => $class_name,
+      '#theme' => 'conductor_activity',
+      '#contextual_links' => array(
+        'contextual_example' => array( 'contextual', array('foobars')),
+      ),
+    );
   }
+  drupal_add_css($css, array('type' => 'inline'));
+  drupal_add_js(array('conductor_ui' => $settings), array('type' => 'setting'));
   return $output;
+}
+
+/**
+ * Convert any string into a CSS class.
+ *
+ * @param $name
+ *   The string to be converted into a W3C standards compliant CSS class.
+ *
+ * @return
+ *   The CSS class name.
+ */
+function conductor_ui_css_safe_class($name) {
+  $class_name = preg_replace('/[^a-zA-Z0-9- ]/', '-', strtolower($name));
+  $class_name = preg_replace('/\W+/', '-', $class_name);
+  $class_name = preg_replace('/\s+/','-', $class_name); 
+  return $class_name;
 }
 
 /**
@@ -102,4 +150,25 @@ function conductor_ui_add_js() {
  */
 function conductor_ui_add_css() {
   drupal_add_css(drupal_get_path('module', 'conductor_ui') . '/css/conductor_ui.css');
+}
+
+function conductor_ui_dev_workflow() {
+  $workflow = new ConductorWorkflow;
+  $activity = $workflow->newActivity('activity');
+  $activity->x = 180;
+  $activity->y = 500;
+  $activity->name = 'Activity booyeah';
+  $activity->inputs = array();
+  $activity->outputs = array(
+    'Activity 2'
+  );
+  $activity = $workflow->newActivity('activity');
+  $activity->x = 280;
+  $activity->y = 200;
+  $activity->name = 'Activity 2';
+  $activity->inputs = array(
+    'Activity 2'
+  );
+  $activity->outputs = array();
+  return $workflow;
 }
