@@ -74,6 +74,8 @@ function conductor_ui_add_workflow_callback() {
   drupal_set_title(t('Add a new Conductor workflow'));
   conductor_ui_add_js();
   conductor_ui_add_css();
+  ctools_include('modal');
+  ctools_modal_add_js();
 
   $output = array();
   $output['workflow_element_panel'] = array(
