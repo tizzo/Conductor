@@ -119,6 +119,7 @@ function conductor_get_activity_handler($activity) {
   if ($class_name != FALSE) {
     $handler = new $class_name;
   }
+  $handler->plugin_info = $activity_plugin;
   return $handler;
 }
 
