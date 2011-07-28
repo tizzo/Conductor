@@ -31,7 +31,6 @@ Drupal.Conductor.activities.activity = function(activityDomElement, activityInfo
   var outputs = {};
   $(activityDomElement).css('top', y + 'px');
   $(activityDomElement).css('left', x + 'px');
-  console.log('top'+ y + 'px');
   for (i in activityInfo) {
     //this.{activityInfo[i]} = activityInfo[i];activityInfo;
     //console.log(this.activityInfo[i]);
