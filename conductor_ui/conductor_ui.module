@@ -55,7 +55,7 @@ function conductor_ui_theme() {
  */
 function conductor_ui_conductor_activity_process(&$plugin) {
   $plugin += array(
-    'conductor-ui-template' => 'conductor_activity',
+    'conductor_ui_template' => 'conductor_activity',
   );
 }
 
