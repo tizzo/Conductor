@@ -6,9 +6,11 @@ Drupal.Conductor.activities = Drupal.Conductor.activities || {};
 Drupal.behaviors.conductor_ui = {
   attach: function (context, settings) {
     var activities = Drupal.settings.conductor_ui.activities;
-    // Iterate over each activity activating it and popuplating it with whatever information we have
+    // Iterate over each activity activating it and popuplating it with whatever
+    // information we have.
     for (i in activities) {
-      // Identify the js representation to use for this particular activity plugin.
+      // Identify the js representation to use for this particular
+      // activity plugin.
       var jsActivityObject = activities[i].plugin_info.conductur_ui_js_object;
       $('.' + activities[i]['css_class'], context).each(function() { Drupal.Conductor.activities[jsActivityObject](this, activities[i]) });
     }
