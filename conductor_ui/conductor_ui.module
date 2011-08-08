@@ -42,6 +42,7 @@ function conductor_ui_theme() {
       'variables' => array(
         'name' => '',
         'class' => '',
+        'drop_links' => '',
       ),
       'path' => drupal_get_path('module', 'conductor_ui') . '/theme',
       'template' => 'conductor-activity'
@@ -109,9 +110,12 @@ function conductor_ui_add_workflow_callback() {
     $class_name = 'conductor-ui-activity-' . conductor_ui_css_safe_class($activity->name);
     $settings['activities'][$name] = $activity;
     $activity->css_class = $class_name;
+    $drop_links = theme('links__ctools_dropbutton', array('title' => t('Edit'), 'links' => $activity->getUILinks()));
+
     $output['workflow_editor'][$name] = array(
       '#name' => $activity->name,
       '#class' => $class_name,
+      '#drop_links' => $drop_links,
       '#theme' => 'conductor_activity',
       '#contextual_links' => array(
         'contextual_example' => array( 'contextual', array('foobars')),
@@ -152,6 +156,8 @@ function conductor_ui_add_js() {
  */
 function conductor_ui_add_css() {
   drupal_add_css(drupal_get_path('module', 'conductor_ui') . '/css/conductor_ui.css');
+  // The views styling for ctools buttons is nice, lets steal it.
+  drupal_add_css(drupal_get_path('module', 'views') . '/css/views-admin.ctools.css');
 }
 
 function conductor_ui_dev_workflow() {
