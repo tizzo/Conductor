@@ -6,6 +6,12 @@
  */
 
 /**
+ * General TODO's for this file:
+ *
+ * TODO: Move page callbacks into a pages.inc
+ */
+
+/**
  * Implements hook_menu().
  */
 function conductor_ui_menu() {
@@ -26,9 +32,16 @@ function conductor_ui_menu() {
   );
   $items['admin/structure/conductor/add'] = array(
     'title' => 'Add A New Workflow',
-    'page callback' => 'conductor_ui_add_workflow_callback',
+    'page callback' => 'conductor_ui_add_workflow_page',
     'access arguments' => array('administer conductor workflows'),
     'type' => MENU_LOCAL_TASK,
+  );
+  $items['conductor_ui/%ctools_js/activity'] = array(
+      'title' => 'Activity',
+      'page callback' => 'conductor_ui_activity_form',
+      'page arguments' => array(1),
+      'access callback' => TRUE,
+      'type' => MENU_CALLBACK,
   );
   return $items;
 }
@@ -70,7 +83,7 @@ function conductor_ui_list() {
 /**
  * Page callback to add a new workflow.
  */
-function conductor_ui_add_workflow_callback() {
+function conductor_ui_add_workflow_page() {
 
   drupal_set_title(t('Add a new Conductor workflow'));
   conductor_ui_add_js();
@@ -85,7 +98,7 @@ function conductor_ui_add_workflow_callback() {
   );
   $output['workflow_element_panel']['add_activity'] = array(
     '#type' => 'markup',
-    '#markup' => t('Add an activity'),
+    '#markup' => ctools_modal_text_button(t('+ Add Activity'), 'conductor_ui/nojs/activity', t('Add an actiivty to this workflow.'), 'ctools-modal-conductor-ui-style-style'),
   );
   $output['workflow_element_panel']['buttons'] = array(
     '#prefix' => '<div id="toolbar-buttons">',
@@ -128,6 +141,79 @@ function conductor_ui_add_workflow_callback() {
 }
 
 /**
+ * Retrieve configuration for a 
+ * The default 
+ */
+function conductor_ui_add_ctools_modal_style() {
+  // Create our own javascript that will be used to theme a modal.
+  $sample_style = array(
+    'conductor-ui-style' => array(
+      'modalSize' => array(
+        'type' => 'fixed',
+        'width' => 500,
+        'height' => 300,
+        'addWidth' => 20,
+        'addHeight' => 15,
+      ),
+      'modalOptions' => array(
+        'opacity' => .5,
+        'background-color' => '#000',
+      ),
+      'animation' => 'fadeIn',
+      'modalTheme' => 'CToolsSampleModal',
+      'throbber' => theme('image', array('path' => ctools_image_path('ajax-loader.gif', 'ctools_ajax_sample'), 'alt' => t('Loading...'), 'title' => t('Loading'))),
+    ),
+  );
+  drupal_add_js($sample_style, 'setting');
+}
+
+function conductor_ui_activity_form($js = NULL, $step = NULL) {
+  // TODO: Clean this all up.  Alot.
+  if ($js) {
+    ctools_include('modal');
+    ctools_include('ajax');
+  }
+  $form = array();
+  $form['foo'] = array(
+    '#type' => 'checkbox',
+    '#options' => array('foo' => 'FOO', 'bar' => 'Bar'),
+    '#title' => t('Whazzat? Foo?'),
+  );
+  $output = drupal_render($form);
+
+  // If $output is FALSE, there was no actual form.
+  if ($js) {
+    // If javascript is active, we have to use a render array.
+    $commands = array();
+    if ($output === FALSE || !empty($form_state['complete'])) {
+      // Dismiss the modal.
+      $commands[] = ajax_command_html('#ctools-sample', $animal);
+      $commands[] = ctools_modal_command_dismiss();
+    }
+    else if (!empty($form_state['cancel'])) {
+      // If cancelling, return to the activity.
+      $commands[] = ctools_modal_command_dismiss();
+    }
+    else {
+      $commands = ctools_modal_form_render($form_state, $output);
+    }
+    print ajax_render($commands);
+    exit;
+  }
+  else {
+    if ($output === FALSE || !empty($form_state['complete'])) {
+      return $animal;
+    }
+    else if (!empty($form_state['cancel'])) {
+      drupal_goto('ctools_ajax_sample');
+    }
+    else {
+      return $output;
+    }
+  }
+}
+
+/**
  * Convert any string into a CSS class.
  *
  * @param $name
@@ -147,7 +233,15 @@ function conductor_ui_css_safe_class($name) {
  * Add required javascript for the conductor ui.
  */
 function conductor_ui_add_js() {
+
   drupal_add_library('system', 'ui.draggable');
+
+  // Include the CTools tools that we need.
+  ctools_include('ajax');
+  ctools_include('modal');
+  drupal_add_js('misc/ajax.js');
+  ctools_modal_add_js();
+
   drupal_add_js(drupal_get_path('module', 'conductor_ui') . '/js/conductor_ui.js');
 }
 
@@ -165,7 +259,7 @@ function conductor_ui_dev_workflow() {
   $activity = $workflow->newActivity('activity');
   $activity->x = 180;
   $activity->y = 500;
-  $activity->name = 'Activity booyeah';
+  $activity->name = 'Activity 1';
   $activity->inputs = array();
   $activity->outputs = array(
     'Activity 2'
