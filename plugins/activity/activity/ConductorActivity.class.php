@@ -46,6 +46,12 @@ class ConductorActivity {
   }
 
   /**
+   * @defgroup conductor_activity_ui Conductor Activity UI
+   * @{
+   * UI Related elements of the Conductor Activity API.
+   */
+
+  /**
    *
    */
   public function getUILinks() {
@@ -56,4 +62,9 @@ class ConductorActivity {
     $links['output'] = array('title' => t('add output'), 'href' => $_GET['q']);
     return $links;
   }
+
+/**
+ * @} End of "Conductor Activity UI".
+ */
+
 }
