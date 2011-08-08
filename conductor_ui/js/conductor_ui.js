@@ -70,7 +70,7 @@ Drupal.Conductor.activities.activity = function(activityDomElement, activityInfo
         x = ui.position['left'];
         y = ui.position['top']
         var e = $.Event("release");
-        $(activityDomElement).trigger(e, {activityDomElement: activityDomElement, activityObject: instanceObject});
+        $(activityDomElement).trigger(e, {activityDomElement: activityDomElement});
       }
     }
   );
@@ -82,7 +82,8 @@ Drupal.Conductor.activities.activity = function(activityDomElement, activityInfo
  * It is currently here only for convenient testing.
  */
  // TODO: Better document the use of extend
- // Extend is used here to clone the parent object such that it can be added to without modifying the original.
+ // Extend is used here to clone the parent object such that it can be added to
+ // without modifying the original.
 Drupal.Conductor.activities.activityConditional = $.extend(true, {}, Drupal.Conductor.activities.activity);
 Drupal.Conductor.activities.activityConditional.something = function() {
   // TODO: flesh this out
