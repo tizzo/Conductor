@@ -70,16 +70,30 @@ function conductor_ui_theme() {
  */
 function conductor_ui_library() {
   // jsPlumb.
+  //$path = drupal_get_path('module', 'conductor_ui') . '/js/jsplumb/js/1.3.2/';
   $path = drupal_get_path('module', 'conductor_ui') . '/js/';
   $libraries['jsplumb'] = array(
     'title' => 'jsPlumb',
     'website' => 'http://code.google.com/p/jsplumb/',
     'version' => '1.2.2',
+    // TODO: Upgrade to the newer lib?
+    // 'version' => '1.2.3',
     'js' => array(
       $path . 'jsPlumb-1.2.2-RC1.js' => array(),
       $path . 'jsPlumb-defaults-1.2.2-RC1.js' => array(),
       $path . 'jquery.jsPlumb-1.2.2-RC1.js' => array(),
     ),
+/*
+TODO: Upgrade to the newer lib?
+    'js' => array(
+      $path . 'jsPlumb-1.3.2-RC1.js' => array(),
+      $path . 'jquery.jsPlumb-1.3.2-RC1.js' => array(),
+      $path . 'jsPlumb-defaults-1.3.2-RC1.js' => array(),
+      $path . 'jsPlumb-renderers-canvas-1.3.2-RC1.js' => array(),
+      $path . 'jsPlumb-renderers-svg-1.3.2-RC1.js' => array(),
+      $path . 'jsPlumb-renderers-vml-1.3.2-RC1.js' => array(),
+    ),
+*/
     'dependencies' => array(
       array('system', 'jquery'),
       array('system', 'ui'),
