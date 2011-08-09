@@ -31,7 +31,21 @@ Drupal.behaviors.conductor_ui = {
     jsPlumb.draggable($('.conductor-ui-activity-activity-1'));
     jsPlumb.connect({
       source: "conductor-ui-activity-activity-1",
-      target: "conductor-ui-activity-activity-2"
+      target: "conductor-ui-activity-activity-2",
+      //connector:"Flowchart",
+      endpointsOnTop:true,
+      paintStyle:{
+          lineWidth:9,
+          strokeStyle: "#CCC",
+          outlineColor:"#666",
+          outlineWidth:1
+      },
+/*
+      anchors:["Center", "Center"],
+      endpointStyle:{ radius:95, fillStyle: "#ccc"},
+      labelStyle : { cssClass:"component label" },
+      label : "big\nendpoints"
+*/
     });
   }
 }
