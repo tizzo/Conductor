@@ -24,7 +24,7 @@ Drupal.behaviors.conductor_ui = {
         }
       });
       //workflow.activities[i] = activity;
-      workflow.drawLines();
+      //workflow.drawLines();
 
     }
   }
