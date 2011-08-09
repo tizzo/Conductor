@@ -8,7 +8,6 @@ Drupal.behaviors.conductor_ui = {
     // Grab local convenience versions of global vars.
     var activities = Drupal.settings.conductor_ui.activities;
     var workflow = Drupal.Conductor.workflow;
-
     // Iterate over each activity activating it and popuplating it with whatever
     // information we have.
     var activity = null;
@@ -25,8 +24,7 @@ Drupal.behaviors.conductor_ui = {
           // $(data.activityDomElement).data('activityInfo')
         }
       });
-      //workflow.activities[i] = activity;
-      //workflow.drawLines();
+      workflow.drawLines();
     }
 
     jsPlumb.draggable($('.conductor-ui-activity-activity-1'));
