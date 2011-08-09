@@ -170,7 +170,6 @@ function conductor_ui_add_workflow_page() {
     $settings['activities'][$name] = $activity;
     $activity->css_class = $class_name;
     $drop_links = theme('links__ctools_dropbutton', array('title' => t('Edit'), 'links' => $activity->getUILinks()));
-
     $output['workflow_editor'][$name] = array(
       '#name' => $activity->name,
       '#title' => $activity->title,
@@ -326,21 +325,30 @@ function conductor_ui_dev_workflow() {
   $workflow->description = 'example';
   // Add and configure workflow activities.
   $activity = $workflow->newActivity('activity');
-  $activity->x = 180;
-  $activity->y = 100;
-  $activity->name = 'activity_1';
-  $activity->title = 'Activity 1';
-  $activity->inputs = array();
-  $activity->outputs = array(
-    'Activity 2'
-  );
-  $activity = $workflow->newActivity('activity');
   $activity->x = 280;
   $activity->y = 200;
+  $activity->name = 'activity_1';
+  $activity->title = 'Activity 1';
+  $activity->inputs = array(
+    'activity_2'
+  );
+  $activity = $workflow->newActivity('activity');
+  $activity->x = 180;
+  $activity->y = 100;
   $activity->name = 'activity_2';
   $activity->title = 'Activity 2';
+  $activity->inputs = array();
+  $activity->outputs = array(
+    'activity_1',
+    'activity_3'
+  );
+  $activity = $workflow->newActivity('activity');
+  $activity->x = 380;
+  $activity->y = 200;
+  $activity->name = 'activity_3';
+  $activity->title = 'Activity 3';
   $activity->inputs = array(
-    'Activity 2'
+    'activity_2'
   );
   $activity->outputs = array();
   return $workflow;
