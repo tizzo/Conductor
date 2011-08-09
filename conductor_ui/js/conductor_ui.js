@@ -24,7 +24,8 @@ Drupal.behaviors.conductor_ui = {
           // $(data.activityDomElement).data('activityInfo')
         }
       });
-      workflow.drawLines();
+      //workflow.activities[i] = activity;
+      //workflow.drawLines();
     }
 
     jsPlumb.draggable($('.conductor-ui-activity-activity-1'));
