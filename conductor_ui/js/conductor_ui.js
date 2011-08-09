@@ -28,12 +28,12 @@ Drupal.behaviors.conductor_ui = {
       //workflow.activities[i] = activity;
       //workflow.drawLines();
     }
-      /*
-      jsPlumb.connect({
-        source: "conductor-ui-activity-activity-1",
-        target: "conductor-ui-activity-activity-2"
-      });
-      //*/
+
+    jsPlumb.draggable($('.conductor-ui-activity-activity-1'));
+    jsPlumb.connect({
+      source: "conductor-ui-activity-activity-1",
+      target: "conductor-ui-activity-activity-2"
+    });
   }
 }
 
