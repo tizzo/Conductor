@@ -6,12 +6,14 @@ Drupal.Conductor.activities = Drupal.Conductor.activities || {};
 Drupal.behaviors.conductor_ui = {
   attach: function (context, settings) {
     var activities = Drupal.settings.conductor_ui.activities;
+    var workflow = Drupal.Conductor.workflow;
     // Iterate over each activity activating it and popuplating it with whatever
     // information we have.
     var activity = null;
     for (i in activities) {
       // Identify the js representation to use for this particular
       // activity plugin.
+      //console.log(activities[i]);
       var jsActivityObject = activities[i].plugin_info.conductur_ui_js_object;
       activity = $('.' + activities[i]['css_class'], context).each(function() { Drupal.Conductor.activities[jsActivityObject](this, activities[i]) });
       // Respond to events issued by the activity
@@ -21,6 +23,8 @@ Drupal.behaviors.conductor_ui = {
           // $(data.activityDomElement).data('activityInfo')
         }
       });
+      //workflow.activities[i] = activity;
+      workflow.drawLines();
 
     }
   }
@@ -29,11 +33,17 @@ Drupal.behaviors.conductor_ui = {
 /**
  *  A javascript representation of a Conductor Workflow.
  */
-Drupal.Conductor.workflow = function() {
+Drupal.Conductor.workflow = function(){
+  var activities = {};
   /**
    *
    */
-  var drawLines = function () {
+  var drawLines = function drawlines() {
+    alert('monkey');
+    return FALSE;
+    for (i in activities) {
+      console.log(activities);
+    }
   }
 }
 
@@ -90,4 +100,5 @@ Drupal.Conductor.activities.activityConditional.something = function() {
 }
 
 })(jQuery);
+
 

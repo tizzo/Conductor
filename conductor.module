@@ -130,3 +130,14 @@ function conductor_ajax() {
   if (isset($_REQUEST['conductor_name'])) {
   }
 }
+
+
+/**
+ * Load a workflow by name.
+ *
+ * TODO: Finish ... all of the CRUD I guess.
+ */
+function conductor_get_workflow($name) {
+  return TRUE;
+}
+

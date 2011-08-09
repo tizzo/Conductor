@@ -54,6 +54,7 @@ function conductor_ui_theme() {
     'conductor_activity' => array(
       'variables' => array(
         'name' => '',
+        'title' => '',
         'class' => '',
         'drop_links' => '',
       ),
@@ -89,6 +90,7 @@ function conductor_ui_add_workflow_page() {
   conductor_ui_add_js();
   conductor_ui_add_css();
   ctools_include('modal');
+  ctools_include('object-cache');
   ctools_modal_add_js();
   conductor_ui_add_ctools_modal_style();
 
@@ -117,7 +119,11 @@ function conductor_ui_add_workflow_page() {
     '#prefix' => '<div id="conductor-workflow-editor">',
     '#suffix' => '</div>',
   );
-  $activities = conductor_ui_dev_workflow()->getActivities();
+  if (!$workflow = ctools_object_cache_get('conductor_workflow', 'test')) {
+    $workflow = conductor_ui_dev_workflow();
+    ctools_object_cache_set('conductor_workflow', 'test', $workflow);
+  }
+  $activities = $workflow->getActivities(); 
   $settings = array();
   $css = '';
   foreach ($activities as $name => $activity) {
@@ -128,6 +134,7 @@ function conductor_ui_add_workflow_page() {
 
     $output['workflow_editor'][$name] = array(
       '#name' => $activity->name,
+      '#title' => $activity->title,
       '#class' => $class_name,
       '#drop_links' => $drop_links,
       '#theme' => 'conductor_activity',
@@ -175,11 +182,25 @@ function conductor_ui_activity_form($js = NULL, $step = NULL) {
     ctools_include('ajax');
   }
   $form = array();
-  $form['foo'] = array(
-    '#type' => 'checkbox',
-    '#options' => array('foo' => 'FOO', 'bar' => 'Bar'),
-    '#title' => t('Whazzat? Foo?'),
+  // TODO: This is really a workflow creation form, not an activity form.
+  $form['human_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('workflow name'),
+    '#required' => TRUE,
+    '#size' => 32,
+    '#default_value' => !empty($form_state['view']) ? $form_state['view']->human_name : '',
+    '#maxlength' => 255,
   );
+  $form['name'] = array(
+    '#type' => 'machine_name',
+    '#maxlength' => 32,
+    '#machine_name' => array(
+      'exists' => 'conductor_get_workflow',
+      'source' => array('human_name'),
+    ),
+    '#description' => t('A unique machine-readable name for this View. It must only contain lowercase letters, numbers, and underscores.'),
+  );
+
   $output = drupal_render($form);
 
   // If $output is FALSE, there was no actual form.
@@ -259,8 +280,9 @@ function conductor_ui_dev_workflow() {
   $workflow = new ConductorWorkflow;
   $activity = $workflow->newActivity('activity');
   $activity->x = 180;
-  $activity->y = 500;
-  $activity->name = 'Activity 1';
+  $activity->y = 100;
+  $activity->name = 'activity_1';
+  $activity->title = 'Activity 1';
   $activity->inputs = array();
   $activity->outputs = array(
     'Activity 2'
@@ -268,7 +290,8 @@ function conductor_ui_dev_workflow() {
   $activity = $workflow->newActivity('activity');
   $activity->x = 280;
   $activity->y = 200;
-  $activity->name = 'Activity 2';
+  $activity->name = 'activity_2';
+  $activity->title = 'Activity 2';
   $activity->inputs = array(
     'Activity 2'
   );
