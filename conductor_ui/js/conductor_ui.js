@@ -14,7 +14,6 @@ Drupal.behaviors.conductor_ui = {
     for (i in activities) {
       // Identify the js representation to use for this particular
       // activity plugin.
-      //console.log(activities[i]);
       var jsActivityObject = activities[i].plugin_info.conductur_ui_js_object;
       activity = $('.' + activities[i]['css_class'], context).each(function() { Drupal.Conductor.activities[jsActivityObject](this, activities[i]) });
       // Respond to events issued by the activity
@@ -24,48 +23,60 @@ Drupal.behaviors.conductor_ui = {
           // $(data.activityDomElement).data('activityInfo')
         }
       });
-      //workflow.activities[i] = activity;
-      //workflow.drawLines();
+      var info = activity.data('activityInfo');
+      // Inform the workflow object of the activities that are members of it.
+      workflow.activities[info.name] = {};
+      // Stow the dom element for easy access.
+      workflow.activities[info.name].domElement = activity;
+      // Stow the js object for easy access.
+      workflow.activities[info.name].activityInfo = info;
+      workflow.initLines();
     }
 
-    jsPlumb.draggable($('.conductor-ui-activity-activity-1'));
-    jsPlumb.connect({
-      source: "conductor-ui-activity-activity-1",
-      target: "conductor-ui-activity-activity-2",
-      //connector:"Flowchart",
-      endpointsOnTop:true,
-      paintStyle:{
-          lineWidth:9,
-          strokeStyle: "#CCC",
-          outlineColor:"#666",
-          outlineWidth:1
-      },
-/*
-      anchors:["Center", "Center"],
-      endpointStyle:{ radius:95, fillStyle: "#ccc"},
-      labelStyle : { cssClass:"component label" },
-      label : "big\nendpoints"
-*/
-    });
-  }
+      }
 }
 
 /**
  *  A javascript representation of a Conductor Workflow.
  */
-Drupal.Conductor.workflow = function(){
-  var activities = {};
-  /**
-   *
-   */
-  var drawLines = function drawlines() {
-    alert('monkey');
-    return FALSE;
-    for (i in activities) {
-      console.log(activities);
+Drupal.Conductor.workflow = {
+  activities: {},
+  inputs: {},
+  outputs: {},
+  // Initialize the lines between activity nodes.
+  initLines: function() {
+    for (i in this.activities) {
+      var info = this.activities[i].activityInfo;
+      this.inputs[info.name] = info.inputs;
+      this.outputs[info.name] = info.outputs;
+    }
+    // Make activities draggable
+    jsPlumb.draggable($('.conductor-ui-activity-activity-1'));
+    // Loop through each activity for processing.
+    for (activity in this.inputs) {
+      // Loop through inputs associated with this activity.
+      for (input in this.inputs[activity]) {
+        if (this.outputs[this.inputs[activity][input]] != undefined) {
+          if ($.inArray(activity, this.outputs[this.inputs[activity][input]]) != -1) {
+            jsPlumb.connect({
+              source: this.activities[activity].activityInfo.css_class,
+              target: "conductor-ui-activity-activity-2",
+              endpointsOnTop:true,
+              paintStyle:{
+                  lineWidth:9,
+                  strokeStyle: "#CCC",
+                  outlineColor:"#666",
+                  outlineWidth:1
+              },
+              endpointStyle:{ radius:1, fillStyle: "#ccc"},
+            });
+          }
+        }
+      }
     }
   }
-}
+};
+
 
 /**
  * A javascript representation of a base Conductor Activity.
