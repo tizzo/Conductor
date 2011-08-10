@@ -133,11 +133,31 @@ function conductor_ajax() {
 
 
 /**
- * Load a workflow by name.
+ * Get a workflow from the database or from default workflows.
  *
- * TODO: Finish ... all of the CRUD I guess.
+ * This function is just a static wrapper around workflows::load(). This function
+ * isn't called 'workflows_load()' primarily because it might get a workflow
+ * from the default workflows which aren't technically loaded from the database.
+ *
+ * @param $name
+ *   The name of the workflow.
+ * @param $reset
+ *   If TRUE, reset this entry in the load cache.
+ * @return workflow
+ *   A reference to the $workflow object. Use $reset if you're sure you want
+ *   a fresh one.
  */
-function conductor_get_workflow($name) {
-  return TRUE;
-}
+function conductor_get_workflow($name, $reset = FALSE) {
+  if ($reset) {
+    $cache = &drupal_static('ctools_export_load_object');
+    if (isset($cache['conductor_workflow'][$name])) {
+      unset($cache['conductor_workflow'][$name]);
+    }
+  }
 
+  ctools_include('export');
+  $workflow = ctools_export_crud_load('conductor_workflow', $name);
+  if ($workflow) {
+    return $workflow->clone_workflow();
+  }
+}

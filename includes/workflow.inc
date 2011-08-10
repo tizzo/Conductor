@@ -138,6 +138,7 @@ class ConductorWorkflow {
    */
   public function newActivity($activity) {
     $new_activity = conductor_get_activity_handler($activity);
+    $new_activity->workflow = $this;
     $this->activities[] = $new_activity;
     return $new_activity;
   }
@@ -145,4 +146,54 @@ class ConductorWorkflow {
   public function getActivities() {
     return $this->activities;
   }
+
+  /**
+   * Set keys of the activity's name for each activity.
+   */
+  public function indexActivities() {
+    $activities = $this->activities;
+    $this->activities = array();
+    foreach ($activities as &$activity) {
+      $this->activities[$activity->name] = $activity;
+    }
+  }
+
+
+  /**
+   * Safely clone a workflow.
+   *
+   * Because workflows are complicated objects within objects, and PHP loves to
+   * do references to everything, if a workflow is not properly and safely
+   * cloned it will still have references to the original workflow, and can
+   * actually cause the original workflow to point to objects in the cloned
+   * workflow. This gets ugly fast.
+   *
+   * This will completely wipe a workflow clean so it can be considered fresh.
+   *
+   * @return workflow
+   *    The cloned workflow.
+   */
+  function clone_workflow() {
+    $clone = clone($this);
+
+    // shallow cloning means that all the child objects
+    // *were not cloned*. We must clone them ourselves.
+    $activities = array();
+    foreach ($clone->activities as $id => $activity) {
+      $activities[$id] = clone $activity;
+    }
+    $clone->activities = $activities;
+    return $clone;
+  }
+
+  /**
+   * Unset references so that a $workflow object may be properly garbage
+   * collected.
+   */
+  function destroy() {
+    foreach ($this->activities as $activity) {
+      unset($activity);
+    }
+  }
+
 }

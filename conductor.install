@@ -65,7 +65,7 @@ function conductor_schema() {
   $schema['conductor_state'] = array(
     'description' => '',
     'fields' => array(
-      'wsid' => array(
+      'sid' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -73,11 +73,12 @@ function conductor_schema() {
         'no export' => TRUE,
       ),
     ),
+    'primary key' => array('sid'),
   );
   $schema['conductor_state_item'] = array(
     'description' => '',
     'fields' => array(
-      'wsid' => array(
+      'id' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
