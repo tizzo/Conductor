@@ -119,10 +119,10 @@ function conductor_ui_add_workflow_page() {
     '#prefix' => '<div id="conductor-workflow-editor">',
     '#suffix' => '</div>',
   );
-  if (!$workflow = ctools_object_cache_get('conductor_workflow', 'test')) {
+  //if (!$workflow = ctools_object_cache_get('conductor_workflow', 'test')) {
     $workflow = conductor_ui_dev_workflow();
     ctools_object_cache_set('conductor_workflow', 'test', $workflow);
-  }
+  //}
   $activities = $workflow->getActivities(); 
   $settings = array();
   $css = '';

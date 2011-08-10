@@ -60,6 +60,10 @@ class ConductorActivity {
     $links['edit'] = array('title' => t('edit'), 'href' => $_GET['q']);
     $links['input'] = array('title' => t('add input'), 'href' => $_GET['q']);
     $links['output'] = array('title' => t('add output'), 'href' => $_GET['q']);
+    $links['remove'] = array('title' => t('remove'), 'href' => $_GET['q']);
+    foreach ($links as &$link) {
+      $link['attributes']['class'][] = 'conductor-ui-activity-link';
+    }
     return $links;
   }
 

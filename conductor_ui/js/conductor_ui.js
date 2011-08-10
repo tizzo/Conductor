@@ -5,8 +5,10 @@ Drupal.Conductor.activities = Drupal.Conductor.activities || {};
 
 Drupal.behaviors.conductor_ui = {
   attach: function (context, settings) {
+    // Grab local convenience versions of global vars.
     var activities = Drupal.settings.conductor_ui.activities;
     var workflow = Drupal.Conductor.workflow;
+
     // Iterate over each activity activating it and popuplating it with whatever
     // information we have.
     var activity = null;
@@ -25,7 +27,6 @@ Drupal.behaviors.conductor_ui = {
       });
       //workflow.activities[i] = activity;
       //workflow.drawLines();
-
     }
   }
 }
@@ -67,7 +68,6 @@ Drupal.Conductor.activities.activity = function(activityDomElement, activityInfo
 
   // Stash data inside this DOM element so that we can work with it later.
   $(activityDomElement).data('activityInfo', activityInfo);
-
   // Make activities draggable.
   $(activityDomElement).draggable(
     {
@@ -84,6 +84,9 @@ Drupal.Conductor.activities.activity = function(activityDomElement, activityInfo
       }
     }
   );
+  $('.conductor-ui-activity-link', activityDomElement).click(function(e) {
+    e.preventDefault();
+  });
 }
 
 /**

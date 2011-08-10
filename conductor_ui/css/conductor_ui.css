@@ -22,12 +22,12 @@
 #conductor-workflow-editor .ctools-dropbutton {
   -moz-border-radius: 15px;
   border-radius: 15px;
+  background: white;
 }
 
 #conductor-workflow-editor .conductor-drop-link {
   position: absolute;
   right: 0.5em;
   top: 0.5em;
-  background: white;
 }
 
