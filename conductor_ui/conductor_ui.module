@@ -320,7 +320,7 @@ function conductor_ui_add_css() {
 
 function conductor_ui_dev_workflow() {
   $workflow = new ConductorWorkflow;
-  $workflow->id = 'new';
+  $workflow->wid = 'new';
   $workflow->name = 'Example';
   $workflow->description = 'example';
   // Add and configure workflow activities.

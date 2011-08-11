@@ -19,28 +19,26 @@ class ConductorWorkflow {
    * A wid will be assigned to the workflow and also returned from this function.
    */
   public function save() {
-    if ($this->wid == 'new') {
+    $update = FALSE;
+    if (!isset($this->wid) || $this->wid == 'new') {
       $this->wid = NULL;
+      $update = TRUE;
     }
-
-    // If we have no wid or our wid is a string, this is a new workflow.
-    if (!empty($this->wid)) {
-      // remove existing table entries
-      foreach ($this->dbObjects() as $key) {
-        db_delete('conductor_' . $key)
-          ->condition('wid', $this->wid)
-          ->execute();
-      }
+    if ($update){
+      $query = db_insert('conductor_workflow');
     }
-
-    $this->save_row(!empty($this->wid) ? 'wid' : FALSE);
-
-    // Save all of our subtables.
-    foreach ($this->dbObjects() as $key) {
-      $this->_save_rows($key);
+    else {
+      $query = db_update('conductor_workflow')
+        ->condition('wid', $this->wid);
     }
-
-    $this->save_locale_strings();
+    $fields = array(
+      'name' => $this->name,
+      'description' => $this->description,
+      'data' => serialize($this),
+    );
+    $query
+      ->fields($fields)
+      ->execute();
   }
 
   /**
@@ -57,6 +55,7 @@ class ConductorWorkflow {
    *   A workflow object or NULL if it was not available.
    */
   static function &load($arg, $reset = FALSE) {
+
     static $cache = array();
 
     // We want a NULL value to return TRUE here, so we can't use isset() or empty().
@@ -64,42 +63,11 @@ class ConductorWorkflow {
       $result = db_select('conductor_workflow', 'w')
         ->fields('w')
         ->condition(is_numeric($arg) ? 'wid' : 'name', $arg)
-        ->execute();
-      if ($result->rowCount() == 0) {
-        $cache[$arg] = NULL;
-      }
-      else {
-        $workflow = new ConductorWorkflow();
-        $workflow->loadRow($result->fetchObject());
-        // Load all of our subtables.
-        foreach ($workflow->dbObjects() as $key) {
-          $object_name = "conductor_$key";
-          $result = db_select($object_name, 'w')
-            ->fields('w')
-            ->condition('wid', $workflow->wid)
-            ->orderBy('position')
-            ->execute();
-          foreach ($result as $data) {
-            $object = new $object_name(FALSE);
-            $object->loadRow($data);
-
-            // Because it can get complicated with this much indirection,
-            // make a shortcut reference.
-            $location = &$workflow->$key;
-
-            // If we have a basic id field, load the item onto the workflow based on
-            // this ID, otherwise push it on.
-            if (!empty($object->id)) {
-              $location[$object->id] = $object;
-            }
-            else {
-              $location[] = $object;
-            }
-          }
-        }
-        $workflow->loaded = TRUE;
-        $cache[$arg] = $workflow;
-      }
+        ->execute()
+        ->fetchObject();
+      $workflow = unserialize($result->data);
+      $workflow->loaded = TRUE;
+      $cache[$arg] = $workflow;
     }
 
     return $cache[$arg];
