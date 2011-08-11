@@ -161,3 +161,48 @@ function conductor_get_workflow($name, $reset = FALSE) {
     return $workflow->cloneWorkflow();
   }
 }
+
+/**
+ * Load a single workflow.
+ */
+function conductor_load_workflow() {
+  ctools_include('export');
+  $result = ctools_export_load_object('conductor_workflow', 'names', array($name));
+  if (isset($result[$name])) {
+    return $result[$name];
+  }
+}
+
+/**
+ * Save a single workflow.
+ */
+function conductor_save_workflow(&$workflow) {
+  return $workflow->save();
+}
+
+/**
+ * Delete a single workflow.
+ */
+function conductor_delete_workflow(&$workflow) {
+  $workflow->destroy();
+  return $workflow->delete();
+}
+
+/**
+ * Export CRUD callback to export a view.
+ */
+function conductor_export_workflow(&$workflow, $indent = '') {
+  return $workflow->export($indent);
+}
+
+/**
+ * Create an empty workflow to work with.
+ *
+ * @return ConductorWorkflow
+ *   A fully formed, empty $workflow object.
+ */
+function conductor_new_workflow() {
+  $view = new ConductorWorkflow();
+  $view->wid = 'new';
+  return $view;
+}

@@ -74,32 +74,87 @@ class ConductorWorkflow {
   }
 
   /**
-   * Load the object with a row from the database.
-   *
-   * This method is separate from the constructor in order to give us
-   * more flexibility in terms of how the workflow object is built in different
-   * contexts.
-   *
-   * @param $data
-   *   An object from db_fetch_object. It should contain all of the fields
-   *   that are in the schema.
+   * Delete the workflow from the database.
    */
-  public function loadRow($data) {
-    $schema = drupal_get_schema($this->db_table);
-
-    // Go through our schema and build correlations.
-    foreach ($schema['fields'] as $field => $info) {
-      $this->$field = empty($info['serialize']) ? $data->$field : unserialize($data->$field);
-    }
+  public function delete() {
+    db_delete('conductor_workflow')
+      ->condition('wid', $this->wid)
+      ->execute();
   }
 
   /**
-   * Returns the complete list of dependent objects in a workflow, for the purpose
-   * of initialization and loading/saving to/from the database.
+   * Export a workflow as PHP code.
    */
-  static function dbObjects() {
-    return array();
+  function export($indent = '') {
+
+    $this->indexActivities();
+    $output = '';
+    $output .= "\n" . $indent . "/* Conductor Workflow: " . $this->title . " */\n";
+    $output .= $this->export_row('workflow', $indent);
+    // Set the API version
+    $api = conductor_ctools_plugin_api();
+    $output .= $indent . '$workflow->api_version = \'' . $api['version'] . "';\n";
+    $output .= $indent . '$workflow->disabled = FALSE; /* Edit this to true to make a default workflow disabled initially */' . "\n";
+
+    foreach ($this->activities as $id => $activity) {
+      $output .= "\n" . $indent . "/* Activity: $activity->title */\n";
+      $output .= $indent . '$handler = $view->newActivity(' . ctools_var_export($activity->plugin_info['name'], $indent) . ");\n";
+      $output .= $activity->export_options($indent, '$handler->options');
+    }
+    return $output;
   }
+
+  /**
+   * Export a loaded row, such as an argument, field or the view itself to PHP code.
+   * TODO: port for workflow
+   *
+   * @param $identifier
+   *   The variable to assign the PHP code for this object to.
+   * @param $indent
+   *   An optional indentation for prettifying nested code.
+   */
+  function export_row($identifier = NULL, $indent = '') {
+    ctools_include('export');
+
+    if (!$identifier) {
+      $identifier = $this->db_table;
+    }
+    $schema = drupal_get_schema($this->db_table);
+
+    $output = $indent . '$' . $identifier . ' = new ' . get_class($this) . ";\n";
+    // Go through our schema and build correlations.
+    foreach ($schema['fields'] as $field => $info) {
+      if (!empty($info['no export'])) {
+        continue;
+      }
+      if (!isset($this->$field)) {
+        if (isset($info['default'])) {
+          $this->$field = $info['default'];
+        }
+        else {
+          $this->$field = '';
+        }
+
+        // serialized defaults must be set as serialized.
+        if (isset($info['serialize'])) {
+          $this->$field = unserialize($this->$field);
+        }
+      }
+      $value = $this->$field;
+      if ($info['type'] == 'int') {
+        if (isset($info['size']) && $info['size'] == 'tiny') {
+          $value = (bool) $value;
+        }
+        else {
+          $value = (int) $value;
+        }
+      }
+
+      $output .= $indent . '$' . $identifier . '->' . $field . ' = ' . ctools_var_export($value, $indent) . ";\n";
+    }
+    return $output;
+  }
+
 
   /**
    * Create and add an activity with a handler to the workflow.

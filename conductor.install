@@ -10,28 +10,26 @@ function conductor_schema() {
       'identifier' => 'conductor_workflow',
       'bulk export' => TRUE,
       'primary key' => 'wid',
+      'key' => 'name',
       'default hook' => 'conductor_default_workflows',
       'admin_title' => 'human_name',
       'admin_description' => 'description',
       'api' => array(
-        'owner' => 'views',
+        'owner' => 'conductor',
         'api' => 'conductor_workflow_default',
         'minimum_version' => '1',
         'current_version' => '1.0',
       ),
-      'object' => 'workflow',
-      // TODO: We're gonna be needing to figure this stuff out...
-      // the callback to load the displays
-      'subrecords callback' => 'views_load_display_records',
+      'object' => 'ConductorWorkflow',
       // the variable that holds enabled/disabled status
-      'status' => 'views_defaults',
-      // CRUD callbacks
-      'create callback' => 'views_new_view',
-      'save callback' => 'views_save_view',
-      'delete callback' => 'views_delete_view',
-      'export callback' => 'views_export_view',
+      'status' => 'conductor_workflows_defaults',
+      'create callback' => 'conductor_new_workflow',
+      'save callback' => 'conductor_save_workflow',
+      'load callback' => 'conductor_load_workflow',
+      'delete callback' => 'conductor_delete_workflow',
+      'export callback' => 'conductor_export_workflow',
       'cache defaults' => TRUE,
-      'default cache bin' => 'cache',
+      'default cache bin' => 'cache_conductor_data',
     ),
     'fields' => array(
       'wid' => array(
@@ -56,16 +54,22 @@ function conductor_schema() {
       ),
       'data' => array(
         // Type corrected in update 6009
-        'type' => 'blob',
+        'type' => 'text',
+        'size' => 'big',
         'description' => 'A serialized representation of this workflow.',
         'serialize' => TRUE,
         'serialized default' => 'a:0:{}',
+        'no export' => TRUE,
       ),
     ),
     'primary key' => array('wid'),
     'unique keys' => array('name' => array('name')),
   );
+  $schema['cache_conductor_data'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_conductor_data']['description'] = 'Cache table for conductor to store pre-rendered queries, results, and display output.';
+  $schema['cache_conductor_data']['fields']['serialized']['default'] = 1;
   /*
+  // TODO: What do we want to call this stuff?
   $schema['conductor_instance'] = array(
   );
   */
@@ -81,7 +85,8 @@ function conductor_schema() {
       ),
       'data' => array(
         // Type corrected in update 6009
-        'type' => 'blob',
+        'type' => 'text',
+        'size' => 'big',
         'description' => 'A serialized representation of this workflow preventing the workflow of this item from changing.',
         'serialize' => TRUE,
         'serialized default' => 'a:0:{}',

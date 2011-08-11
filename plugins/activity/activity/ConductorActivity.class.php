@@ -3,7 +3,7 @@
 /**
  *
  */
-class ConductorActivity {
+class ConductorActivity extends ConductorObject {
 
   //
   public $inputs = array();
@@ -16,6 +16,14 @@ class ConductorActivity {
 
   // 
   public $y = null;
+
+  public function option_definition() {
+    $options['x'] = array('default' => 0);
+    $options['y'] = array('default' => 0);
+    $options['inputs'] = array('default' => array());
+    $options['outputs'] = array('default' => array());
+    return $options;
+  }
 
   public function addInput($activity) {
   }
