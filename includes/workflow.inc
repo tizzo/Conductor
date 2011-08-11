@@ -173,7 +173,7 @@ class ConductorWorkflow {
    * @return workflow
    *    The cloned workflow.
    */
-  function clone_workflow() {
+  function cloneWorkflow() {
     $clone = clone($this);
 
     // shallow cloning means that all the child objects

@@ -54,6 +54,13 @@ function conductor_schema() {
         'default' => '',
         'description' => 'A description of the workflow for the admin interface.',
       ),
+      'data' => array(
+        // Type corrected in update 6009
+        'type' => 'blob',
+        'description' => 'A serialized representation of this workflow.',
+        'serialize' => TRUE,
+        'serialized default' => 'a:0:{}',
+      ),
     ),
     'primary key' => array('wid'),
     'unique keys' => array('name' => array('name')),
@@ -65,6 +72,20 @@ function conductor_schema() {
   $schema['conductor_state'] = array(
     'description' => '',
     'fields' => array(
+      'workflow_name' => array(
+        'type' => 'varchar',
+        'length' => '32',
+        'default' => '',
+        'not null' => TRUE,
+        'description' => 'The unique name of the workflow. This is the primary field workflows are loaded from, and is used so that workflows may be internal and not necessarily in the database. May only be alphanumeric characters plus underscores.',
+      ),
+      'data' => array(
+        // Type corrected in update 6009
+        'type' => 'blob',
+        'description' => 'A serialized representation of this workflow preventing the workflow of this item from changing.',
+        'serialize' => TRUE,
+        'serialized default' => 'a:0:{}',
+      ),
       'sid' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
@@ -86,6 +107,7 @@ function conductor_schema() {
         'no export' => TRUE,
       ),
     ),
+    'primary key' => array('id'),
   );
   return $schema;
 }

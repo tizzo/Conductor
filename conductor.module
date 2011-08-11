@@ -158,6 +158,6 @@ function conductor_get_workflow($name, $reset = FALSE) {
   ctools_include('export');
   $workflow = ctools_export_crud_load('conductor_workflow', $name);
   if ($workflow) {
-    return $workflow->clone_workflow();
+    return $workflow->cloneWorkflow();
   }
 }
