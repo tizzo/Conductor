@@ -13,12 +13,16 @@ class ConductorWorkflow {
   protected  $db_table = 'conductor_workflow';
   
   public $activities = array();
+  public $name = '';
 
   /**
    * Save the workflow to the database. If the workflow does not already exist,
    * A wid will be assigned to the workflow and also returned from this function.
    */
   public function save() {
+    if (!isset($this->name)) {
+      return FALSE;
+    }
     $update = FALSE;
     if (!isset($this->wid) || $this->wid == 'new') {
       $this->wid = NULL;
@@ -31,12 +35,21 @@ class ConductorWorkflow {
       $query = db_update('conductor_workflow')
         ->condition('wid', $this->wid);
     }
-    $fields = array(
-      'name' => $this->name,
-      'description' => $this->description,
-      'data' => serialize($this),
-    );
-    $query
+
+    $schema = drupal_get_schema($this->db_table);
+    $fields = array();
+
+    // We take responsibility for the activities so remove them from the schema.
+    unset($schema['fields']['activities']);
+    // Serialize the activities
+    $fields['activities'] = serialize($this->activities);
+
+    foreach ($schema['fields'] as $name => $field) {
+      if (isset($this->$name)) {
+        $fields[$name] = $this->$name;
+      }
+    }
+    return $query
       ->fields($fields)
       ->execute();
   }
@@ -65,11 +78,15 @@ class ConductorWorkflow {
         ->condition(is_numeric($arg) ? 'wid' : 'name', $arg)
         ->execute()
         ->fetchObject();
-      $workflow = unserialize($result->data);
+      if (isset($result->data)) {
+        $workflow = unserialize($result->data);
+      }
+      else {
+        return NULL;
+      }
       $workflow->loaded = TRUE;
       $cache[$arg] = $workflow;
     }
-
     return $cache[$arg];
   }
 
@@ -98,8 +115,8 @@ class ConductorWorkflow {
 
     foreach ($this->activities as $id => $activity) {
       $output .= "\n" . $indent . "/* Activity: $activity->title */\n";
-      $output .= $indent . '$handler = $view->newActivity(' . ctools_var_export($activity->plugin_info['name'], $indent) . ");\n";
-      $output .= $activity->export_options($indent, '$handler->options');
+      $output .= $indent . '$activity = $workflow->newActivity(' . ctools_var_export($activity->plugin_info['name'], $indent) . ");\n";
+      $output .= $activity->export_options($indent, '$activity');
     }
     return $output;
   }

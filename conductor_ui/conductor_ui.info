@@ -5,4 +5,5 @@ core = 7.x
 configure = admin/structure/conductor
 dependencies[] = conductor
 dependencies[] = views
+files[] = plugins/export_ui/conductor_ui.class.inc
 

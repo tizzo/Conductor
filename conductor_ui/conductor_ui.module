@@ -6,36 +6,13 @@
  */
 
 /**
- * General TODO's for this file:
- *
- * TODO: Move page callbacks into a pages.inc
- */
-
-/**
  * Implements hook_menu().
  */
 function conductor_ui_menu() {
   $items = array();
-  $items['admin/structure/conductor'] = array(
-    'title' => 'Conductor Workflows',
-    'description' => 'Manage custom workflows',
-    'page callback' => 'conductor_ui_list',
-    'access arguments' => array('administer conductor workflows'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-  $items['admin/structure/conductor/list'] = array(
-    'title' => 'List Conductor Workflows',
-    'page callback' => 'conductor_ui_list',
-    'access arguments' => array('administer conductor workflows'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-
-  );
-  $items['admin/structure/conductor/add'] = array(
-    'title' => 'Add A New Workflow',
-    'page callback' => 'conductor_ui_add_workflow_page',
-    'access arguments' => array('administer conductor workflows'),
-    'type' => MENU_LOCAL_TASK,
-  );
+  // Note most of the Conductor UI is provided by a ctools
+  // export_ui plugin.  The basic data is defined in plugins/export_ui/conductor_ui.inc
+  // The class providing the functionality is in plugins/export_ui/conductor_ui.class.inc
   $items['conductor_ui/%ctools_js/activity'] = array(
       'title' => 'Activity',
       'page callback' => 'conductor_ui_activity_form',
@@ -101,6 +78,24 @@ TODO: upgrade to the newer lib?
   );
 
   return $libraries;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ *
+ * @param string $owner
+ *   The system name of the module owning the plugin type for which a base
+ *   directory location is being requested.
+ * @param string $plugin_type
+ *   The name of the plugin type for which a base directory is being requested.
+ * @return string
+ *   The path where CTools' plugin system should search for plugin files,
+ *   relative to your module's root. Omit leading and trailing slashes.
+ */
+function conductor_ui_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' && $plugin_type == 'export_ui') {
+    return "plugins/$plugin_type";
+  }
 }
 
 /**
@@ -313,12 +308,16 @@ function conductor_ui_add_js() {
  * Add required css for the conductor ui.
  */
 function conductor_ui_add_css() {
-  drupal_add_css(drupal_get_path('module', 'conductor_ui') . '/css/conductor_ui.css');
   // The views styling for ctools buttons is nice, lets steal it.
   drupal_add_css(drupal_get_path('module', 'views') . '/css/views-admin.ctools.css');
+  drupal_add_css(drupal_get_path('module', 'conductor_ui') . '/css/conductor_ui.css');
 }
 
-function conductor_ui_dev_workflow() {
+/**
+ * Implements hook_conductor_default_workflows().
+ */
+function conductor_ui_conductor_default_workflows() {
+  $workflows = array();
   $workflow = new ConductorWorkflow;
   $workflow->wid = 'new';
   $workflow->name = 'example';
@@ -352,5 +351,63 @@ function conductor_ui_dev_workflow() {
     'activity_2'
   );
   $activity->outputs = array();
-  return $workflow;
+  $workflows[$workflow->name] = $workflow;
+  return $workflows;
+}
+
+function conductor_ui_ctools_export_ui_form(&$form_state, &$form) {
+  
+
+
+}
+function conductor_ui_ctools_export_ui_form_validate(&$form_state, &$form) {
+}
+function conductor_ui_ctools_export_ui_form_submit(&$form_state, &$form) {
+}
+
+/**
+ * Specialized cache function to add a flag to our workflow, include an appropriate
+ * include, and cache more easily.
+ */
+function conductor_ui_cache_set(&$workflow) {
+  if (!empty($workflow->locked)) {
+    drupal_set_message(t('Changes cannot be made to a locked workflow.'), 'error');
+    return;
+  }
+  ctools_include('object-cache');
+  $workflow->changed = TRUE; // let any future object know that this workflow has changed.
+
+  /*
+   TODO: This is probably a good idea, we should avoid saving the handler code in the cache wherever we can.
+   we should consider reorganizing the handlers the way views does where the activity_info is the root and
+   the handler is an element in that array rather than the other way around.
+  // Unset handlers; we don't want to write these into the cache
+  unset($workflow->display_handler);
+  unset($workflow->default_display);
+  $workflow->query = NULL;
+  foreach (array_keys($workflow->display) as $id) {
+    unset($workflow->display[$id]->handler);
+    unset($workflow->display[$id]->default_display);
+  }
+  */
+  ctools_object_cache_set('workflow', $workflow->name, $workflow);
+}
+
+/**
+ * Set breadcrumbs for admin pages in the Conductor UI
+ *
+ * @param $sub_path
+ *   An array of additional breadcrumb entries to be added to the end of the base path.
+ */
+function conductor_ui_set_breadcrumb($sub_path = NULL) {
+  $breadcrumb = array(
+    l(t('Home'), NULL),
+    l(t(' Administration'), 'admin'),
+    l(t('Structure'), 'admin/structure'),
+    l(t('Conductor Workflows'), 'admin/structure/conductor/list'),
+  );
+  if (!is_null($sub_path)) {
+    $breadcrumb = array_merge($breadcrumb, $sub_path);
+  }
+  drupal_set_breadcrumb($breadcrumb);
 }

@@ -7,7 +7,7 @@ function conductor_schema() {
   $schema['conductor_workflow'] = array(
     'description' => 'Stores the general data for a view.',
     'export' => array(
-      'identifier' => 'conductor_workflow',
+      'identifier' => 'workflow',
       'bulk export' => TRUE,
       'primary key' => 'wid',
       'key' => 'name',
@@ -46,13 +46,20 @@ function conductor_schema() {
         'not null' => TRUE,
         'description' => 'The unique name of the workflow. This is the primary field workflows are loaded from, and is used so that workflows may be internal and not necessarily in the database. May only be alphanumeric characters plus underscores.',
       ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => '32',
+        'default' => '',
+        'not null' => TRUE,
+        'description' => 'The human readable name of the workflow.',
+      ),
       'description' => array(
         'type' => 'varchar',
         'length' => '255',
         'default' => '',
         'description' => 'A description of the workflow for the admin interface.',
       ),
-      'data' => array(
+      'activities' => array(
         // Type corrected in update 6009
         'type' => 'text',
         'size' => 'big',

@@ -18,6 +18,8 @@ class ConductorActivity extends ConductorObject {
   public $y = null;
 
   public function option_definition() {
+    $options['name'] = array('default' => '');
+    $options['title'] = array('default' => '');
     $options['x'] = array('default' => 0);
     $options['y'] = array('default' => 0);
     $options['inputs'] = array('default' => array());

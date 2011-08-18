@@ -88,7 +88,7 @@ function conductor_activity_process(&$plugin) {
 }
 
 /**
- * Implements hook_cetools_plugin_directory().
+ * Implements hook_ctools_plugin_directory().
  *
  * @param string $owner
  *   The system name of the module owning the plugin type for which a base
@@ -165,7 +165,7 @@ function conductor_get_workflow($name, $reset = FALSE) {
 /**
  * Load a single workflow.
  */
-function conductor_load_workflow() {
+function conductor_load_workflow($name) {
   ctools_include('export');
   $result = ctools_export_load_object('conductor_workflow', 'names', array($name));
   if (isset($result[$name])) {

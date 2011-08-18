@@ -19,13 +19,14 @@
   background: white;
 }
 
-#conductor-workflow-editor .ctools-dropbutton {
+.ctools-dropbutton {
   -moz-border-radius: 15px;
   border-radius: 15px;
-  background: white;
+  /* TODO: it would be nice to get rid of the !important here... */
+  background: white !important;
 }
 
-#conductor-workflow-editor .conductor-drop-link {
+.conductor-drop-link {
   position: absolute;
   right: 0.5em;
   top: 0.5em;
