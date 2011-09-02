@@ -316,13 +316,14 @@ function conductor_ui_add_css() {
 /**
  * Implements hook_conductor_default_workflows().
  */
-function conductor_ui_conductor_default_workflows() {
+function conductor_ui_default_conductor_workflows() {
   $workflows = array();
   $workflow = new ConductorWorkflow;
   $workflow->wid = 'new';
   $workflow->name = 'example';
   $workflow->title = 'Example';
   $workflow->description = 'example';
+  $workflow->api_version = '1.0';
   // Add and configure workflow activities.
   $activity = $workflow->newActivity('activity');
   $activity->x = 280;
@@ -410,4 +411,13 @@ function conductor_ui_set_breadcrumb($sub_path = NULL) {
     $breadcrumb = array_merge($breadcrumb, $sub_path);
   }
   drupal_set_breadcrumb($breadcrumb);
+}
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function conductor_ui_ctools_plugin_api($owner, $api) {
+  if ($owner == 'conductor' && $api == 'workflow') {
+    return array('version' => 1.0);
+  }
 }

@@ -3,8 +3,6 @@
 /**
  * @file
  * Contains the CTools Export UI integration code.
- *
- * Note that this is only a partial integration.
  */
 
 /**

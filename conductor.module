@@ -55,8 +55,10 @@ function conductor_theme() {
 /**
  * Implements hook_ctools_plugin_api().
  */
-function conductor_ctools_plugin_api() {
+function conductor_ctools_plugin_api($owner, $api) {
+  if ($owner == 'conductor' && ($api == 'plugins' || $api == 'workflow')) {
     return array('version' => 1.0);
+  }
 }
 
 /**
@@ -176,14 +178,14 @@ function conductor_load_workflow($name) {
 /**
  * Save a single workflow.
  */
-function conductor_save_workflow(&$workflow) {
+function conductor_save_workflow(ConductorWorkflow &$workflow) {
   return $workflow->save();
 }
 
 /**
  * Delete a single workflow.
  */
-function conductor_delete_workflow(&$workflow) {
+function conductor_delete_workflow(ConductorWorkflow &$workflow) {
   $workflow->destroy();
   return $workflow->delete();
 }
@@ -191,7 +193,7 @@ function conductor_delete_workflow(&$workflow) {
 /**
  * Export CRUD callback to export a view.
  */
-function conductor_export_workflow(&$workflow, $indent = '') {
+function conductor_export_workflow(ConductorWorkflow &$workflow, $indent = '') {
   return $workflow->export($indent);
 }
 

@@ -109,7 +109,7 @@ class ConductorWorkflow {
     $output .= "\n" . $indent . "/* Conductor Workflow: " . $this->title . " */\n";
     $output .= $this->export_row('workflow', $indent);
     // Set the API version
-    $api = conductor_ctools_plugin_api();
+    $api = conductor_ctools_plugin_api('conductor', 'workflow');
     $output .= $indent . '$workflow->api_version = \'' . $api['version'] . "';\n";
     $output .= $indent . '$workflow->disabled = FALSE; /* Edit this to true to make a default workflow disabled initially */' . "\n";
 
