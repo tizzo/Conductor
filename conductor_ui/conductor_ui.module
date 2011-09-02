@@ -325,7 +325,7 @@ function conductor_ui_default_conductor_workflows() {
   $workflow->description = 'example';
   $workflow->api_version = '1.0';
   // Add and configure workflow activities.
-  $activity = $workflow->newActivity('activity');
+  $activity = $workflow->newActivity('start');
   $activity->x = 280;
   $activity->y = 200;
   $activity->name = 'activity_1';
@@ -343,7 +343,7 @@ function conductor_ui_default_conductor_workflows() {
     'activity_1',
     'activity_3'
   );
-  $activity = $workflow->newActivity('activity');
+  $activity = $workflow->newActivity('stop');
   $activity->x = 380;
   $activity->y = 200;
   $activity->name = 'activity_3';
