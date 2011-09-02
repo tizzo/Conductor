@@ -378,6 +378,9 @@ function conductor_ui_cache_set(&$workflow) {
   ctools_include('object-cache');
   $workflow->changed = TRUE; // let any future object know that this workflow has changed.
 
+  // If there is any state information make sure it is not cached.
+  unset($workflow->state);
+
   /*
    TODO: This is probably a good idea, we should avoid saving the handler code in the cache wherever we can.
    we should consider reorganizing the handlers the way views does where the activity_info is the root and

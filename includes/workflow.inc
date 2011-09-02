@@ -10,10 +10,20 @@
  */
 class ConductorWorkflow {
 
+  // The base database table of this object.
   protected  $db_table = 'conductor_workflow';
-  
+
+  // An array of ConductorActivity descended objects that comprise this workflow.
   public $activities = array();
+
+  // The machine name of this workflow.
   public $name = '';
+
+  // The human readable title of this workflow.
+  public $title = '';
+
+  // An array of state information.
+  public $state = array();
 
   /**
    * Save the workflow to the database. If the workflow does not already exist,
@@ -112,7 +122,6 @@ class ConductorWorkflow {
     $api = conductor_ctools_plugin_api('conductor', 'workflow');
     $output .= $indent . '$workflow->api_version = \'' . $api['version'] . "';\n";
     $output .= $indent . '$workflow->disabled = FALSE; /* Edit this to true to make a default workflow disabled initially */' . "\n";
-
     foreach ($this->activities as $id => $activity) {
       $output .= "\n" . $indent . "/* Activity: $activity->title */\n";
       $output .= $indent . '$activity = $workflow->newActivity(' . ctools_var_export($activity->plugin_info['name'], $indent) . ");\n";
@@ -182,7 +191,7 @@ class ConductorWorkflow {
     $this->activities[] = $new_activity;
     return $new_activity;
   }
-  
+ 
   public function getActivities() {
     return $this->activities;
   }
@@ -237,6 +246,11 @@ class ConductorWorkflow {
   }
 
   function run() {
+    // Ensure that activities are indexed.
+    $this->indexActivities();
+    // Create a record for this instance.
+    // Acquire a lock for this instance.
+    lock_acquire($this->name);
     return TRUE;
   }
 
