@@ -206,3 +206,14 @@ function conductor_new_workflow() {
   $view->wid = 'new';
   return $view;
 }
+
+/**
+ * Start an instance of a workflow.
+ *
+ * @param $name
+ *   The name of the workflow to start.
+ */
+function conductor_start_workflow($name) {
+  $workflow = conductor_get_workflow($name);
+  return $workflow->run();
+}

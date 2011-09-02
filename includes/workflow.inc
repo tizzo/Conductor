@@ -236,4 +236,8 @@ class ConductorWorkflow {
     }
   }
 
+  function run() {
+    return TRUE;
+  }
+
 }
