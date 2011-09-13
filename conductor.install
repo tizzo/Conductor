@@ -16,7 +16,7 @@ function conductor_schema() {
       'admin_description' => 'description',
       'api' => array(
         'owner' => 'conductor',
-        'api' => 'workflow',
+        'api' => 'conductor',
         'minimum_version' => '0',
         'current_version' => '1.0',
       ),
