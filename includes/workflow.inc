@@ -249,6 +249,7 @@ class ConductorWorkflow {
     // Ensure that activities are indexed.
     $this->indexActivities();
     // Create a record for this instance.
+    // TODO: Shoiuld we create a record before we start processing this?  hint: prolly not...
     // Acquire a lock for this instance.
     lock_acquire($this->name);
     return TRUE;

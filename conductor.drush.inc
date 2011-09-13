@@ -84,7 +84,7 @@ function drush_conductor_start($name = NULL) {
     $success = FALSE;
   }
   else {
-    $success = conductor_start_workflow();
+    $success = conductor_start_workflow($name);
   }
   return $success;
 }
