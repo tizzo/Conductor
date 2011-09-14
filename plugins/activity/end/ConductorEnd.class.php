@@ -40,6 +40,7 @@ class ConductorEnd extends ConductorActivity {
     // Create an array to be rendered by theme_links__ctools_dropbutton().
     $links = parent::getUILinks();
     unset($links['output']);
+    unset($links['remove']);
     return $links;
   }
 
