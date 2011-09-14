@@ -13,10 +13,10 @@ function conductor_ui_menu() {
   // Note most of the Conductor UI is provided by a ctools
   // export_ui plugin.  The basic data is defined in plugins/export_ui/conductor_ui.inc
   // The class providing the functionality is in plugins/export_ui/conductor_ui.class.inc
-  $items['conductor_ui/%ctools_js/activity'] = array(
+  $items['conductor_ui/activity-config/%/%/%ctools_js'] = array(
       'title' => 'Activity',
       'page callback' => 'conductor_ui_activity_form',
-      'page arguments' => array(1),
+      'page arguments' => array(2, 3, 4),
       'access callback' => TRUE,
       'type' => MENU_CALLBACK,
   );
@@ -195,32 +195,28 @@ function conductor_ui_add_ctools_modal_style() {
   drupal_add_js($sample_style, 'setting');
 }
 
-function conductor_ui_activity_form($js = NULL, $step = NULL) {
+/**
+ * The form callback used to load the activity configuration forms.
+ */
+function conductor_ui_activity_form($workflow_name, $activity_name, $js = NULL) {
+
+  $workflow_name = strtr($workflow_name, array('-' => '_'));
+  $activity_name = strtr($activity_name, array('-' => '_'));
+  // Load workflow
+  $form = FALSE;
+  if ($workflow = conductor_get_workflow($workflow_name)) {
+    if ($activity = $workflow->getActivity($activity_name)) {
+      $form = array();
+      $form['#workflow'] = $workflow;
+      $form['#activity'] = $activity;
+      $form = $activity->configureForm($form);
+    }
+  }
   // TODO: Clean this all up.  Alot.
   if ($js) {
     ctools_include('modal');
     ctools_include('ajax');
   }
-  $form = array();
-  // TODO: This is really a workflow creation form, not an activity form.
-  $form['human_name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('workflow name'),
-    '#required' => TRUE,
-    '#size' => 32,
-    '#default_value' => !empty($form_state['workflow']) ? $form_state['workflow']->human_name : '',
-    '#maxlength' => 255,
-  );
-  $form['name'] = array(
-    '#type' => 'machine_name',
-    '#maxlength' => 32,
-    '#machine_name' => array(
-      'exists' => 'conductor_get_workflow',
-      'source' => array('human_name'),
-    ),
-    '#description' => t('A unique machine-readable name for this View. It must only contain lowercase letters, numbers, and underscores.'),
-  );
-
   $output = drupal_render($form);
 
   // If $output is FALSE, there was no actual form.

@@ -191,7 +191,7 @@ function conductor_delete_workflow(ConductorWorkflow &$workflow) {
 }
 
 /**
- * Export CRUD callback to export a view.
+ * Export CRUD callback to export a workflow.
  */
 function conductor_export_workflow(ConductorWorkflow &$workflow, $indent = '') {
   return $workflow->export($indent);
@@ -204,9 +204,15 @@ function conductor_export_workflow(ConductorWorkflow &$workflow, $indent = '') {
  *   A fully formed, empty $workflow object.
  */
 function conductor_new_workflow() {
-  $view = new ConductorWorkflow();
-  $view->wid = 'new';
-  return $view;
+  $workflow = new ConductorWorkflow();
+  $workflow->wid = 'new';
+  $activity = $workflow->newActivity('start');
+  $activity->name = 'start';
+  $activity->title = t('Start');
+  $activity = $workflow->newActivity('end');
+  $activity->name = 'end';
+  $activity->title = t('End');
+  return $workflow;
 }
 
 /**

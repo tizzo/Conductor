@@ -36,20 +36,44 @@ class ConductorActivity extends ConductorObject {
   /**
    * TODO:
    */
-  public function configureForm() {
-    return FALSE;
+  public function configureForm(&$form) {
+    // TODO: Once testing is finished, this should be the default.
+    //return FALSE;
+    $form['human_name'] = array(
+      '#type' => 'textfield',
+      '#title' => t('workflow name'),
+      '#required' => TRUE,
+      '#size' => 32,
+      '#default_value' => !empty($form_state['workflow']) ? $form_state['workflow']->human_name : '',
+      '#maxlength' => 255,
+    );
+    $form['name'] = array(
+      '#type' => 'machine_name',
+      '#maxlength' => 32,
+      '#machine_name' => array(
+        'exists' => 'conductor_get_workflow',
+        'source' => array('human_name'),
+      ),
+      '#description' => t('A unique machine-readable name for this View. It must only contain lowercase letters, numbers, and underscores.'),
+    );
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => 'Save',
+    );
+    return $form;
   }
 
   /**
    * TODO:
    */
-  public function configureFormValidate() {
+  public function configureFormValidate($form, &$form_state) {
+
   }
 
   /**
    * TODO:
    */
-  public function configureFormSubmit() {
+  public function configureFormSubmit($form, &$form_state) {
   }
 
   public function run() {
@@ -73,7 +97,7 @@ class ConductorActivity extends ConductorObject {
       ),
     );
     $links = array();
-    $links['edit'] = array('title' => t('edit'), 'href' => 'conductor_ui/activity-config/' . strtr($this->workflow->name, array('_' => '-')) . '/' . strtr($this->name, array('_' => '-')) . '/no-js', 'attributes' => $ctools_modal_attributes);
+    $links['edit'] = array('title' => t('edit'), 'href' => 'conductor_ui/activity-config/' . strtr($this->workflow->name, array('_' => '-')) . '/' . strtr($this->name, array('_' => '-')) . '/nojs', 'attributes' => $ctools_modal_attributes);
     $links['input'] = array('title' => t('add input'), 'href' => $_GET['q']);
     $links['output'] = array('title' => t('add output'), 'href' => $_GET['q']);
     $links['remove'] = array('title' => t('remove'), 'href' => $_GET['q']);

@@ -192,6 +192,19 @@ class ConductorWorkflow {
     return $new_activity;
   }
  
+  public function getActivity($name) {
+    $activity = FALSE;
+    // If we can't find an activity by that name we may need to reindex activities.
+    if (!isset($this->activities[$name])) {
+      $this->indexActivities();
+    }
+    // If we have an activity of the requested name, return it.
+    if (isset($this->activities[$name])) {
+      $activity = $this->activities[$name];
+    }
+    return $activity;
+  }
+
   public function getActivities() {
     return $this->activities;
   }
