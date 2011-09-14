@@ -4,6 +4,7 @@ Drupal.Conductor = Drupal.Conductor || {};
 // TODO: What if someone wants to put two instances of the conductor interface on screen at the same time?  Can we make this more self contained?
 Drupal.Conductor.activities = Drupal.Conductor.activities || {};
 Drupal.Conductor.jsPlumbLoaded = false;
+Drupal.Conductor.setupHasRun = false;
 
 Drupal.behaviors.conductor_ui = {
   attach: function (context, settings) {
@@ -21,6 +22,7 @@ Drupal.behaviors.conductor_ui = {
   }
 }
 Drupal.Conductor.setup = function (context, settings) {
+  if (Drupal.Conductor.setupHasRun != true) {
     // Grab local convenience versions of global vars.
     var activities = Drupal.settings.conductor_ui.activities;
     var workflow = Drupal.Conductor.workflow;
@@ -51,7 +53,9 @@ Drupal.Conductor.setup = function (context, settings) {
       // Stow the js object for easy access.
       workflow.activities[info.name].activityInfo = info;
       workflow.initLines();
+      Drupal.Conductor.setupHasRun = true;
     }
+  }
 }
 
 
@@ -138,7 +142,8 @@ Drupal.Conductor.activities.activity = function(activityDomElement, activityInfo
     }
   }
   jsPlumb.draggable(activityDomElement, jQueryDraggableOptions);
-  $('.conductor-ui-activity-link', activityDomElement).click(function(e) {
+  // TODO: there's a better way than singling out the edit button.  For shizzle.
+  $('.conductor-ui-activity-link a:not(.edit)', activityDomElement).click(function(e) {
     e.preventDefault();
   });
 }

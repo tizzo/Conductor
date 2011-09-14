@@ -276,6 +276,8 @@ function conductor_ui_css_safe_class($name) {
  */
 function conductor_ui_add_js() {
 
+  // Added for use of ctools modals
+  drupal_add_js('misc/ajax.js');
   drupal_add_library('system', 'ui.draggable');
 
   // Include jsPlumb for drawing our lines

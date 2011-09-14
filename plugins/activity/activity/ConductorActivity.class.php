@@ -66,8 +66,14 @@ class ConductorActivity extends ConductorObject {
    */
   public function getUILinks() {
     // Create an array to be rendered by theme_links__ctools_dropbutton().
+    $ctools_modal_attributes = array(
+      'class' => array(
+        'use-ajax',
+        'ctools-use-modal'
+      ),
+    );
     $links = array();
-    $links['edit'] = array('title' => t('edit'), 'href' => $_GET['q']);
+    $links['edit'] = array('title' => t('edit'), 'href' => 'conductor_ui/activity-config/' . strtr($this->workflow->name, array('_' => '-')) . '/' . strtr($this->name, array('_' => '-')) . '/no-js', 'attributes' => $ctools_modal_attributes);
     $links['input'] = array('title' => t('add input'), 'href' => $_GET['q']);
     $links['output'] = array('title' => t('add output'), 'href' => $_GET['q']);
     $links['remove'] = array('title' => t('remove'), 'href' => $_GET['q']);

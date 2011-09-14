@@ -74,7 +74,7 @@ class conductor_ui extends ctools_export_ui {
     /*
     $output['workflow_element_panel']['add_activity'] = array(
       '#type' => 'markup',
-      '#markup' => ctools_modal_text_button(t('+ Add Activity'), 'conductor_ui/nojs/activity', t('Add an actiivty to this workflow.'), 'ctools-modal-conductor-ui-style-style'),
+      '#markup' => ctools_modal_text_button(t('+ Add Activity'), 'conductor_ui/nojs/activity', t('Add an actiivty to this workflow.')),
     );
     */
     $output['workflow_element_panel']['buttons'] = array(
