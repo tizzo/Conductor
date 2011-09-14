@@ -1,6 +1,7 @@
 (function ($) {
 
 Drupal.Conductor = Drupal.Conductor || {};
+// TODO: What if someone wants to put two instances of the conductor interface on screen at the same time?  Can we make this more self contained?
 Drupal.Conductor.activities = Drupal.Conductor.activities || {};
 Drupal.Conductor.jsPlumbLoaded = false;
 
