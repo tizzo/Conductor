@@ -406,7 +406,8 @@ function conductor_ui_set_breadcrumb($sub_path = NULL) {
  * Implements hook_ctools_plugin_api().
  */
 function conductor_ui_ctools_plugin_api($owner, $api) {
-  if ($owner == 'conductor' && $api == 'workflow') {
+  // TODO: $api should be workflow, not conductor but that messes with features file naming.
+  if ($owner == 'conductor' && $api == 'conductor') {
     return array('version' => 1.0);
   }
 }
