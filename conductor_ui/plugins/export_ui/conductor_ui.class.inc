@@ -96,8 +96,8 @@ class conductor_ui extends ctools_export_ui {
     $activities = $workflow->getActivities(); 
     $settings = array();
     foreach ($activities as $name => $activity) {
+      // Prevent us from making changes to this activity during render.
       $class_name = 'conductor-ui-activity-' . conductor_ui_css_safe_class($activity->name);
-      $settings['activities'][$name] = $activity;
       $activity->css_class = $class_name;
       $drop_links = theme('links__ctools_dropbutton', array('title' => t('Edit'), 'links' => $activity->getUILinks()));
       $output['workflow_editor'][$name] = array(

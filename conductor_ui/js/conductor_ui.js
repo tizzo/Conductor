@@ -2,9 +2,24 @@
 
 Drupal.Conductor = Drupal.Conductor || {};
 Drupal.Conductor.activities = Drupal.Conductor.activities || {};
+Drupal.Conductor.jsPlumbLoaded = false;
 
 Drupal.behaviors.conductor_ui = {
   attach: function (context, settings) {
+    // Wait for jsPlumb to become available.
+    if (Drupal.Conductor.jsPlumbLoaded == false) {
+      Drupal.Conductor.jsPlumbLoaded = true;
+      jsPlumb.bind('ready', function() {
+        jsPlumb.setAutomaticRepaint(true);
+        Drupal.Conductor.setup(context, settings);
+      });
+    }
+    else {
+      Drupal.Conductor.setup(context, settings);
+    }
+  }
+}
+Drupal.Conductor.setup = function (context, settings) {
     // Grab local convenience versions of global vars.
     var activities = Drupal.settings.conductor_ui.activities;
     var workflow = Drupal.Conductor.workflow;
@@ -22,6 +37,9 @@ Drupal.behaviors.conductor_ui = {
         release: function(e, data) {
           // For now, the data about this element is stashed via jQuery.
           // $(data.activityDomElement).data('activityInfo')
+          // TODO: we're not properly getting the updated x and y coordinates on drop.
+          // This is related in some way to the draggable options for jsPlumb and how they
+          // are passed through to jQuery ui.
         }
       });
       var info = activity.data('activityInfo');
@@ -33,10 +51,8 @@ Drupal.behaviors.conductor_ui = {
       workflow.activities[info.name].activityInfo = info;
       workflow.initLines();
     }
-
-
-  }
 }
+
 
 /**
  *  A javascript representation of a Conductor Workflow.
@@ -53,7 +69,6 @@ Drupal.Conductor.workflow = {
       this.outputs[info.name] = info.outputs;
     }
     // Make activities draggable
-    jsPlumb.draggable($('.conductor-ui-activity-activity-1'));
     // Loop through each activity for processing.
     for (activity in this.inputs) {
       // Loop through inputs associated with this activity.
@@ -64,11 +79,17 @@ Drupal.Conductor.workflow = {
               source: this.activities[activity].activityInfo.css_class,
               target: "conductor-ui-activity-activity-2",
               endpointsOnTop:true,
+              anchors:["AutoDefault", "AutoDefault"],
+              // connector: "Straight",
+              connector: [
+                "Bezier",
+                { curviness: 20 }
+              ],
               paintStyle:{
                   lineWidth:9,
                   strokeStyle: "#CCC",
-                  outlineColor:"#666",
-                  outlineWidth:1
+                  //outlineColor:"#666",
+                  //outlineWidth:1
               },
               endpointStyle:{ radius:1, fillStyle: "#ccc"},
             });
@@ -101,21 +122,21 @@ Drupal.Conductor.activities.activity = function(activityDomElement, activityInfo
   // Stash data inside this DOM element so that we can work with it later.
   $(activityDomElement).data('activityInfo', activityInfo);
   // Make activities draggable.
-  $(activityDomElement).draggable(
-    {
-      stack: "#conductor-workflow-editor div",
-      // Ideally we'd like to keep these boxes inside their parent
-      // but allow the parent to grown downward.  The line below
-      // does not do that.
-      //containment: '#conductor-workflow-editor',
-      stop: function(event, ui) {
-        x = ui.position['left'];
-        y = ui.position['top']
-        var e = $.Event("release");
-        $(activityDomElement).trigger(e, {activityDomElement: activityDomElement});
-      }
+  var jQueryDraggableOptions = {
+    stack: "#conductor-workflow-editor div",
+    // Ideally we'd like to keep these boxes inside their parent
+    // but allow the parent to grown downward.  The line below
+    // does not do that.
+    //containment: '#conductor-workflow-editor',
+    stop: function(event, ui) {
+      console.log(this.data('activityInfo'));
+      x = ui.position['left'];
+      y = ui.position['top']
+      var e = $.Event("release");
+      $(activityDomElement).trigger(e, {activityDomElement: activityDomElement});
     }
-  );
+  }
+  jsPlumb.draggable(activityDomElement, jQueryDraggableOptions);
   $('.conductor-ui-activity-link', activityDomElement).click(function(e) {
     e.preventDefault();
   });

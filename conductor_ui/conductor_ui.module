@@ -54,21 +54,8 @@ function conductor_ui_library() {
     'website' => 'http://code.google.com/p/jsplumb/1.3.2/',
     'version' => '1.2.3',
     'js' => array(
-      $path . 'jsPlumb-1.2.2-RC1.js' => array(),
-      $path . 'jsPlumb-defaults-1.2.2-RC1.js' => array(),
-      $path . 'jquery.jsPlumb-1.2.2-RC1.js' => array(),
+      $path . 'jquery.jsPlumb-1.3.3-all-min.js' => array(),
     ),
-/*
-TODO: upgrade to the newer lib?
-    'js' => array(
-      $path . 'jsPlumb-1.3.2-RC1.js' => array(),
-      $path . 'jquery.jsPlumb-1.3.2-RC1.js' => array(),
-      $path . 'jsPlumb-defaults-1.3.2-RC1.js' => array(),
-      $path . 'jsPlumb-renderers-canvas-1.3.2-RC1.js' => array(),
-      $path . 'jsPlumb-renderers-svg-1.3.2-RC1.js' => array(),
-      $path . 'jsPlumb-renderers-vml-1.3.2-RC1.js' => array(),
-    ),
-*/
     'dependencies' => array(
       array('system', 'jquery'),
       array('system', 'ui'),

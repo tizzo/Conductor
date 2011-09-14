@@ -10,13 +10,14 @@
 }
 
 .conductor-ui-activity {
-  width: 300px;
+  width: 150px;
   border: 2px solid #ccc;
   padding: 1em;
   -moz-border-radius: 15px;
   border-radius: 15px;
   position: relative;
   background: white;
+  z-index: 1;
 }
 
 .ctools-dropbutton {
@@ -32,3 +33,6 @@
   top: 0.5em;
 }
 
+._jsPlumb_connector {
+  z-index: 0;
+}
