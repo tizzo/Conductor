@@ -1,11 +1,10 @@
 <?php
 
 $plugin = array(
-  'title' => t('Stop'),
+  'title' => t('End'),
   'description' => t('This is always the last activity in a workflow, it cannot be removed.'),
-  'description' => t(''),
   'handler' => array(
-    'class' => 'ConductorStop',
+    'class' => 'ConductorEnd',
   ),  
   'conductor_ui_template' => 'conductor_activity',
   // This should be added to Drupal.Conductor.activities.

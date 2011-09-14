@@ -7,5 +7,5 @@ files[] = includes/workflow.inc
 files[] = includes/ConductorBase.inc
 files[] = plugins/activity/activity/ConductorActivity.class.php
 files[] = plugins/activity/start/ConductorStart.class.php
-files[] = plugins/activity/stop/ConductorStop.class.php
+files[] = plugins/activity/end/ConductorEnd.class.php
 files[] = plugins/activity/conditional/ConductorActivityConditional.class.php

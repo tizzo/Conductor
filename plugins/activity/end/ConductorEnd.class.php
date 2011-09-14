@@ -3,7 +3,7 @@
 /**
  *
  */
-class ConductorStop extends ConductorActivity {
+class ConductorEnd extends ConductorActivity {
 
   //
   public $inputs = array();

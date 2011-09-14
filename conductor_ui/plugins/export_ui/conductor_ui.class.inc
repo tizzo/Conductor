@@ -110,6 +110,12 @@ class conductor_ui extends ctools_export_ui {
           'contextual_example' => array( 'contextual', array('foobars')),
         ),
       );
+      // Clone the activity to prevent changes from effecting the original object.
+      $settings_activity = clone $activity;
+      // Unset the workflow object handle.
+      unset($activity->workflow);
+      // Add the activity to the settings array so that it can be used later.
+      $settings['activities'][$name] = $activity;
     }
     drupal_add_js(array('conductor_ui' => $settings), array('type' => 'setting'));
     return $output;
