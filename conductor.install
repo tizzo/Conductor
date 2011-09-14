@@ -28,8 +28,8 @@ function conductor_schema() {
       'load callback' => 'conductor_load_workflow',
       'delete callback' => 'conductor_delete_workflow',
       'export callback' => 'conductor_export_workflow',
-      'cache defaults' => TRUE,
-      'default cache bin' => 'cache_conductor_data',
+      //'cache defaults' => TRUE,
+      //'default cache bin' => 'cache_conductor_data',
     ),
     'fields' => array(
       'wid' => array(
