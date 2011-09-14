@@ -208,7 +208,7 @@ function conductor_ui_activity_form($js = NULL, $step = NULL) {
     '#title' => t('workflow name'),
     '#required' => TRUE,
     '#size' => 32,
-    '#default_value' => !empty($form_state['view']) ? $form_state['view']->human_name : '',
+    '#default_value' => !empty($form_state['workflow']) ? $form_state['workflow']->human_name : '',
     '#maxlength' => 255,
   );
   $form['name'] = array(
