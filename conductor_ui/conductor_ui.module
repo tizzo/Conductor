@@ -197,18 +197,17 @@ function conductor_ui_add_ctools_modal_style() {
 /**
  * The form callback used to load the activity configuration forms.
  */
-function conductor_ui_activity_form($workflow_name, $activity_name, $js = NULL) {
+function conductor_ui_activity_form($workflow_uri_name, $activity_uri_name, $js = NULL) {
 
-  $workflow_name = strtr($workflow_name, array('-' => '_'));
-  $activity_name = strtr($activity_name, array('-' => '_'));
-  // Load workflow
+  $workflow_name = strtr($workflow_uri_name, array('-' => '_'));
+  $activity_name = strtr($activity_uri_name, array('-' => '_'));
+  // Load a workflow.
   $form = FALSE;
   if ($workflow = conductor_get_workflow($workflow_name)) {
     if ($activity = $workflow->getActivity($activity_name)) {
       $form = array();
       $form['#workflow'] = $workflow;
       $form['#activity'] = $activity;
-      $form = $activity->configureForm($form);
     }
   }
   // TODO: Clean this all up.  Alot.
@@ -216,8 +215,41 @@ function conductor_ui_activity_form($workflow_name, $activity_name, $js = NULL) 
     ctools_include('modal');
     ctools_include('ajax');
   }
-  $output = drupal_render($form);
 
+  $form_info = array(
+    'id' => 'temp',
+    'path' => 'conductor_ui/activity-config/' . $workflow_uri_name . '/' . $activity_uri_name . '/no-js',
+    'show trail' => FALSE,
+    'show back' => FALSE,
+    'show cancel' => FALSE,
+    'show return' => FALSE,
+    'order' => array(
+      'start' => t('Funktytown'),
+    ),
+   // here we map a step to a form id.
+    'forms' => array(
+      // e.g. this for the step at wombat/create
+      'start' => array(
+        'form id' => 'conductor_ui_activity_form_loader'
+      ),
+    ),
+  );
+
+  $form_state = array(
+    'ajax' => $js,
+    // Put our object and ID into the form state cache so we can easily find
+    // it.
+    'object_id' => 'new',
+    'activity' => &$activity,
+    'workflow' => &$workflow,
+  );
+
+  ctools_include('wizard');
+  $step = 'start';
+  $form = ctools_wizard_multistep_form($form_info, $step, $form_state);
+
+
+  $output = drupal_render($form);
   // If $output is FALSE, there was no actual form.
   if ($js) {
     // If javascript is active, we have to use a render array.
@@ -250,6 +282,12 @@ function conductor_ui_activity_form($workflow_name, $activity_name, $js = NULL) 
   }
 }
 
+function conductor_ui_activity_form_loader($form, &$form_state) {
+  dpm(func_get_args());
+  $activity = $form_state['activity'];
+  $form = $activity->configureForm($form);
+  return $form;
+}
 /**
  * Convert any string into a CSS class.
  *
@@ -279,9 +317,9 @@ function conductor_ui_add_js() {
   drupal_add_library('conductor_ui', 'jsplumb');
 
   // Include the CTools tools that we need.
+  drupal_add_js('misc/ajax.js');
   ctools_include('ajax');
   ctools_include('modal');
-  drupal_add_js('misc/ajax.js');
   ctools_modal_add_js();
 
   drupal_add_js(drupal_get_path('module', 'conductor_ui') . '/js/conductor_ui.js');
