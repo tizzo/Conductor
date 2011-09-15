@@ -10,9 +10,9 @@
  */
 function conductor_ui_menu() {
   $items = array();
-  // Note most of the Conductor UI is provided by a ctools
-  // export_ui plugin.  The basic data is defined in plugins/export_ui/conductor_ui.inc
-  // The class providing the functionality is in plugins/export_ui/conductor_ui.class.inc
+  // Note most of the Conductor UI is provided by a ctools export_ui plugin.
+  // The basic data is defined inplugins/export_ui/conductor_ui.inc.  The class
+  // providing the functionality is in plugins/export_ui/conductor_ui.class.inc.
   $items['conductor_ui/activity-config/%/%/%ctools_js'] = array(
       'title' => 'Activity',
       'page callback' => 'conductor_ui_activity_form',
@@ -46,15 +46,12 @@ function conductor_ui_theme() {
  * Implements hook_library().
  */
 function conductor_ui_library() {
-  // jsPlumb.
-  //$path = drupal_get_path('module', 'conductor_ui') . '/js/jsplumb/js/1.3.2/';
-  $path = drupal_get_path('module', 'conductor_ui') . '/js/';
   $libraries['jsplumb'] = array(
     'title' => 'jsPlumb',
     'website' => 'http://code.google.com/p/jsplumb/1.3.2/',
     'version' => '1.2.3',
     'js' => array(
-      $path . 'jquery.jsPlumb-1.3.3-all-min.js' => array(),
+      drupal_get_path('module', 'conductor_ui') . '/js/jquery.jsPlumb-1.3.3-all-min.js' => array(),
     ),
     'dependencies' => array(
       array('system', 'jquery'),
@@ -63,7 +60,6 @@ function conductor_ui_library() {
       array('system', 'ui.droppable'),
     ),
   );
-
   return $libraries;
 }
 
@@ -93,79 +89,6 @@ function conductor_ui_conductor_activity_process(&$plugin) {
   $plugin += array(
     'conductor_ui_template' => 'conductor_activity',
   );
-}
-
-/**
- * Page callback to list all workflows.
- */
-function conductor_ui_list() {
-  return '';
-}
-
-/**
- * Page callback to add a new workflow.
- */
-function conductor_ui_add_workflow_page() {
-
-  drupal_set_title(t('Add a new Conductor workflow'));
-  conductor_ui_add_js();
-  conductor_ui_add_css();
-  ctools_include('modal');
-  ctools_include('object-cache');
-  ctools_modal_add_js();
-  conductor_ui_add_ctools_modal_style();
-
-  $output = array();
-  $output['workflow_element_panel'] = array(
-    '#prefix' => '<div id="conductor-ui-toolbar">',
-    '#suffix' => '</div>',
-  );
-  $output['workflow_element_panel']['add_activity'] = array(
-    '#type' => 'markup',
-    '#markup' => ctools_modal_text_button(t('+ Add Activity'), 'conductor_ui/nojs/activity', t('Add an actiivty to this workflow.'), 'ctools-modal-conductor-ui-style-style'),
-  );
-  $output['workflow_element_panel']['buttons'] = array(
-    '#prefix' => '<div id="toolbar-buttons">',
-    '#suffix' => '</div>',
-  );
-  $output['workflow_element_panel']['buttons']['save'] = array(
-    '#value' => t('Save'),
-    '#type' => 'button',
-  );
-  $output['workflow_element_panel']['buttons']['cancel'] = array(
-    '#value' => t('Cancel'),
-    '#type' => 'button',
-  );
-  $output['workflow_editor'] = array(
-    '#prefix' => '<div id="conductor-workflow-editor">',
-    '#suffix' => '</div>',
-  );
-  //if (!$workflow = ctools_object_cache_get('conductor_workflow', 'test')) {
-    $workflow = conductor_ui_dev_workflow();
-    ctools_object_cache_set('conductor_workflow', 'test', $workflow);
-  //}
-  $activities = $workflow->getActivities(); 
-  $settings = array();
-  $css = '';
-  foreach ($activities as $name => $activity) {
-    $class_name = 'conductor-ui-activity-' . conductor_ui_css_safe_class($activity->name);
-    $settings['activities'][$name] = $activity;
-    $activity->css_class = $class_name;
-    $drop_links = theme('links__ctools_dropbutton', array('title' => t('Edit'), 'links' => $activity->getUILinks()));
-    $output['workflow_editor'][$name] = array(
-      '#name' => $activity->name,
-      '#title' => $activity->title,
-      '#class' => $class_name,
-      '#drop_links' => $drop_links,
-      '#theme' => 'conductor_activity',
-      '#contextual_links' => array(
-        'contextual_example' => array( 'contextual', array('foobars')),
-      ),
-    );
-  }
-  drupal_add_css($css, array('type' => 'inline'));
-  drupal_add_js(array('conductor_ui' => $settings), array('type' => 'setting'));
-  return $output;
 }
 
 /**
@@ -208,6 +131,7 @@ function conductor_ui_activity_form($workflow_uri_name, $activity_uri_name, $js 
       $form = array();
       $form['#workflow'] = $workflow;
       $form['#activity'] = $activity;
+      $form = $activity->configureForm();
     }
   }
   // TODO: Clean this all up.  Alot.
@@ -230,7 +154,7 @@ function conductor_ui_activity_form($workflow_uri_name, $activity_uri_name, $js 
     'forms' => array(
       // e.g. this for the step at wombat/create
       'start' => array(
-        'form id' => 'conductor_ui_activity_form_loader'
+        'form id' => 'conductor_ui_activity_get_form'
       ),
     ),
   );
