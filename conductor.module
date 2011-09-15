@@ -206,10 +206,10 @@ function conductor_export_workflow(ConductorWorkflow &$workflow, $indent = '') {
 function conductor_new_workflow() {
   $workflow = new ConductorWorkflow();
   $workflow->wid = 'new';
-  $activity = $workflow->newActivity('start');
+  $activity = $workflow->newActivity('start'); 
   $activity->name = 'start';
   $activity->title = t('Start');
-  $activity = $workflow->newActivity('end');
+  $activity = $workflow->newActivity('end'); 
   $activity->name = 'end';
   $activity->title = t('End');
   return $workflow;

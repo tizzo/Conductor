@@ -169,8 +169,7 @@ function conductor_ui_add_workflow_page() {
 }
 
 /**
- * Retrieve configuration for a 
- * The default 
+ * TODO: get this working and get rid of the hideous default modal.
  */
 function conductor_ui_add_ctools_modal_style() {
   // Create our own javascript that will be used to theme a modal.
