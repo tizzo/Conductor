@@ -41,6 +41,7 @@ class ConductorEnd extends ConductorActivity {
     $links = parent::getUILinks();
     unset($links['output']);
     unset($links['remove']);
+    //unset($links['edit']);
     return $links;
   }
 

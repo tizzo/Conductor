@@ -5,16 +5,24 @@
  */
 class ConductorActivity extends ConductorObject {
 
-  //
+  /**
+   * An array of other activity names that feed into this activity.
+   *
+   * TODO: We may need to expand this to provide information about allowable contexts.
+   */
   public $inputs = array();
 
-  //
+  /**
+   * An array of other activity names that feed out of this activity.
+   *
+   * TODO: We may need to expand this to provide information about provided contexts.
+   */
   public $outputs = array();
 
-  //
+  // The number of pixels from the top of the container this activity should appear.
   public $x = null;
 
-  // 
+  // The number of pixels from the left of the container this activity should appear.
   public $y = null;
 
   public function option_definition() {
@@ -31,6 +39,23 @@ class ConductorActivity extends ConductorObject {
   }
 
   public function addOutput($activity) {
+  }
+  /**
+   *
+   * @param
+   * @param $activity_state
+   *   The state of this individual activity.
+   */
+  public function setState($activity_state, $state) {
+  }
+
+  /**
+   * Run this activity performing whatever actions need to be performed.
+   *
+   * @return
+   *   A value representing in a structured way the outcome of this activity's run.
+   */
+  public function run() {
   }
 
   /**
@@ -74,9 +99,6 @@ class ConductorActivity extends ConductorObject {
    * TODO:
    */
   public function configureFormSubmit($form, &$form_state) {
-  }
-
-  public function run() {
   }
 
   /**
