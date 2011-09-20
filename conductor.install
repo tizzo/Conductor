@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * @file
+ *   Manages the schema for conductor.
+ *
+ * TODO: We may want to create a permanent record of each workflow activity having
+ * been processed for administrative listings.
+ */
+
+/**
  * Implements hook_schema().
  */
 function conductor_schema() {
@@ -60,7 +68,6 @@ function conductor_schema() {
         'description' => 'A description of the workflow for the admin interface.',
       ),
       'activities' => array(
-        // Type corrected in update 6009
         'type' => 'text',
         'size' => 'big',
         'description' => 'A serialized representation of this workflow.',
@@ -75,11 +82,6 @@ function conductor_schema() {
   $schema['cache_conductor_data'] = drupal_get_schema_unprocessed('system', 'cache');
   $schema['cache_conductor_data']['description'] = 'Cache table for conductor to store pre-rendered queries, results, and display output.';
   $schema['cache_conductor_data']['fields']['serialized']['default'] = 1;
-  /*
-  // TODO: What do we want to call this stuff?
-  $schema['conductor_instance'] = array(
-  );
-  */
   $schema['conductor_state'] = array(
     'description' => '',
     'fields' => array(
@@ -91,7 +93,6 @@ function conductor_schema() {
         'description' => 'The unique name of the workflow. This is the primary field workflows are loaded from, and is used so that workflows may be internal and not necessarily in the database. May only be alphanumeric characters plus underscores.',
       ),
       'data' => array(
-        // Type corrected in update 6009
         'type' => 'text',
         'size' => 'big',
         'description' => 'A serialized representation of this workflow preventing the workflow of this item from changing.',
@@ -106,20 +107,52 @@ function conductor_schema() {
         'no export' => TRUE,
       ),
     ),
+    'activities' => array(
+      'description' => 'A serialized representation of this workflow\'s entities at the time this workflow was started.',
+      'type' => 'text',
+      'size' => 'big',
+      'serialize' => TRUE,
+      'serialized default' => 'a:0:{}',
+      'no export' => TRUE,
+      ),
+
     'primary key' => array('sid'),
   );
   $schema['conductor_state_item'] = array(
-    'description' => '',
+    'description' => 'A conductor state item is a record of the machine name of an individual activity in a workflow state to allow for easy resuming.',
     'fields' => array(
-      'id' => array(
+      'siid' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'description' => '',
         'no export' => TRUE,
       ),
+      'wid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The {conductor_workflow}.wid of the workflow this state is an instance of.',
+        'no export' => TRUE,
+      ),
+      'sid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The {conductor_state}.sid of the workflow this state item belongs to.',
+        'no export' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'The unique name of the state. This is the primary field workflow states are loaded from, and is used so that workflows may be found easily when they need to be resumed.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ),
     ),
-    'primary key' => array('id'),
+    'primary key' => array('siid'),
+    'indexes' => array(
+      'name' => array('name'),
+    ),
   );
   return $schema;
 }
