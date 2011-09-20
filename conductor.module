@@ -150,17 +150,26 @@ function conductor_ajax() {
  *   a fresh one.
  */
 function conductor_get_workflow($name, $reset = FALSE) {
+  $workflow = FALSE;
+  $cache = &drupal_static('ctools_export_load_object');
   if ($reset) {
-    $cache = &drupal_static('ctools_export_load_object');
-    if (isset($cache['conductor_workflow'][$name])) {
-      unset($cache['conductor_workflow'][$name]);
-    }
+    unset($cache['conductor_workflow'][$name]);
+    cache_clear_all('conductor_workflow_' . $name);
   }
-
-  ctools_include('export');
-  $workflow = ctools_export_crud_load('conductor_workflow', $name);
+  if (isset($cache['conductor_workflow'][$name])) {
+    $workflow = $cache['conductor_workflow'][$name];
+  }
+  else if ($cached_data = cache_get('conductor_workflow_' . $name)) {
+    $workflow = $cached_data->data;
+    $cache['conductor_workflow'][$name] = $workflow;
+  }
+  if (!$workflow) {
+    ctools_include('export');
+    $workflow = ctools_export_crud_load('conductor_workflow', $name)->cloneWorkflow();
+  }
   if ($workflow) {
-    return $workflow->cloneWorkflow();
+    cache_set('conductor_workflow_' . $name, $workflow);
+    return $workflow;
   }
 }
 
@@ -179,6 +188,7 @@ function conductor_load_workflow($name) {
  * Save a single workflow.
  */
 function conductor_save_workflow(ConductorWorkflow &$workflow) {
+  cache_clear_all('conductor_workflow_' . $workflow->name);
   return $workflow->save();
 }
 
