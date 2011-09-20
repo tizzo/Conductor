@@ -1,7 +1,7 @@
 <?php
 /**
  * @file workflow.inc
- * Provides the workflow object type and associated methods.
+ *   Provides the workflow object type and associated methods.
  */
 
 /**
