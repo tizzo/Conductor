@@ -13,7 +13,7 @@ class ConductorWorkflow {
   // The base database table of this object.
   protected  $db_table = 'conductor_workflow';
 
-  // An array of ConductorActivity descended objects that comprise this workflow.
+  // An array of ConductorActivity descended objects comprising this workflow.
   public $activities = array();
 
   // The machine name of this workflow.
@@ -22,7 +22,7 @@ class ConductorWorkflow {
   // The human readable title of this workflow.
   public $title = '';
 
-  // A ConductorState object containing state for a particular workflow instance.
+  // A ConductorState object containing state for a workflow instance.
   public $state = NULL;
 
   /**
@@ -36,7 +36,8 @@ class ConductorWorkflow {
 
   /**
    * Save the workflow to the database. If the workflow does not already exist,
-   * A wid will be assigned to the workflow and also returned from this function.
+   *
+   * A wid will be assigned to the workflow and returned from this function.
    */
   public function save() {
     if (!isset($this->name)) {
@@ -288,7 +289,7 @@ class ConductorWorkflow {
   }
 
   /**
-   *
+   * Run this workflow.
    */
   function run() {
     $tries = &drupal_static('__FUNCTION__', 0);
