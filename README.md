@@ -56,11 +56,27 @@ Workflow state represents a single instance of a workflow.
 ## Storage ##
 
 Workflow state is stored using another ctools plugin and so storage can be swapped out.
+The activities on a workflow are stored with the workflow state in their configuration
+at the time that workflow is stored.  This is important because without this otherwise
+changing the workflow while a particular instance is in the process of completion could
+result in stranded workflow items with inconsistent state.
 
 ## About workflow processing ##
 
 Conductor workflows are currently started off by some module other than conductor which
 hands in whatever context is necessary for processing.  This becomes the bases for the
 workflow state which is passed from activity to activity.  The activity can then ask
-questions of the WorkflowState descended object and use the context present to perfor
-its own activities. 
+questions of the WorkflowActivityState descended object and use the context present to perform
+its own activities.
+
+When an activity is completed its state object is moved to the 'activitiesCompleted'
+array.  This will then be available in the ConductorActivityState object handed into
+the next activity.
+
+## Updating Conductor ##
+
+One question that needs to be answered for Conductor to be a viable option as the center
+point for a site's workflow managnement, is how we are going to manage updating to a new
+version of workflow with processes in the midst of processing.  At the time of writing the
+API is highly unstable and we can't make any promises about whether changes will break
+existing workflows.
