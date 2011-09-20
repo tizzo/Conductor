@@ -22,8 +22,17 @@ class ConductorWorkflow {
   // The human readable title of this workflow.
   public $title = '';
 
-  // An array of state information.
-  public $state = array();
+  // A ConductorState object containing state for a particular workflow instance.
+  public $state = NULL;
+
+  /**
+   * Allow the workflow to be populated with state on load.
+   */
+  public function __construct($state = NULL) {
+    if (!is_null($state)) {
+      $this->setState($state);
+    }
+  }
 
   /**
    * Save the workflow to the database. If the workflow does not already exist,
@@ -253,19 +262,78 @@ class ConductorWorkflow {
    * collected.
    */
   function destroy() {
+    unset($this->state);
     foreach ($this->activities as $activity) {
       unset($activity);
     }
   }
 
+  /**
+   * Sets the state of this workflow.
+   */
+  function setState(ConductorState $state) {
+    // Pass a copy of this workflow into the state object.
+    $state->workflow = &$this;
+    $this->state = &$state;
+  }
+
+  /**
+   * Gets the state of this workflow.
+   *
+   * @return
+   *   The ConductorState descended object that manages state for this workflow.
+   */
+  function getState() {
+    return $this->state;
+  }
+
+  /**
+   *
+   */
   function run() {
-    // Ensure that activities are indexed.
-    $this->indexActivities();
-    // Create a record for this instance.
-    // TODO: Shoiuld we create a record before we start processing this?  hint: prolly not...
-    // Acquire a lock for this instance.
-    lock_acquire($this->name);
-    return TRUE;
+    $tries = &drupal_static('__FUNCTION__', 0);
+    if ($this->getState()) {
+      // Figure out what we need to do to resume.
+    }
+    else {
+      // Figure out what more we need to do to start anew.
+      $this->state = new ConductorState;
+    }
+    // Get an ID for this instance.
+    $this->instanceID = $this->state->getIntanceID();
+    // Acquire a lock for this instance, ensuring 2 processes do not run this workflow simultaneously.
+    if (lock_acquire($this->instanceID)) {
+      // Ensure that activities are indexed.
+      $this->indexActivities();
+
+      // Create a record for this instance.
+      return TRUE;
+    }
+    else if ($tries < 5) {
+      $tries++;
+      $this->run();
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  /**
+   * This function contains pseudocode for processing workflows.
+   */
+  function runActitiesLogic() {
+    // Get the active activities from the state.
+    $activities = $this->state->getActiveActivities();
+    // Loop through all active Activities.
+    foreach ($activities as $name => &$activityState) {
+      $activity = $this->activities[$name];
+      // Set the state on the activity.
+      $activity->setState($activityState, $this->state);
+      $activity->run();
+      if ($activityState->status() === ConductorActivityState::RAN_SUCCESSFULLY) {
+        $this->state->activityCompleted($activityState);
+      }
+    }
   }
 
 }
