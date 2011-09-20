@@ -209,9 +209,13 @@ function conductor_new_workflow() {
   $activity = $workflow->newActivity('start'); 
   $activity->name = 'start';
   $activity->title = t('Start');
+  $activity->x = 100;
+  $activity->y = 100;
   $activity = $workflow->newActivity('end'); 
   $activity->name = 'end';
   $activity->title = t('End');
+  $activity->x = 300;
+  $activity->y = 100;
   return $workflow;
 }
 

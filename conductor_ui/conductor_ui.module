@@ -16,6 +16,7 @@ function conductor_ui_menu() {
   $items['conductor_ui/activity-config/%/%/%ctools_js'] = array(
       'title' => 'Activity',
       'page callback' => 'conductor_ui_activity_form',
+      'cancel callback' => 'ctools_ajax_sample_wizard_cancel',
       'page arguments' => array(2, 3, 4),
       'access callback' => TRUE,
       'type' => MENU_CALLBACK,
@@ -122,6 +123,9 @@ function conductor_ui_add_ctools_modal_style() {
  */
 function conductor_ui_activity_form($workflow_uri_name, $activity_uri_name, $js = NULL) {
 
+  // We use the ctools wizard here because of its magic ajax and because we
+  // expect to grow into it.
+  ctools_include('wizard');
   $workflow_name = strtr($workflow_uri_name, array('-' => '_'));
   $activity_name = strtr($activity_uri_name, array('-' => '_'));
   // Load a workflow.
@@ -141,11 +145,10 @@ function conductor_ui_activity_form($workflow_uri_name, $activity_uri_name, $js 
   }
 
   $form_info = array(
-    'id' => 'temp',
     'path' => 'conductor_ui/activity-config/' . $workflow_uri_name . '/' . $activity_uri_name . '/no-js',
     'show trail' => FALSE,
     'show back' => FALSE,
-    'show cancel' => FALSE,
+    'show cancel' => TRUE,
     'show return' => FALSE,
     'order' => array(
       'start' => t('Funktytown'),
@@ -168,7 +171,6 @@ function conductor_ui_activity_form($workflow_uri_name, $activity_uri_name, $js 
     'workflow' => &$workflow,
   );
 
-  ctools_include('wizard');
   $step = 'start';
   $form = ctools_wizard_multistep_form($form_info, $step, $form_state);
 
@@ -180,7 +182,6 @@ function conductor_ui_activity_form($workflow_uri_name, $activity_uri_name, $js 
     $commands = array();
     if ($output === FALSE || !empty($form_state['complete'])) {
       // Dismiss the modal.
-      $commands[] = ajax_command_html('#ctools-sample', $animal);
       $commands[] = ctools_modal_command_dismiss();
     }
     else if (!empty($form_state['cancel'])) {
@@ -206,12 +207,18 @@ function conductor_ui_activity_form($workflow_uri_name, $activity_uri_name, $js 
   }
 }
 
-function conductor_ui_activity_form_loader($form, &$form_state) {
-  dpm(func_get_args());
+function conductor_ui_activity_get_form($form, &$form_state) {
   $activity = $form_state['activity'];
   $form = $activity->configureForm($form);
   return $form;
 }
+
+function conductor_ui_activity_get_form_validate($form, &$form_state) {
+}
+
+function conductor_ui_activity_get_form_submit($form, &$form_state) {
+}
+
 /**
  * Convert any string into a CSS class.
  *
