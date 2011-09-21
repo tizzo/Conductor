@@ -282,17 +282,19 @@ function conductor_ui_default_conductor_workflows() {
   $activity->y = 200;
   $activity->name = 'start';
   $activity->title = 'Start';
-  $activity->inputs = array(
+  $activity->outputs = array(
     'activity_2'
   );
+  $activity->inputs = array();
   $activity = $workflow->newActivity('activity');
   $activity->x = 180;
   $activity->y = 100;
   $activity->name = 'activity_2';
   $activity->title = 'Activity 2';
-  $activity->inputs = array();
-  $activity->outputs = array(
+  $activity->inputs = array(
     'start',
+  );
+  $activity->outputs = array(
     'end'
   );
   $activity = $workflow->newActivity('end');
