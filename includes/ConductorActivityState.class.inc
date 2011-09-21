@@ -5,15 +5,30 @@
  */
 class ConductorActivityState {
 
+  /**
+   * The activity has been initialized but not yet processed.
+   */
   const INITIALIZED = -1;
 
+  /**
+   * The activity processing has failed in a way that cannot be recovered.
+   */
   const FAILED = 1;
 
+  /**
+   * The activity is paused and will need to be resumed.
+   */
   const PAUSED = 2;
 
+  /**
+   * The activity ran, but must be ran again.
+   */
   const RUN_AGAIN = 3;
 
-  const FINSIHED = 0;
+  /**
+   * The activity is finished and should not be run again.
+   */
+  const FINISHED = 0;
 
   // The status of this activity, one of the constants listed above.
   protected $status = NULL;
@@ -24,16 +39,47 @@ class ConductorActivityState {
   // The name of the activity.
   public $name = '';
 
-  public function __construct(ConductorActivity $activity) {
+  // An array of ConductorActivityState descended objects that represent
+  // the state of the inputs for this activity.
+  public $inputStates = array();
+
+  // A container for the 
+  public $workflowState = NULL;
+
+  public function __construct(ConductorActivity $activity, ConductorState $state) {
     $this->name = $activity->name;
     $this->plugin = $activity->plugin_info['name'];
     $this->status = self::INITIALIZED;
+    $this->workflowState = &$state;
   }
 
   /**
    * The status of this activity.
    */
-  function status() {
-    return $status;
+  public function status() {
+    return $this->status;
+  }
+
+  public function markFinished() {
+    $this->status = self::FINISHED;
+  }
+
+  public function markRunAgain() {
+    $this->status = self::RUN_AGAIN;
+  }
+
+  public function setInputActivityState(ConductorActivityState $state) {
+    $this->inputStates[$state->name] = $state;
+  }
+
+  /**
+   * Retrieve the Activity State of one of the inputs.
+   */
+  public function getInputActivityState($name = NULL) {
+    $state = FALSE;
+    if (!is_null($name) && isset($this->inputStates[$name])) {
+      $state = $this->inputStates[$name];
+    }
+    return $state;
   }
 }
