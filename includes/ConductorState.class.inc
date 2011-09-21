@@ -95,8 +95,10 @@ class ConductorState {
   }
 
   public function getIntanceID() {
-
-    return "TODO: we need to generate unique ID's here.  The specifics will vary depending on the state class.  Perhaps we do need plugins for this object?";
+    // TODO: we need to generate unique ID's here.  The specifics will vary
+    // depending on the state class.  Perhaps we do need plugins for this
+    // object?
+    return drupal_hash_base64(drupal_random_bytes(55));
   }
 
   /**
