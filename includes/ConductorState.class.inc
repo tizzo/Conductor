@@ -109,7 +109,7 @@ class ConductorState {
   public function getActiveActivities() {
     // If we do not yet have any activeActivities and we do not yet have any completed
     // activites, we must be starting a workflow.  Run the `start` activity.
-    if (!count($this->activeActivities) && !count($this->completeledActivities)) {
+    if (!count($this->activeActivities) && !count($this->completedActivities)) {
       $activity = $this->workflow->getActivity('start');
       $state = $this->getActivityStateHandler($activity);
       $this->activateActivity($activity, $state);
@@ -126,7 +126,8 @@ class ConductorState {
    *   An ConductorActivityState object represeting the state of the present activity.
    */
   public function activateActivity(ConductorActivity $activity, ConductorActivityState $state) {
-    $this->activeActivities[$activity->name] = $this->getActivityStateHandler($activity);
+    $this->activityStates[$activity->name] = $this->getActivityStateHandler($activity);
+    $this->activeActivities[$activity->name] = &$this->activityStates[$activity->name];
   }
 
   /**
@@ -139,10 +140,11 @@ class ConductorState {
    */
   public function completeActivity(ConductorActivity $activity, ConductorActivityState $state) {
     $this->completedActivities[$activity->name] = &$state;
-    foreach ($activity->getOutputs() as $activity_name) {
-      $activity = $this->workflow->getActivity($activity_name);
-      $this->activateActivity($activity, $this->getActivityStateHandler($activity));
+    foreach ($activity->outputs as $activity_name) {
+      $activateActivity = $this->workflow->getActivity($activity_name);
+      $this->activateActivity($activateActivity, $this->getActivityStateHandler($activateActivity));
     }
+    $activeActivities = &$this->activeActivities;
     unset($this->activeActivities[$activity->name]);
   }
 
@@ -151,8 +153,17 @@ class ConductorState {
    */
   public function getActivityStateHandler(ConductorActivity $activity) {
     // TODO: Figure out what we need to do to get the Conductor Activity State handler.
-    return new ConductorActivityState($activity);
-    
+    $activityState = new ConductorActivityState($activity, $this);
+    foreach ($activity->inputs as $activityName) {
+      if (isset($this->activityStates[$activityName])) {
+        $activityState->setInputActivityState($this->activityStates[$activityName]);
+      }
+    }
+    return $activityState;
+  }
+
+  public function workflowComplete() {
+    $this->status == self::FINISHED;
   }
 
 }
