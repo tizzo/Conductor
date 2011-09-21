@@ -46,6 +46,9 @@ class ConductorActivityState {
   // A container for the 
   public $workflowState = NULL;
 
+  // An optional context to be passed on the the next item.
+  public $context = array();
+
   public function __construct(ConductorActivity $activity, ConductorState $state) {
     $this->name = $activity->name;
     $this->plugin = $activity->plugin_info['name'];
@@ -70,6 +73,9 @@ class ConductorActivityState {
 
   public function setInputActivityState(ConductorActivityState $state) {
     $this->inputStates[$state->name] = $state;
+    if (is_array($state->context) && is_array($this->context)) {
+      $this->context = array_merge($state->context, $this->context);
+    }
   }
 
   /**
