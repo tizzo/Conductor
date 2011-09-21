@@ -25,6 +25,12 @@ class ConductorActivity extends ConductorObject {
   // The number of pixels from the left of the container this activity should appear.
   public $y = null;
 
+  // The name of the plugin used for this handler.
+  public $plugin = '';
+
+  // The ConductorActivityState object tracking the state of this activity.
+  public $activityState = NULL;
+
   public function option_definition() {
     $options['name'] = array('default' => '');
     $options['title'] = array('default' => '');
@@ -40,22 +46,61 @@ class ConductorActivity extends ConductorObject {
 
   public function addOutput($activity) {
   }
+
   /**
+   * Set the activity state on this activity.
    *
-   * @param
    * @param $activity_state
    *   The state of this individual activity.
    */
-  public function setState($activity_state, $state) {
+  public function setState($activity_state) {
+    $this->activityState = $activity_state;
+  }
+
+  public function checkRunnability() {
+    $runnable = TRUE;
+    if (is_null($this->activityState)) {
+      $runnable = FALSE;
+    }
+    foreach ($this->inputs as $input) {
+      // TODO: Currently the base Condcutor Activity defaults to requiring
+      // that all configured inputs have been properly run before allowing
+      // itself to run.  Decide if there should be configuration available
+      // by default or if we should have a different default.
+
+      // Ensure we have state for every configured input.
+      if (!$this->activityState->getInputActivityState($input)) {
+        $runnable = FALSE;
+      }
+    }
+    return $runnable;
   }
 
   /**
    * Run this activity performing whatever actions need to be performed.
    *
    * @return
-   *   A value representing in a structured way the outcome of this activity's run.
+   *   The appropriately adjusted ConductorActivityState object.
    */
   public function run() {
+    if ($this->process()) {
+      $this->activityState->markFinished();
+    }
+    return $this->activityState;
+  }
+
+  /**
+   * Process this workflow item.
+   *
+   * TODO: We may want to allow the process method to have more smarts
+   * so the run method can hide its inner workings to consumers of the
+   * API and still offer the same functionality (pause, etc.).
+   *
+   * @return
+   *   TRUE if the process completed successfully.
+   */
+  public function process() {
+    return TRUE;
   }
 
   /**
@@ -108,7 +153,7 @@ class ConductorActivity extends ConductorObject {
    */
 
   /**
-   *
+   * TODO: How can we delegate this to the conductor_ui module?
    */
   public function getUILinks() {
     // Create an array to be rendered by theme_links__ctools_dropbutton().
