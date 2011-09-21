@@ -120,7 +120,12 @@ class ConductorState {
     // activites, we must be starting a workflow.  Run the `start` activity.
     if (!count($this->activeActivities) && !count($this->completedActivities)) {
       $activity = $this->workflow->getActivity('start');
-      $state = $this->getActivityStateHandler($activity);
+      if (!isset($this->activityStates['start'])) {
+        $state = $this->getActivityStateHandler($activity);
+      }
+      else {
+        $state = $this->getActivityState('start');
+      }
       $this->activateActivity($activity, $state);
     }
     return $this->activeActivities;
@@ -135,7 +140,10 @@ class ConductorState {
    *   An ConductorActivityState object represeting the state of the present activity.
    */
   public function activateActivity(ConductorActivity $activity, ConductorActivityState $state) {
-    $this->activityStates[$activity->name] = $this->getActivityStateHandler($activity);
+    // Instantiate the appropriate state handler if we do not already have one.
+    if (!isset($this->activityStates[$activity->name])) {
+      $this->activityStates[$activity->name] = $this->getActivityStateHandler($activity);
+    }
     $this->activeActivities[$activity->name] = &$this->activityStates[$activity->name];
   }
 
