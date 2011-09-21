@@ -31,7 +31,7 @@ storage backend allowing it, too, to be persisted to a NoSQL or in memory data s
 A workflow is a process.  These processes have different steps, generically refered to as
 activities, that a particular workflow moves through.
 
-## Storage ##
+#### Storage ####
 
 Conductor workflows are implemented as [ctools exportables](http://drupalcode.org/project/ctools.git/blob_plain/7.x-1.x:/help/export.html).
 This means they may be provided in code or in the database and if there is a rendition
@@ -47,7 +47,7 @@ without making additional database calls for processing.
 An activity is a single step in a workflow process.
 Activities are implemented as [ctools plugins](http://drupalcode.org/project/ctools.git/blob_plain/7.x-1.x:/help/plugins-api.html).
 
-## Storage ##
+####Storage ####
 
 Activities are members of the workflow object and are stored in a serialized or exported
 format inside the workflow itself.  There is no external storage of activities beyond a
@@ -58,7 +58,7 @@ workflow that a given activity is a member of.
 
 Workflow state represents a single instance of a workflow.
 
-## Storage ##
+####Storage ####
 
 Workflow state is stored using another ctools plugin and so storage can be swapped out.
 The activities on a workflow are stored with the workflow state in their configuration
