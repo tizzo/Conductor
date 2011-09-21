@@ -197,11 +197,11 @@ class ConductorWorkflow {
    */
   public function newActivity($activity) {
     $new_activity = conductor_get_activity_handler($activity);
-    $new_activity->workflow = $this;
+    $new_activity->workflow = &$this;
     $this->activities[] = $new_activity;
     return $new_activity;
   }
- 
+
   public function getActivity($name) {
     $activity = FALSE;
     // If we can't find an activity by that name we may need to reindex activities.
@@ -298,17 +298,46 @@ class ConductorWorkflow {
     }
     else {
       // Figure out what more we need to do to start anew.
-      $this->state = new ConductorState;
+      $this->setState(new ConductorState);
     }
     // Get an ID for this instance.
     $this->instanceID = $this->state->getIntanceID();
-    // Acquire a lock for this instance, ensuring 2 processes do not run this workflow simultaneously.
+    // Acquire a lock for this instance, ensuring 2 processes do not run this
+    // workflow simultaneously.
     if (lock_acquire($this->instanceID)) {
       // Ensure that activities are indexed.
       $this->indexActivities();
+      // TODO: Create a record for this instance in the appropriate place.
+      // Get the active activities from the state.
 
-      // Create a record for this instance.
-      return TRUE;
+      // Loop through all active Activities processing them until we
+      // stop getting a current set of activeActivities that are different
+      // from the ones we already have (indicating that all active activities
+      // can't yet run and are blocked on some external process).
+      $activeActivities = array();
+      $newActiveActivities = $this->state->getActiveActivities();
+      if (is_array($newActiveActivities)) {
+        // Verify that we still have activities to run and all are not stalled.
+        while (count(array_diff(array_keys($newActiveActivities), array_keys($activeActivities)))) {
+          $activeActivities = $newActiveActivities;
+          foreach ($activeActivities as $name => &$activityState) {
+            print "Running $name\n";
+            $activity = $this->activities[$name];
+            $activity->setState($activityState);
+            if ($activity->checkRunnability()) {
+              $activityState = $activity->run();
+              // TODO: deal with other states.
+              if ($activityState->status() === ConductorActivityState::FINISHED) {
+                $this->state->completeActivity($activity, $activityState);
+              }
+            }
+          }
+          // Retrieve any newly eligible activities to process.
+          $newActiveActivities = $this->state->getActiveActivities();
+          //print print_r($newActiveActivities, TRUE);
+        }
+        return TRUE;
+      }
     }
     else if ($tries < 5) {
       $tries++;
@@ -319,22 +348,7 @@ class ConductorWorkflow {
     }
   }
 
-  /**
-   * This function contains pseudocode for processing workflows.
-   */
-  function runActitiesLogic() {
-    // Get the active activities from the state.
-    $activities = $this->state->getActiveActivities();
-    // Loop through all active Activities.
-    foreach ($activities as $name => &$activityState) {
-      $activity = $this->activities[$name];
-      // Set the state on the activity.
-      $activity->setState($activityState, $this->state);
-      $activity->run();
-      if ($activityState->status() === ConductorActivityState::RAN_SUCCESSFULLY) {
-        $this->state->activityCompleted($activityState);
-      }
-    }
+  function runActiveActivities() {
   }
 
 }
