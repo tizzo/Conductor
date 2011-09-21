@@ -12,6 +12,26 @@
 class ConductorState {
 
   /**
+   * The workflow has not yet been initialized with state.
+   */
+  const NO_STATE = 0;
+
+  /**
+   * The workflow has been initialized with state but not yet processed.
+   */
+  const INITIALIZED = 1;
+
+  /**
+   * The workflow instance is in the process of being run.
+   */
+  const RUNNING = 2;
+
+  /**
+   * The workflow has finished running.
+   */
+  const FINISHED = 3;
+
+  /**
    * An array of CondcutorActivityState descended object.
    *
    * Each of these objects tracks the state for a specific activity in the
@@ -41,8 +61,16 @@ class ConductorState {
    */
   public $storageHandler = NULL;
 
-  //public __construct($activityStates = array(), ConductorStorage $storageHandler) {
-  public function __construct($activityStates = array()) {
+  public $status = self::RUNNING;
+
+
+  /**
+   * Constructor for ConductorState.
+   *
+   * @param $activityStates (optional)
+   *   An associative array of ConductorActivityState objects keyed by $activity->name.
+   */
+  public function __construct(array $activityStates = array()) {
     $this->activityStates = $activityStates;
   }
 
@@ -82,11 +110,10 @@ class ConductorState {
     // If we do not yet have any activeActivities and we do not yet have any completed
     // activites, we must be starting a workflow.  Run the `start` activity.
     if (!count($this->activeActivities) && !count($this->completeledActivities)) {
-      $this->activeActivities[] = 'start';
       $activity = $this->workflow->getActivity('start');
+      $state = $this->getActivityStateHandler($activity);
+      $this->activateActivity($activity, $state);
     }
-    $state = $this->getActivityStateHandler($activity);
-    $this->activateActivity($activity, $state);
     return $this->activeActivities;
   }
 
