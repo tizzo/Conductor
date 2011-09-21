@@ -1,21 +1,9 @@
 <?php
 
 /**
- *
+ * This is the first activity in any workflow.
  */
 class ConductorStart extends ConductorActivity {
-
-  //
-  public $inputs = array();
-
-  //
-  public $outputs = array();
-
-  //
-  public $x = null;
-
-  // 
-  public $y = null;
 
   public function option_definition() {
     $options = parent::option_definition();
@@ -27,33 +15,22 @@ class ConductorStart extends ConductorActivity {
     return FALSE;
   }
 
-  public function addOutput($activity) {
-  }
-
   /**
-   * TODO:
+   * The Start action has no dependencies.
    */
-  public function configureForm() {
-    return FALSE;
+  public function checkRunnability() {
+    return TRUE;
   }
 
   /**
-   * TODO:
+   * The start method performs no actions.
    */
-  public function configureFormValidate() {
+  public function process() {
+    return TRUE;
   }
 
   /**
-   * TODO:
-   */
-  public function configureFormSubmit() {
-  }
-
-  public function run() {
-  }
-
-  /**
-   *
+   * Provide UI links, disabling those from the parent class that do not apply.
    */
   public function getUILinks() {
     // Create an array to be rendered by theme_links__ctools_dropbutton().

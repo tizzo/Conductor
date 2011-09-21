@@ -5,25 +5,10 @@
  */
 class ConductorEnd extends ConductorActivity {
 
-  //
-  public $inputs = array();
-
-  //
-  public $outputs = array();
-
-  //
-  public $x = null;
-
-  // 
-  public $y = null;
-
   public function option_definition() {
     $options = parent::option_definition();
     unset($options['outputs']);
     return $options;
-  }
-
-  public function addInput($activity) {
   }
 
   public function addOutput($activity) {
@@ -31,6 +16,11 @@ class ConductorEnd extends ConductorActivity {
   }
 
   public function run() {
+    $state = parent::run();
+    if ($state->status() === ConductorActivityState::FINISHED) {
+      //$this->state->workflowComplete();
+    }
+    return $state;
   }
 
   /**
