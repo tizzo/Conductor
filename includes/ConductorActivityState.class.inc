@@ -43,7 +43,7 @@ class ConductorActivityState {
   // the state of the inputs for this activity.
   public $inputStates = array();
 
-  // A container for the 
+  // A container for the state for this entire workflow instance.
   public $workflowState = NULL;
 
   // An optional context to be passed on the the next item.

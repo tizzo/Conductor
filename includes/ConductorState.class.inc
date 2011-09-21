@@ -67,6 +67,10 @@ class ConductorState {
   /**
    * Constructor for ConductorState.
    *
+   * TODO: Right now this constructor can't be called used practically but it
+   * should make resuming working processing dead simple when loading from a
+   * persistence layer.
+   *
    * @param $activityStates (optional)
    *   An associative array of ConductorActivityState objects keyed by $activity->name.
    */
@@ -81,14 +85,17 @@ class ConductorState {
     $this->activityStates = $activityStates;
   }
 
-  public function getActivityState($activityState = NULL) {
+  /**
+   * Get an activity state.
+   */
+  public function getActivityState($name = NULL) {
     $return = FALSE;
 
-    if (is_null($activityState)) {
+    if (is_null($name)) {
       $return = $this->activityStates;
     }
-    else if(isset($activityState[$activityState])) {
-       $return = $activityState[$activityState];
+    else if(isset($this->activityStates[$name])) {
+       $return = $this->activityStates[$name];
     }
 
     return $return;
