@@ -334,7 +334,6 @@ class ConductorWorkflow {
           }
           // Retrieve any newly eligible activities to process.
           $newActiveActivities = $this->state->getActiveActivities();
-          //print print_r($newActiveActivities, TRUE);
         }
         return TRUE;
       }
