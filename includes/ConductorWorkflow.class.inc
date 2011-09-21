@@ -321,7 +321,6 @@ class ConductorWorkflow {
         while (count(array_diff(array_keys($newActiveActivities), array_keys($activeActivities)))) {
           $activeActivities = $newActiveActivities;
           foreach ($activeActivities as $name => &$activityState) {
-            print "Running $name\n";
             $activity = $this->activities[$name];
             $activity->setState($activityState);
             if ($activity->checkRunnability()) {
