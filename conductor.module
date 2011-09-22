@@ -12,11 +12,11 @@ function conductor_menu() {
   $items = array();
   $items['conductor/ajax'] = array(
     'title' => 'Conductor',
+    'description' => 'Ajax callback for workflow manipulation.',
     'page callback' => 'conductor_ajax',
     'theme callback' => 'ajax_base_page_theme',
     'delivery callback' => 'ajax_deliver',
-    'access callback' => TRUE,
-    'description' => 'Ajax callback for workflow loading.',
+    'access arguments' => array('administer conductor workflows'),
     'type' => MENU_CALLBACK,
     'file' => 'includes/ajax.inc',
   );
