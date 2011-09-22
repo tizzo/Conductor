@@ -243,3 +243,40 @@ function conductor_start_workflow($name) {
   $workflow = conductor_get_workflow($name);
   return $workflow->run();
 }
+
+/**
+ * Start an instance of a workflow with a given context.
+ *
+ * Currently context is a simple associative array and it is passed from
+ * activity to activity, an array_merge being performed anytime additional
+ * context needs to be added.
+ *
+ * Dependency injection is expected to keep Conductor flexible
+ * and to allow us to extend it unforseen ways.  This may have
+ * gotten out of control though.  We really need to rejigger
+ * the dependencies such that this could be one or two lines
+ * not 8.
+ *
+ * @param $name
+ *   The name of the workflow to start.
+ * @param $context
+ *   An associative array of context information.
+ */
+function conductor_start_workflow_with_context($name, $context = array()) {
+  // TODO: Damn this ugly.
+  $workflow = conductor_get_workflow($name);
+  // Get the first activity, we will need it to set the initial context.
+  $start = $workflow->getActivity('start');
+  // Instantiate the state for this workflow instance.
+  $conductorState = new ConductorState();
+  // Create a state object for the first activity.
+  $startState = new ConductorActivityState($start, $conductorState);
+  // Set the context.
+  $startState->context = $context;
+  // Add the activity's state to the workflow instance state.
+  $conductorState->setActivityStates(array('start' => $startState));
+  // Actually assign the workflow instance state to the workflow.
+  $workflow->setState($conductorState);
+  // Finally, start running this workflow.
+  return $workflow->run();
+}
