@@ -2,7 +2,7 @@
 
 /**
  * @file
- *   Documents 
+ *   Documents the conductor API.
  */
 
 /**

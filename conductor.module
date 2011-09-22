@@ -210,6 +210,10 @@ function conductor_export_workflow(ConductorWorkflow &$workflow, $indent = '') {
 /**
  * Create an empty workflow to work with.
  *
+ * This function simply instantiates a new ConductorWorkflow, populating it
+ * with the `start` and `end` workflow activities required by all Conductor
+ * workflows for processing.
+ *
  * @return ConductorWorkflow
  *   A fully formed, empty $workflow object.
  */
