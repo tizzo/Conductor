@@ -78,6 +78,19 @@ When an activity is completed (always starting with the `start` activity), its n
 added to the `completedActivities` array in the WorkflowState object and each of its
 specified outputs is activated making them eligible for processing.
 
+## Context ##
+
+Note: the word context is probably the most overloaded word in the Drupal ecosystem.
+Here "context" simply means some data relevant to the operation being performed.
+
+Most activities will need some data to work with and some activities may load additional
+data to be utilized by subsequent processes.  To properly accomodate the anticipated
+context needs we will likely need to add named inputs and outputs for activities and
+allow them to specify what context they consume or expect.  There is some question as
+to how we can allow multiple context items to move through the chain for later use.  It
+is clear that a simple array is not sufficient for our requirements and we will likely
+need to make this system much more robust.
+
 ## Updating Conductor ##
 
 One question that needs to be answered for Conductor to be a viable option as the center
