@@ -114,11 +114,11 @@ function conductor_schema() {
       'serialize' => TRUE,
       'serialized default' => 'a:0:{}',
       'no export' => TRUE,
-      ),
+    ),
 
     'primary key' => array('sid'),
   );
-  $schema['conductor_state_item'] = array(
+  $schema['conductor_state_references'] = array(
     'description' => 'A conductor state item is a record of the machine name of an individual activity in a workflow state to allow for easy resuming.',
     'fields' => array(
       'siid' => array(
@@ -147,6 +147,20 @@ function conductor_schema() {
         'type' => 'varchar',
         'length' => '255',
         'not null' => TRUE,
+      ),
+      'activity' => array(
+        'description' => 'The unique name of the activity this reference points to allowing processes needing to resume a running workflow to pass new data to the appropriate activity upon resume.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ),
+      'data' => array(
+        'description' => 'A serialized representation of this workflow\'s entities at the time this workflow was started.',
+        'type' => 'text',
+        'size' => 'big',
+        'serialize' => TRUE,
+        'serialized default' => 'a:0:{}',
+        'no export' => TRUE,
       ),
     ),
     'primary key' => array('siid'),

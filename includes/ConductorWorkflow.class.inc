@@ -272,8 +272,12 @@ class ConductorWorkflow {
     $activities = array();
     foreach ($clone->activities as $id => $activity) {
       $activities[$id] = clone $activity;
+      // Ensure that the activityState has been cleared for each activity.
+      unset($activities[$id]->activityState);
     }
     $clone->activities = $activities;
+    // Ensure there is no workflow state floating around if this instance had been run.
+    unset($clone->state);
     return $clone;
   }
 
@@ -343,6 +347,8 @@ class ConductorWorkflow {
       $newActiveActivities = $this->state->getActiveActivities();
       if (is_array($newActiveActivities)) {
         // Verify that we still have activities to run and all are not stalled.
+        // TODO: This might be faster if we don't array_diff it.  Perhaps we could just check if these
+        // are identical?
         while (count(array_diff(array_keys($newActiveActivities), array_keys($activeActivities)))) {
           $activeActivities = $newActiveActivities;
           foreach ($activeActivities as $name => &$activityState) {
@@ -351,8 +357,12 @@ class ConductorWorkflow {
             if ($activity->checkRunnability()) {
               $activityState = $activity->run();
               // TODO: deal with other states.
+              switch ($activityState->status()) {
+                case ConductorActivityState::FINISHED:
+                  $this->state->completeActivity($activity, $activityState);
+                  break;
+              }
               if ($activityState->status() === ConductorActivityState::FINISHED) {
-                $this->state->completeActivity($activity, $activityState);
               }
             }
           }
@@ -369,9 +379,6 @@ class ConductorWorkflow {
     else {
       return FALSE;
     }
-  }
-
-  function runActiveActivities() {
   }
 
 }
