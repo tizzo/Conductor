@@ -199,10 +199,11 @@ class ConductorWorkflow {
    * @return
    *   If successfully created, the new ConductorActivity descended object, else FALSE.
    */
-  public function newActivity($activity) {
-    $new_activity = conductor_get_activity_handler($activity);
-    $new_activity->workflow = &$this;
-    $this->activities[] = $new_activity;
+  public function newActivity($activityHandlerName) {
+    if ($new_activity = conductor_get_activity_handler($activityHandlerName)) {
+      $new_activity->workflow = &$this;
+      $this->activities[] = $new_activity;
+    }
     return $new_activity;
   }
 
@@ -217,12 +218,12 @@ class ConductorWorkflow {
   public function getActivity($activityName) {
     $activity = FALSE;
     // If we can't find an activity by that name we may need to reindex activities.
-    if (!isset($this->activities[$name])) {
+    if (!isset($this->activities[$activityName])) {
       $this->indexActivities();
     }
     // If we have an activity of the requested name, return it.
-    if (isset($this->activities[$name])) {
-      $activity = $this->activities[$name];
+    if (isset($this->activities[$activityName])) {
+      $activity = $this->activities[$activityName];
     }
     return $activity;
   }
