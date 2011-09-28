@@ -88,6 +88,18 @@ Drupal.Conductor.workflow = {
               endpointsOnTop:true,
               anchors:["AutoDefault", "AutoDefault"],
               // connector: "Straight",
+              // TODO: Make this arrow look less terrible.
+              overlays: [
+                ["Arrow", {
+                  location:0.9, width:30,
+                }],
+                /*
+                ["Label", {
+                  label: Drupal.t('Output'),
+                  location:0.5, width:30,
+                }],
+                */
+              ], 
               connector: [
                 "Bezier",
                 { curviness: 20 }
