@@ -7,12 +7,13 @@
 
 /**
  * Implements hook_menu().
+ *
+ * Note most of the Conductor UI is provided by a ctools export_ui plugin.
+ * The basic data is defined inplugins/export_ui/conductor_ui.inc.  The class
+ * providing the functionality is in plugins/export_ui/conductor_ui.class.inc.
  */
 function conductor_ui_menu() {
   $items = array();
-  // Note most of the Conductor UI is provided by a ctools export_ui plugin.
-  // The basic data is defined inplugins/export_ui/conductor_ui.inc.  The class
-  // providing the functionality is in plugins/export_ui/conductor_ui.class.inc.
   $items['conductor_ui/activity-config/%/%/%ctools_js'] = array(
       'title' => 'Activity',
       'page callback' => 'conductor_ui_activity_form',
@@ -252,6 +253,9 @@ function conductor_ui_add_js() {
   ctools_include('ajax');
   ctools_include('modal');
   ctools_modal_add_js();
+
+  // TODO: Our API allows modules to specify their own js for their own
+  // activities.  Auto include it here.
 
   drupal_add_js(drupal_get_path('module', 'conductor_ui') . '/js/conductor_ui.js');
 }
