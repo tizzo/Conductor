@@ -67,6 +67,7 @@ Drupal.Conductor.workflow = {
   inputs: {},
   outputs: {},
   // Initialize the lines between activity nodes.
+  // TODO: This sometimes run more times than it should.
   initLines: function() {
     for (i in this.activities) {
       var info = this.activities[i].activityInfo;
@@ -75,14 +76,15 @@ Drupal.Conductor.workflow = {
     }
     // Make activities draggable
     // Loop through each activity for processing.
+    console.log(this.inputs);
     for (activity in this.inputs) {
       // Loop through inputs associated with this activity.
       for (input in this.inputs[activity]) {
         if (this.outputs[this.inputs[activity][input]] != undefined) {
           if ($.inArray(activity, this.outputs[this.inputs[activity][input]]) != -1) {
             jsPlumb.connect({
-              source: this.activities[activity].activityInfo.css_class,
-              target: "conductor-ui-activity-activity-2",
+              source: this.activities[this.inputs[activity][input]].activityInfo.css_class,
+              target: this.activities[activity].activityInfo.css_class,
               endpointsOnTop:true,
               anchors:["AutoDefault", "AutoDefault"],
               // connector: "Straight",
