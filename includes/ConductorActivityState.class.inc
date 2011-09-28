@@ -16,12 +16,13 @@ class ConductorActivityState {
   const FAILED = 1;
 
   /**
-   * The activity is paused and will need to be resumed.
+   * The activity must be re-run at another time,
+   * but definitively not during this run.
    */
-  const PAUSED = 2;
+  const PAUSE = 2;
 
   /**
-   * The activity ran, but must be ran again.
+   * The activity ran, but must run again.
    */
   const RUN_AGAIN = 3;
 
@@ -29,6 +30,7 @@ class ConductorActivityState {
    * The activity is finished and should not be run again.
    */
   const FINISHED = 0;
+
 
   // The status of this activity, one of the constants listed above.
   protected $status = NULL;
