@@ -89,7 +89,7 @@ class ConductorWorkflow {
    */
   static function &load($arg, $reset = FALSE) {
 
-    static $cache = array();
+    static $cache = &drupal_static('__FUNCTION__',.array());
 
     // We want a NULL value to return TRUE here, so we can't use isset() or empty().
     if (!array_key_exists($arg, $cache) || $reset) {
