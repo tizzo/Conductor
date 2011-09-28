@@ -2,6 +2,8 @@
 
 /**
  * Provides the default handler for Conductor State Storage using the dabase.
+ *
+ * TODO: Should we 
  */
 class ConductorStateStorageDatabase implements CondConductorStateStorage {
 
@@ -23,6 +25,7 @@ class ConductorStateStorageDatabase implements CondConductorStateStorage {
 
   static function load($unique_id) {
     $result = db_query('SELECT * FROM {conductor_state} WHERE sid=:sid', array('sid' => $unique_id), $options)->fetchObject();
+    
   }
 
   static function loadFromPointer($name) {

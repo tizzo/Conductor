@@ -124,6 +124,7 @@ function conductor_ui_add_ctools_modal_style() {
  */
 function conductor_ui_activity_form($workflow_uri_name, $activity_uri_name, $js = NULL) {
 
+  //dpm(func_get_args());
   // We use the ctools wizard here because of its magic ajax and because we
   // expect to grow into it.
   ctools_include('wizard');
