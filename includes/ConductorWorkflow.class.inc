@@ -142,7 +142,6 @@ class ConductorWorkflow {
 
   /**
    * Export a loaded row, such as an argument, field or the view itself to PHP code.
-   * TODO: port for workflow
    *
    * @param $identifier
    *   The variable to assign the PHP code for this object to.
@@ -193,7 +192,12 @@ class ConductorWorkflow {
 
 
   /**
-   * Create and add an activity with a handler to the workflow.
+   * Create and add an activity with a handler to this workflow.
+   *
+   * @param $activityHandlerName
+   *   The name of the ctools plugin for this activity handler.
+   * @return
+   *   If successfully created, the new ConductorActivity descended object, else FALSE.
    */
   public function newActivity($activity) {
     $new_activity = conductor_get_activity_handler($activity);
@@ -202,7 +206,15 @@ class ConductorWorkflow {
     return $new_activity;
   }
 
-  public function getActivity($name) {
+  /**
+   * Get an activity that is already a member of this workflow by machine name.
+   *
+   * @param $activityName
+   *   The machine name of the activity in this workflow.
+   * @return
+   *   If found, the ConductorActivity descended activity, else FALSE.
+   */
+  public function getActivity($activityName) {
     $activity = FALSE;
     // If we can't find an activity by that name we may need to reindex activities.
     if (!isset($this->activities[$name])) {
@@ -215,6 +227,12 @@ class ConductorWorkflow {
     return $activity;
   }
 
+  /**
+   * Get the array of all activities in this workflow.
+   *
+   * @return
+   *   An array of all activities that are members of this workflow.
+   */
   public function getActivities() {
     return $this->activities;
   }
@@ -270,7 +288,13 @@ class ConductorWorkflow {
   }
 
   /**
-   * Sets the state of this workflow.
+   * Set the state of this workflow.
+   *
+   * Note, this can also be set using the constructor.  We currently support both constructor
+   * and setter dependency injection techniques, though this is subject to change.
+   *
+   * @param $state
+   *   A ConductorState descended object to use for this workflow.
    */
   function setState(ConductorState $state) {
     // Pass a copy of this workflow into the state object.
@@ -279,7 +303,7 @@ class ConductorWorkflow {
   }
 
   /**
-   * Gets the state of this workflow.
+   * Get the state of this workflow.
    *
    * @return
    *   The ConductorState descended object that manages state for this workflow.
