@@ -3,6 +3,7 @@ description = Create arbitrary workflows to be performed on your site.
 package = Conductor
 dependencies[] = ctools
 core = 7.x
+files[] = conductor.test
 files[] = includes/ConductorWorkflow.class.inc
 files[] = includes/ConductorBase.inc
 files[] = includes/ConductorState.class.inc

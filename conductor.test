@@ -1,0 +1,134 @@
+<?php
+/**
+ * @file
+ *   Provides tests for the conductor module.
+ */
+
+/**
+ * This class exists to test Conductor code itself.
+ *
+ * Note, we may have to be very tricky in this case because Conductor
+ * relies very heavily on ctools and on the code registry, however in
+ * theory if we manually load all appropriate dependencies (requiring
+ * their files) we should be able to test the code isolated from the
+ * rest of the environment.
+ *
+ * Note: These tests can not access the database nor files. Calling any
+ * Drupal function that needs the database will throw exceptions. These
+ * include watchdog(), module_implements(), module_invoke_all() etc.
+ */
+class ConductorUnitTestCase extends DrupalUnitTestCase {
+
+  /**
+   * Implements getInfo().
+   */
+  public static function getInfo() {
+    return array (
+      'name' => t('Conductor API Unit tests'),
+      'description' => t('Isolate the objects as much as possible and verify the API methods.'),
+      'group' => t('Conductor'),
+    );
+  }
+  public function testWorkflowInstantiation() {
+    $this->includeFileDependencies();
+    $workflow = $this->instantiateWorkflow();
+    try {
+      if (get_class($workflow->getActivity('start')) == 'ConductorStart') {
+        $this->pass(t('Simple workflow instantiation is successful.'));
+      }
+      else {
+        $this->fail(t('Something prevented workflow intantiation.'));
+      }
+    }
+    catch (Exception $e) {
+      $this->fail(t('Something prevented workflow intantiation.'));
+    }
+  }
+
+  /**
+   * Load all potentially necessary files.
+   *
+   * Conductor relies heavily on the registry for autoloading, this function
+   * loads all files specified in conductor's .info file to premptively load
+   * all of the files we're likely to need.
+   */
+  private function includeFileDependencies() {
+    $info = drupal_parse_info_file(drupal_get_path('module', 'conductor') . '/conductor.info');
+    foreach ($info['files'] as $file) {
+      require_once($file);
+    }
+  }
+
+  /**
+   * Instantiate the simplest possible conductor workflow.
+   *
+   * @return
+   *   A ConductorWorkflow object populated with 2 activities.
+   */
+  private function instantiateWorkflow() {
+    $workflow = new ConductorWorkflow();
+    $workflow->wid = 'new';
+    $activity = $workflow->newActivity('start');
+    $activity->name = 'start';
+    $activity->title = t('Start');
+    $activity->x = 100;
+    $activity->y = 100;
+    $activity = $workflow->newActivity('end');
+    $activity->name = 'end';
+    $activity->title = t('End');
+    $activity->x = 300;
+    $activity->y = 100;
+    return $workflow;
+  }
+
+  /**
+   * Instantiate a workflow and populate it with state and context.
+   */
+  private function instantiateWorkflowWithState() {
+    $workflow = $this->instantiateWorkflow();
+    // Create the context
+    $context = array('foo' => 'bar');
+    // Get the first activity, we will need it to set the initial context.
+    $start = $workflow->getActivity('start');
+    // Instantiate the state for this workflow instance.
+    $conductorState = new ConductorState();
+    // Create a state object for the first activity.
+    $startState = new ConductorActivityState($start, $conductorState);
+    // Set the context.
+    $startState->context = $context;
+    // Add the activity's state to the workflow instance state.
+    $conductorState->setActivityStates(array('start' => $startState));
+    // Actually assign the workflow instance state to the workflow.
+    $workflow->setState($conductorState);
+    // Finally, start running this workflow.
+    return $workflow->run();
+  }
+}
+
+/**
+ *
+ */
+class ConductorTestCase extends DrupalWebTestCase {
+
+  /**
+  * Implements getInfo().
+  */
+  public static function getInfo() {
+    return array (
+      'name' => t('Conductor API tests'),
+      'description' => t('Verify that conductor workflows behave as expected with existing modules.'),
+      'group' => t('Conductor'),
+    );
+  }
+
+  /**
+   * Implements setUp().
+   */
+  public function setUp() {
+    // Enable any module that you will need in your tests.
+    parent::setUp('conductor');
+  }
+
+  public function testWorkflowRun() {
+  }
+}
