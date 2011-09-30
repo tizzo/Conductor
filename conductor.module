@@ -244,6 +244,12 @@ function conductor_new_workflow() {
  */
 function conductor_start_workflow($name) {
   $workflow = conductor_get_workflow($name);
+  $workflow->getState();
+  if (isset($options['observers'])) {
+    foreach ($options['observers'] as $observer) {
+      $workflow->state->registerObserver($observer);
+    }
+  }
   return $workflow->run();
 }
 
