@@ -311,10 +311,16 @@ class ConductorWorkflow {
   /**
    * Get the state of this workflow.
    *
+   * If no state has been instantiated, the default state class will
+   * be instantiated and used.
+   *
    * @return
    *   The ConductorState descended object that manages state for this workflow.
    */
   function getState() {
+    if (!$this->state) {
+      $this->setState(new ConductorState);
+    }
     return $this->state;
   }
 
@@ -322,19 +328,20 @@ class ConductorWorkflow {
    * Run this workflow.
    */
   function run() {
-    $tries = &drupal_static('__FUNCTION__', 0);
-    if ($this->getState()) {
-      // Figure out what we need to do to resume.
-    }
-    else {
-      // Figure out what more we need to do to start anew.
-      $this->setState(new ConductorState);
-    }
+    // Ensure that we have an instantiated state object.
+    $this->getState();
     // Get an ID for this instance.
-    $this->instanceID = $this->state->getIntanceID();
+    // TODO: This does *not* belong here.  No instance information
+    // should bleed into the workflow object.
+    //$this->instanceID = $this->state->getIntanceID();
     // Acquire a lock for this instance, ensuring 2 processes do not run this
     // workflow simultaneously.
-    if (lock_acquire($this->instanceID)) {
+
+    // TODO: This prevents us from running in DrupalUnitTestCase.
+    // Locking should  happen elsewhere
+    $tries = 0;
+    //if (lock_acquire($this->instanceID)) {
+
       // Ensure that activities are indexed.
       $this->indexActivities();
       // TODO: Create a record for this instance in the appropriate place.
@@ -359,6 +366,8 @@ class ConductorWorkflow {
             if ($activity->checkRunnability()) {
               $activityState = $activity->run();
               // TODO: deal with other states.
+              // TODO: What marks this workflow itself complete?  Does end have to do that or can any activity?
+              // hint: prolly any activity...
               switch ($activityState->status()) {
                 case ConductorActivityState::FINISHED:
                   $this->state->completeActivity($activity, $activityState);
@@ -373,14 +382,17 @@ class ConductorWorkflow {
         }
         return TRUE;
       }
-    }
-    else if ($tries < 5) {
-      $tries++;
-      $this->run();
-    }
-    else {
-      return FALSE;
-    }
+    //}
+    // else if ($tries < 5) {
+    //   $tries++;
+    //   $this->run();
+    // }
+    // else {
+    //   return FALSE;
+    // }
+  }
+
+  protected function executeActiveActivities() {
   }
 
 }
