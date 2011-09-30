@@ -29,18 +29,18 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
       'group' => t('Conductor'),
     );
   }
-  public function testWorkflowInstantiation() {
+
+  /**
+   * Test that a workflow successfully runs and completes.
+   */
+  public function testWorkflowRun() {
+    // We can't rely on autoload in unit tests, so get our files.
     $this->includeFileDependencies();
-    $workflow = $this->instantiateWorkflow();
-    try {
-      if (get_class($workflow->getActivity('start')) == 'ConductorStart') {
-        $this->pass(t('Simple workflow instantiation is successful.'));
-      }
-      else {
-        $this->fail(t('Something prevented workflow intantiation.'));
-      }
+    $workflow = $this->instantiateWorkflowWithState();
+    if (get_class($workflow->getActivity('start')) == 'ConductorStart') {
+      $this->pass(t('Simple workflow instantiation is successful.'));
     }
-    catch (Exception $e) {
+    else {
       $this->fail(t('Something prevented workflow intantiation.'));
     }
     // Register our test observer and populate it with an array we can watch.
@@ -82,18 +82,42 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
    *   A ConductorWorkflow object populated with 2 activities.
    */
   private function instantiateWorkflow() {
-    $workflow = new ConductorWorkflow();
+    $workflow = new ConductorWorkflow;
     $workflow->wid = 'new';
+    $workflow->name = 'example';
+    $workflow->title = 'Example';
+    $workflow->description = 'example';
+    $workflow->api_version = '1.0';
+    // Add and configure workflow activities.
     $activity = $workflow->newActivity('start');
+    $activity->x = 280;
+    $activity->y = 200;
     $activity->name = 'start';
-    $activity->title = t('Start');
-    $activity->x = 100;
+    $activity->title = 'Start';
+    $activity->outputs = array(
+      'activity_2'
+    );
+    $activity->inputs = array();
+    $activity = $workflow->newActivity('activity');
+    $activity->x = 180;
     $activity->y = 100;
+    $activity->name = 'activity_2';
+    $activity->title = 'Activity 2';
+    $activity->inputs = array(
+      'start',
+    );
+    $activity->outputs = array(
+      'end'
+    );
     $activity = $workflow->newActivity('end');
+    $activity->x = 380;
+    $activity->y = 200;
     $activity->name = 'end';
-    $activity->title = t('End');
-    $activity->x = 300;
-    $activity->y = 100;
+    $activity->title = 'End';
+    $activity->inputs = array(
+      'activity_2'
+    );
+    $activity->outputs = array();
     return $workflow;
   }
 
