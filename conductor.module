@@ -241,8 +241,11 @@ function conductor_new_workflow() {
  *
  * @param $name
  *   The name of the workflow to start.
+ * @param $options
+ *   An array of options that need to be documented :-)
+ *   TODO: ^ document this.
  */
-function conductor_start_workflow($name) {
+function conductor_start_workflow($name, $options = array()) {
   $workflow = conductor_get_workflow($name);
   $workflow->getState();
   if (isset($options['observers'])) {
