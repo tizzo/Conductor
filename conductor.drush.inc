@@ -25,7 +25,7 @@ function conductor_drush_command() {
     ),
     'bootstrap' => DRUSH_BOOTSTRAP_MAX,
   );
-  return $items;  
+  return $items;
 }
 
 /**
@@ -79,12 +79,14 @@ function drush_conductor_start($name = NULL) {
     drush_set_error('CONDUCTOR_WORKFLOW_NOT_SPECIFIED', dt('Please specify a workflow by machine name.'));
     $success = FALSE;
   }
-  elseif (conductor_get_workflow($name) === NULL) {
+  elseif (conductor_get_workflow($name) == FALSE) {
     drush_set_error('CONDUCTOR_WORKFLOW_NOT_FOUND', dt('Workflow @workflow not found.', array('@workflow' => $name)));
     $success = FALSE;
   }
   else {
-    $success = conductor_start_workflow($name);
+    // TODO: Register logger if options are appropriate.
+    $options['observers'] = array(new ConductorLogDrush(-1));
+    $success = conductor_start_workflow($name, $options);
   }
   return $success;
 }
