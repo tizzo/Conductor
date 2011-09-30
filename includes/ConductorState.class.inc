@@ -55,6 +55,11 @@ class ConductorState {
   public $workflow = NULL;
 
   /**
+   * 
+   */
+  protected $observers = array();
+
+  /**
    * An object implementing the ConductorStorage interface.
    *
    * All state CRUD operations are delgated to this object.
@@ -67,9 +72,9 @@ class ConductorState {
   /**
    * Constructor for ConductorState.
    *
-   * TODO: Right now this constructor can't be called used practically but it
-   * should make resuming working processing dead simple when loading from a
-   * persistence layer.
+   * TODO: Right now this constructor can't be used practically but it
+   * should make resuming working processing dead simple when loading
+   * from a persistence layer.
    *
    * @param $activityStates (optional)
    *   An associative array of ConductorActivityState objects keyed by $activity->name.
@@ -140,6 +145,7 @@ class ConductorState {
    *   An ConductorActivityState object represeting the state of the present activity.
    */
   public function activateActivity(ConductorActivity $activity, ConductorActivityState $state) {
+    $this->notifyObservers('activateActivity', $activity);
     // Instantiate the appropriate state handler if we do not already have one.
     if (!isset($this->activityStates[$activity->name])) {
       $this->activityStates[$activity->name] = $this->getActivityStateHandler($activity);
@@ -166,10 +172,12 @@ class ConductorState {
   }
 
   /**
-   *
+   * Factory method for ConductorActivityState descended objects.
    */
   public function getActivityStateHandler(ConductorActivity $activity) {
     // TODO: Figure out what we need to do to get the Conductor Activity State handler.
+    // The actual state handler should probably be instantiated by the activity allowing
+    // it to specify a different state handler.
     $activityState = new ConductorActivityState($activity, $this);
     foreach ($activity->inputs as $activityName) {
       if (isset($this->activityStates[$activityName])) {
@@ -183,4 +191,33 @@ class ConductorState {
     $this->status == self::FINISHED;
   }
 
+  /**
+   * Register a new observer.
+   *
+   * TODO: Is this getting way too complicated for our needs?
+   * I really only added it to do logging...
+   *
+   * @param $observer
+   *   A new ConductorObserver descended object.
+   */
+  public function registerObserver($observer) {
+    $this->observers[] = $observer;
+  }
+
+
+  /**
+   * Notify all registered observers of an event that occured.
+   *
+   * @param $event
+   *   A camelcase string identifying the name of the event that occured.
+   * @param $object
+   *   The conductor object that 
+   */
+  public function notifyObservers($event, $object) {
+    if ($this->observers) {
+      foreach ($this->observers as $observer) {
+        $observer->notify($event, $object);
+      }
+    }
+  }
 }
