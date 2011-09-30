@@ -295,8 +295,9 @@ class ConductorWorkflow {
   /**
    * Set the state of this workflow.
    *
-   * Note, this can also be set using the constructor.  We currently support both constructor
-   * and setter dependency injection techniques, though this is subject to change.
+   * Note, this can also be set using the constructor.  We currently support
+   * both constructor and setter dependency injection techniques, though this is
+   * subject to change.
    *
    * @param $state
    *   A ConductorState descended object to use for this workflow.
@@ -337,18 +338,19 @@ class ConductorWorkflow {
       // Ensure that activities are indexed.
       $this->indexActivities();
       // TODO: Create a record for this instance in the appropriate place.
-      // Get the active activities from the state.
 
       // Loop through all active Activities processing them until we
       // stop getting a current set of activeActivities that are different
       // from the ones we already have (indicating that all active activities
       // can't yet run and are blocked on some external process).
       $activeActivities = array();
+
+      // Get the active activities from the state.
       $newActiveActivities = $this->state->getActiveActivities();
       if (is_array($newActiveActivities)) {
         // Verify that we still have activities to run and all are not stalled.
-        // TODO: This might be faster if we don't array_diff it.  Perhaps we could just check if these
-        // are identical?
+        // TODO: This might be faster if we don't array_diff it.  Perhaps we
+        // could just check if these are identical?
         while (count(array_diff(array_keys($newActiveActivities), array_keys($activeActivities)))) {
           $activeActivities = $newActiveActivities;
           foreach ($activeActivities as $name => &$activityState) {
