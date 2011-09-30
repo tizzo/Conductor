@@ -2,15 +2,38 @@
 
 abstract class  ConductorLog implements ConductorObserver {
 
-  public function notify($event, object $object) {
-    $this->logEvent($event, $object);
+  public $logThreshold;
+
+  /**
+   * Set the level of log entry that this logger should log.
+   *
+   * (If a ConductorLogger could log logs.)
+   */
+  public function __construct($logThreshold = 0) {
+    $this->logThreshold = $logThreshold;
   }
 
   /**
+   * Implements ConductorObserver::notify().
+   */
+  public function notify($event, $object) {
+    $logLevel = $this->deriveLogLevel($event);
+    $this->logEvent($event, $object, $logLevel);
+  }
+
+  /**
+   * Log an event that has occured.
+   *
    * @param $event
    *   A string representing the log event.
+   * @param $object
+   *   The object that the event most directly happpened to.
+   * @param $logLevel
+   *   An integer representing the level.
+   *   0 is normal, less than zero is minor (only with verbose
+   *   options), greater indicates a problem.
    */
-  abstract public function logEvent($event, object $object);
+  abstract public function logEvent($event, $object, $logLevel);
 
   /**
    * @param $event
@@ -20,19 +43,45 @@ abstract class  ConductorLog implements ConductorObserver {
    * @return
    *   A string representing a human readable log friendly message.
    */
-  public function generateHumanMessage($event, object $object) {
-    // TODO: make this smarter.
+  public function generateHumanMessage($event, $object) {
     switch ($event) {
-      case 'activateEvent':
-        $message = t('Event @event was activated', array('@event' => $object->title));
+      case 'activateActivity':
+        $string = 'Event @event was activated';
+        $args = array('@event' => $object->title);
         break;
-      case '':
-      case default:
-        $message = t('Conductor just @evented.', array('@event' => $event));
+      default:
+        $string = t('Conductor just @evented.');
+        $args = array('@event' => $event);
         break;
     }
-    return $message;
+    return array( $string,  $args);
   }
 
+  /**
+   * Derive a logLevel to indicate the severity of the message.
+   *
+   * @param $event
+   *   A string representing the name of the event that occured.
+   * @return
+   *   An integer representing the level.
+   *   0 is normal, less than zero is minor (only with verbose
+   *   options), greater indicates a problem.
+   */
+  public function deriveLogLevel($event) {
+    $error = array();
+    $minor = array(
+      'activateActivity',
+    );
+    if (in_array($event, $minor)) {
+      $level = -1;
+    }
+    else if (in_array($event, $error)) {
+      $level = 0;
+    }
+    else {
+      $level = 0;
+    }
+    return $level;
+  }
 
 }
