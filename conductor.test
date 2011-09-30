@@ -43,6 +43,18 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     catch (Exception $e) {
       $this->fail(t('Something prevented workflow intantiation.'));
     }
+    // Register our test observer and populate it with an array we can watch.
+    $observer = new ConductorObserverTest;
+    $history = array();
+    $observer->history = &$history;
+    $workflow->state->registerObserver($observer);
+    $workflow->run();
+    if (count($history['activateEvent']) == 3) {
+      $this->pass(t('The appropriate number of activities were activated'));
+    }
+    else {
+      $this->fail(t('The number of activities activated was not what was expected'));
+    }
   }
 
   /**
@@ -54,7 +66,11 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
    */
   private function includeFileDependencies() {
     $info = drupal_parse_info_file(drupal_get_path('module', 'conductor') . '/conductor.info');
-    foreach ($info['files'] as $file) {
+    $test_files = array(
+      'tests/ConductorObserverTest.inc',
+    );
+    $files = array_merge($info['files'], $test_files);
+    foreach ($files as $file) {
       require_once($file);
     }
   }
@@ -101,7 +117,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     // Actually assign the workflow instance state to the workflow.
     $workflow->setState($conductorState);
     // Finally, start running this workflow.
-    return $workflow->run();
+    return $workflow;
   }
 }
 

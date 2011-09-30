@@ -3,12 +3,19 @@ description = Create arbitrary workflows to be performed on your site.
 package = Conductor
 dependencies[] = ctools
 core = 7.x
+
 files[] = conductor.test
-files[] = includes/ConductorWorkflow.class.inc
+
 files[] = includes/ConductorBase.inc
+files[] = includes/ConductorWorkflow.class.inc
 files[] = includes/ConductorState.class.inc
 files[] = includes/ConductorStorage.interface.inc
 files[] = includes/ConductorActivityState.class.inc
+files[] = includes/ConductorObserver.interface.inc
+files[] = includes/ConductorLog.class.inc
+files[] = includes/ConductorLogDrush.class.inc
+files[] = includes/ConductorLogWatchdog.class.inc
+
 files[] = plugins/activity/activity/ConductorActivity.class.php
 files[] = plugins/activity/start/ConductorStart.class.php
 files[] = plugins/activity/end/ConductorEnd.class.php
