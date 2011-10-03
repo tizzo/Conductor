@@ -1,7 +1,8 @@
 (function ($) {
 
 Drupal.Conductor = Drupal.Conductor || {};
-// TODO: What if someone wants to put two instances of the conductor interface on screen at the same time?  Can we make this more self contained?
+// TODO: What if someone wants to put two instances of the conductor interface
+// on screen at the same time?  Can we make this more self contained?
 Drupal.Conductor.activities = Drupal.Conductor.activities || {};
 Drupal.Conductor.jsPlumbLoaded = false;
 Drupal.Conductor.setupHasRun = false;
@@ -40,9 +41,9 @@ Drupal.Conductor.setup = function (context, settings) {
         release: function(e, data) {
           // For now, the data about this element is stashed via jQuery.
           // $(data.activityDomElement).data('activityInfo')
-          // TODO: we're not properly getting the updated x and y coordinates on drop.
-          // This is related in some way to the draggable options for jsPlumb and how they
-          // are passed through to jQuery ui.
+          // TODO: we're not properly getting the updated x and y coordinates on
+          // drop.  This is related in some way to the draggable options for
+          // jsPlumb and how they are passed through to jQuery ui.
         }
       });
       var info = activity.data('activityInfo');
