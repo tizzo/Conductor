@@ -162,6 +162,7 @@ class ConductorState {
    *   An ConductorActivityState object represeting the state of the present activity.
    */
   public function completeActivity(ConductorActivity $activity, ConductorActivityState $state) {
+    $this->notifyObservers('completeActivity', $activity);
     $this->completedActivities[$activity->name] = &$state;
     foreach ($activity->outputs as $activity_name) {
       $activateActivity = $this->workflow->getActivity($activity_name);

@@ -49,11 +49,17 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $observer->history = &$history;
     $workflow->state->registerObserver($observer);
     $workflow->run();
-    if (count($history['activateEvent']) == 3) {
+    if (count($history['activateActivity']) == 3) {
       $this->pass(t('The appropriate number of activities were activated'));
     }
     else {
       $this->fail(t('The number of activities activated was not what was expected'));
+    }
+    if (count($history['completeActivity']) == 3) {
+      $this->pass(t('The appropriate number of activities were completed'));
+    }
+    else {
+      $this->fail(t('The number of activities completed was not what was expected'));
     }
   }
 
