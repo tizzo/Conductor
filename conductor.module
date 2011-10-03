@@ -276,6 +276,8 @@ function conductor_start_workflow($name, $options = array()) {
  */
 function conductor_start_workflow_with_context($name, $context = array()) {
   // TODO: Damn this ugly.
+  // TODO: This should probably all be logic that can be triggered
+  // via the options array handed into conductor_start_workflow.
   $workflow = conductor_get_workflow($name);
   // Get the first activity, we will need it to set the initial context.
   $start = $workflow->getActivity('start');

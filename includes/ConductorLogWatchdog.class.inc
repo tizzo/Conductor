@@ -15,15 +15,15 @@ class ConductorLogWatchdog extends ConductorLog {
       $severity = WATCHDOG_DEBUG;
     }
     else if ($logLevel == 0) {
-      $level = WATCHDOG_NOTICE;
+      $severity = WATCHDOG_NOTICE;
     }
     else {
-      $level = WATCHDOG_ERROR;
+      $severity = WATCHDOG_ERROR;
     }
 
     // TODO: We should allow our messages to be translated properly.
     // This means a change in generateHumanMessage.
-    list($string, $args) = $this->generateHumanMessage();
+    list($string, $args) = $this->generateHumanMessage($event, $object);
     watchdog('Conductor', $string, $args, $severity);
   }
 

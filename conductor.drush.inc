@@ -84,8 +84,11 @@ function drush_conductor_start($name = NULL) {
     $success = FALSE;
   }
   else {
-    // TODO: Register logger if options are appropriate.
-    $options['observers'] = array(new ConductorLogDrush(-1));
+    // TODO: Make default logger registration in some way configurable.
+    $options['observers'] = array(
+      new ConductorLogDrush(-1),
+      new ConductorLogWatchdog(-1)
+    );
     $success = conductor_start_workflow($name, $options);
   }
   return $success;
