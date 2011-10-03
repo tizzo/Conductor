@@ -3,7 +3,7 @@
 /**
  * This is the first activity in any workflow.
  */
-class ConductorStart extends ConductorActivity {
+class ConductorActivityStart extends ConductorActivity {
 
   public function option_definition() {
     $options = parent::option_definition();

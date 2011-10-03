@@ -3,7 +3,7 @@
 /**
  *
  */
-class ConductorEnd extends ConductorActivity {
+class ConductorActivityEnd extends ConductorActivity {
 
   public function option_definition() {
     $options = parent::option_definition();

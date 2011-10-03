@@ -17,6 +17,6 @@ files[] = includes/ConductorLogDrush.class.inc
 files[] = includes/ConductorLogWatchdog.class.inc
 
 files[] = plugins/activity/activity/ConductorActivity.class.php
-files[] = plugins/activity/start/ConductorStart.class.php
-files[] = plugins/activity/end/ConductorEnd.class.php
+files[] = plugins/activity/start/ConductorActivityStart.class.php
+files[] = plugins/activity/end/ConductorActivityEnd.class.php
 files[] = plugins/activity/conditional/ConductorActivityConditional.class.php
