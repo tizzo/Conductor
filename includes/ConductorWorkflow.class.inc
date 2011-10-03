@@ -328,6 +328,30 @@ class ConductorWorkflow {
    * Run this workflow.
    */
   function run() {
+    // TODO: Here we should be doing some things differently. Rough plan:
+    //
+    // ## Thoughts on worklfow processing:
+    //
+    // 1. Do some evaluation of our our state.
+    // 2. Notify observers of what action we're about to perform (resuming, starting, etc.)
+    // 3. Call the appropriate method on the state object (getActiveActivities?)
+    // 4. Call a mehtod on this object to start processing activities.
+    //    - the activity should return it's status constant, that's it.
+    //    - check the status actviityState object for actual deeper state information
+    //    - depending on the output
+    //      - mark the activity finished activate the appropriate other activities
+    //      - ask the activity to generate a reference to itself (a string for the persistence layer)
+
+    // ## Thoughts on resuming:
+    //
+    // 1. A workflow is always resumed by reference to a specific activity.
+    //   Caveat: if we have branched there may be multiple items that have become
+    //   eligible for processing, does each one need to be resumed externally or can
+    //   that each be evaluated and asked if they'd like to resume?
+    // 2. That activity can have new data passed to it (new input occured)
+    // 3. Integrating modules are responsible for handing new data into paused activities.
+
+
     // Ensure that we have an instantiated state object.
     $this->getState();
     // Get an ID for this instance.
