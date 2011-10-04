@@ -392,12 +392,18 @@ class ConductorWorkflow {
               // TODO: deal with other states.
               // TODO: What marks this workflow itself complete?  Does end have to do that or can any activity?
               // hint: prolly any activity...
-              switch ($activityState->status()) {
-                case ConductorActivityState::FINISHED:
+              switch ($activityState->getStatus()) {
+                // If the activity has been completed, mark it as such.
+                case ConductorActivityState::COMPLETED:
                   $this->state->completeActivity($activity, $activityState);
+                  // TODO: is this how this should work?
+                  // TODO: The workflow should be marked complete when:
+                  //   A: there are no remaining active or suspended activities
+                  //   B: the workflow has expired (TODO: Implement workflow expiry)
+                  if ($activity->plugin_info['name'] == 'end') {
+                    $this->state->workflowComplete();
+                  }
                   break;
-              }
-              if ($activityState->status() === ConductorActivityState::FINISHED) {
               }
             }
           }
