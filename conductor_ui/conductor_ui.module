@@ -15,12 +15,20 @@
 function conductor_ui_menu() {
   $items = array();
   $items['conductor_ui/activity-config/%/%/%ctools_js'] = array(
-      'title' => 'Activity',
-      'page callback' => 'conductor_ui_activity_form',
-      'cancel callback' => 'ctools_ajax_sample_wizard_cancel',
-      'page arguments' => array(2, 3, 4),
-      'access callback' => TRUE,
-      'type' => MENU_CALLBACK,
+    'title' => 'Activity',
+    'page callback' => 'conductor_ui_activity_form',
+    'cancel callback' => 'ctools_ajax_sample_wizard_cancel',
+    'page arguments' => array(2, 3, 4),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/structure/conductor/settings'] = array(
+    'title' => 'Conductor Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('conductor_ui_admin_settings_form'),
+    'access arguments' => array('administer conductor workflows'),
+    'file' => 'conductor_ui.admin.inc',
+    'type' => MENU_LOCAL_TASK,
   );
   return $items;
 }
