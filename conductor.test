@@ -37,11 +37,11 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     // We can't rely on autoload in unit tests, so get our files.
     $this->includeFileDependencies();
     $workflow = $this->instantiateWorkflowWithState();
-    if (get_class($workflow->getActivity('start')) == 'ConductorStart') {
+    if (get_class($workflow->getActivity('start')) == 'ConductorActivityStart') {
       $this->pass(t('Simple workflow instantiation is successful.'));
     }
     else {
-      $this->fail(t('Something prevented workflow intantiation.'));
+      $this->fail(t('Something prevented workflow instantiation.'));
     }
     // Register our test observer and populate it with an array we can watch.
     $observer = new ConductorObserverTest;
@@ -49,6 +49,10 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $observer->history = &$history;
     $workflow->state->registerObserver($observer);
     $workflow->run();
+    // TODO: Test the resulting workflow's state.
+    // TODO: Perform some introspection on the activityState objects.
+    // TODO: Verify we got passthrough of our context to the end.
+
     if (count($history['activateActivity']) == 3) {
       $this->pass(t('The appropriate number of activities were activated'));
     }
@@ -73,7 +77,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
   private function includeFileDependencies() {
     $info = drupal_parse_info_file(drupal_get_path('module', 'conductor') . '/conductor.info');
     $test_files = array(
-      'tests/ConductorObserverTest.inc',
+      'tests/includes/ConductorObserverTest.inc',
     );
     $files = array_merge($info['files'], $test_files);
     foreach ($files as $file) {

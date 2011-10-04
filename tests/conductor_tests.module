@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function conductor_tests_ctools_plugin_api($owner, $api) {
+  if ($owner == 'conductor' && ($api == 'plugins' || $api == 'workflow')) {
+    return array('version' => 1.0);
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ *
+ * @param string $owner
+ *   The system name of the module owning the plugin type for which a base
+ *   directory location is being requested.
+ * @param string $plugin_type
+ *   The name of the plugin type for which a base directory is being requested.
+ * @return string
+ *   The path where CTools' plugin system should search for plugin files,
+ *   relative to your module's root. Omit leading and trailing slashes.
+ */
+function conductor_tests_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'conductor') {
+    return "plugins/$plugin_type";
+  }
+}
+
+

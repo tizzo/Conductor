@@ -1,0 +1,7 @@
+name = Conductor Tests
+core = 7.x
+dependencies[] = conductor
+description = Test module for Conductor testing.
+hidden = TRUE
+package = Testing
+files[] = plugins/activity/pause_test/ConductorActivityPauseTest.class.inc
