@@ -22,7 +22,7 @@ function conductor_menu() {
   );
   return $items;
 }
- 
+
 /*
  * Implements hook_permission().
  */
@@ -80,13 +80,15 @@ function conductor_activity_process(&$plugin) {
   $plugin += array(
     'category' => t('Miscellaneous'),
     'description' => '',
+    'conductor_ui_template' => 'conductor_activity',
+    'conductur_ui_js_object' => 'activity',
   );
-  drupal_alter('conductor_activity_process', $plugin);
   foreach (module_implements('conductor_activity_process') as $module) {
     // Enable other modules to modify the plugin data.
     $function = $module . '_conductor_activity_process';
     $function($plugin);
   }
+  drupal_alter('conductor_activity_process', $plugin);
 }
 
 /**
@@ -248,6 +250,7 @@ function conductor_new_workflow() {
 function conductor_start_workflow($name, $options = array()) {
   $workflow = conductor_get_workflow($name);
   $workflow->getState();
+  // TODO: Load the default observers if any are configured when this is blank.
   if (isset($options['observers'])) {
     foreach ($options['observers'] as $observer) {
       $workflow->state->registerObserver($observer);

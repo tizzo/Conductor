@@ -15,14 +15,6 @@ class ConductorActivityEnd extends ConductorActivity {
     return FALSE;
   }
 
-  public function run() {
-    $state = parent::run();
-    if ($state->status() === ConductorActivityState::FINISHED) {
-      //$this->state->workflowComplete();
-    }
-    return $state;
-  }
-
   /**
    *
    */
@@ -31,7 +23,7 @@ class ConductorActivityEnd extends ConductorActivity {
     $links = parent::getUILinks();
     unset($links['output']);
     unset($links['remove']);
-    //unset($links['edit']);
+    unset($links['edit']);
     return $links;
   }
 
