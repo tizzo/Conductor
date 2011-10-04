@@ -10,6 +10,9 @@
  */
 class conductor_ui extends ctools_export_ui {
 
+  /**
+   * Implements ctools_export_ui::list_page().
+   */
   function list_page($js, $input) {
     conductor_ui_add_css();
     // wrap output in a div for CSS
@@ -20,6 +23,11 @@ class conductor_ui extends ctools_export_ui {
     }
   }
 
+  /**
+   * Implements ctools_export_ui::clone_page().
+   */
+  /*
+   * TODO: Properly implement this!
   function clone_page($js, $input, $item, $step = NULL) {
     drupal_set_title($this->get_page_title('clone', $item));
 
@@ -52,8 +60,11 @@ class conductor_ui extends ctools_export_ui {
 
     return $output;
   }
+  */
 
   /**
+   * Implements ctools_export_ui::edit_page().
+   *
    * Main entry point to edit an item.
    */
   function edit_page($js, $input, $workflow, $step = NULL) {
