@@ -31,11 +31,28 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
   }
 
   /**
+   * Implements DrupalUnitTestCase::setUp().
+   */
+  public function setUp() {
+    parent::setUp();
+    // Conductor relies heavily on the registry for autoloading, this function
+    // loads all files specified in conductor's .info file to premptively load
+    // all of the files we're likely to need.
+    $info = drupal_parse_info_file(drupal_get_path('module', 'conductor') . '/conductor.info');
+    $test_files = array(
+      'tests/includes/ConductorObserverTest.inc',
+    );
+    $files = array_merge($info['files'], $test_files);
+    foreach ($files as $file) {
+      require_once($file);
+    }
+
+  }
+
+  /**
    * Test that a workflow successfully runs and completes.
    */
   public function testWorkflowRun() {
-    // We can't rely on autoload in unit tests, so get our files.
-    $this->includeFileDependencies();
     $workflow = $this->instantiateWorkflowWithState();
     if (get_class($workflow->getActivity('start')) == 'ConductorActivityStart') {
       $this->pass(t('Simple workflow instantiation is successful.'));
@@ -49,7 +66,12 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $observer->history = &$history;
     $workflow->state->registerObserver($observer);
     $workflow->run();
-    // TODO: Test the resulting workflow's state.
+    if ($workflow->state->getStatus() == ConductorState::FINISHED) {
+      $this->pass(t('The workflow was marked successfully complete.'));
+    }
+    else {
+      $this->fail(t('The workflow was not marked complete.'));
+    }
     // TODO: Perform some introspection on the activityState objects.
     // TODO: Verify we got passthrough of our context to the end.
 
@@ -64,24 +86,6 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     }
     else {
       $this->fail(t('The number of activities completed was not what was expected'));
-    }
-  }
-
-  /**
-   * Load all potentially necessary files.
-   *
-   * Conductor relies heavily on the registry for autoloading, this function
-   * loads all files specified in conductor's .info file to premptively load
-   * all of the files we're likely to need.
-   */
-  private function includeFileDependencies() {
-    $info = drupal_parse_info_file(drupal_get_path('module', 'conductor') . '/conductor.info');
-    $test_files = array(
-      'tests/includes/ConductorObserverTest.inc',
-    );
-    $files = array_merge($info['files'], $test_files);
-    foreach ($files as $file) {
-      require_once($file);
     }
   }
 
