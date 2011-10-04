@@ -6,16 +6,20 @@ core = 7.x
 
 files[] = conductor.test
 
+; Interfaces
+files[] = includes/ConductorStorage.interface.inc
+files[] = includes/ConductorObserver.interface.inc
+
+; Conductor core classes
 files[] = includes/ConductorBase.inc
 files[] = includes/ConductorWorkflow.class.inc
 files[] = includes/ConductorState.class.inc
-files[] = includes/ConductorStorage.interface.inc
 files[] = includes/ConductorActivityState.class.inc
-files[] = includes/ConductorObserver.interface.inc
 files[] = includes/ConductorLog.class.inc
 files[] = includes/ConductorLogDrush.class.inc
 files[] = includes/ConductorLogWatchdog.class.inc
 
+; Activity includes
 files[] = plugins/activity/activity/ConductorActivity.class.php
 files[] = plugins/activity/start/ConductorActivityStart.class.php
 files[] = plugins/activity/end/ConductorActivityEnd.class.php
