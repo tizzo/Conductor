@@ -47,6 +47,7 @@ $plugin = array(
   'handler' => array(
      'class' => 'conductor_ui',
      'parent' => 'ctools_export_ui',
+     'file' => 'conductor_ui.class.inc',
    ),
 
 );
