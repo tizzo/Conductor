@@ -11,6 +11,11 @@ class ConductorActivityState {
   const INITIALIZED = -1;
 
   /**
+   * The activity is being processed.
+   */
+  const ACTIVE = 0;
+
+  /**
    * The activity processing has failed in a way that cannot be recovered.
    */
   const FAILED = 1;
@@ -19,7 +24,7 @@ class ConductorActivityState {
    * The activity must be re-run at another time,
    * but definitively not during this run.
    */
-  const PAUSE = 2;
+  const SUSPENDED = 2;
 
   /**
    * The activity ran, but must run again.
@@ -27,9 +32,9 @@ class ConductorActivityState {
   const RUN_AGAIN = 3;
 
   /**
-   * The activity is finished and should not be run again.
+   * The activity is completed and should not be run again.
    */
-  const FINISHED = 0;
+  const COMPLETED = 4;
 
 
   // The status of this activity, one of the constants listed above.
@@ -61,12 +66,21 @@ class ConductorActivityState {
   /**
    * The status of this activity.
    */
-  public function status() {
+  public function getStatus() {
     return $this->status;
   }
 
-  public function markFinished() {
-    $this->status = self::FINISHED;
+  /**
+   * @param $status
+   *   Status must contain one of the status constants in this file.
+   */
+  public function setStatus($status) {
+    $this->status = $status;
+  }
+
+// TODO: Do I really want a ton of different methods just to manipulate a single attribute?
+  public function markCompeted() {
+    $this->status = self::COMPLETED;
   }
 
   public function markRunAgain() {
