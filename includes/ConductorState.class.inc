@@ -7,29 +7,25 @@
  * instance of that workflow.  It delegates saving to a member object stored in the
  * $storageHandler attribute, which must implement the ConductorStorage interface.
  *
- * ConductorState is comprised of ConductorActivityStates.  These 
+ * ConductorState is comprised of ConductorActivityState descended objects.
+ * Each of these maintains the state of an individual activity.
  */
 class ConductorState {
 
   /**
-   * The workflow has not yet been initialized with state.
-   */
-  const NO_STATE = 0;
-
-  /**
    * The workflow has been initialized with state but not yet processed.
    */
-  const INITIALIZED = 1;
+  const INITIALIZED = 0;
 
   /**
    * The workflow instance is in the process of being run.
    */
-  const RUNNING = 2;
+  const RUNNING = 1;
 
   /**
    * The workflow has finished running.
    */
-  const FINISHED = 3;
+  const FINISHED = 2;
 
   /**
    * An array of CondcutorActivityState descended object.
@@ -66,7 +62,12 @@ class ConductorState {
    */
   public $storageHandler = NULL;
 
-  public $status = self::RUNNING;
+  /**
+   * The status of this workflow instance.
+   *
+   * This should always contain one of the constants in this class.
+   */
+  protected $status = self::INITIALIZED;
 
 
   /**
@@ -84,7 +85,21 @@ class ConductorState {
   }
 
   /**
+   * Get the status of this workflow instance.
+   *
+   * @return
+   *   An integer mapping to one of the constants in this class.
+   */
+  public function getStatus() {
+    return $this->status;
+  }
+
+  /**
    * Set the activity states.
+   *
+   * @param $activityStates
+   *   An array of active activity states.
+   * TODO: Support the different types of required states.
    */
   public function setActivityStates($activityStates) {
     $this->activityStates = $activityStates;
@@ -145,12 +160,14 @@ class ConductorState {
    *   An ConductorActivityState object represeting the state of the present activity.
    */
   public function activateActivity(ConductorActivity $activity, ConductorActivityState $state) {
-    $this->notifyObservers('activateActivity', $activity);
-    // Instantiate the appropriate state handler if we do not already have one.
-    if (!isset($this->activityStates[$activity->name])) {
-      $this->activityStates[$activity->name] = $this->getActivityStateHandler($activity);
+    if (!isset($this->activeActivities[$activity->name])) {
+      $this->notifyObservers('activateActivity', $activity);
+      // Instantiate the appropriate state handler if we do not already have one.
+      if (!isset($this->activityStates[$activity->name])) {
+        $this->activityStates[$activity->name] = $this->getActivityStateHandler($activity);
+      }
+      $this->activeActivities[$activity->name] = &$this->activityStates[$activity->name];
     }
-    $this->activeActivities[$activity->name] = &$this->activityStates[$activity->name];
   }
 
   /**
@@ -188,15 +205,15 @@ class ConductorState {
     return $activityState;
   }
 
+  /**
+   * This workflow is complete.
+   */
   public function workflowComplete() {
-    $this->status == self::FINISHED;
+    $this->status = self::FINISHED;
   }
 
   /**
    * Register a new observer.
-   *
-   * TODO: Is this getting way too complicated for our needs?
-   * I really only added it to do logging...
    *
    * @param $observer
    *   A new ConductorObserver descended object.
