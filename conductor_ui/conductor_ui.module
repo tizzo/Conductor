@@ -279,7 +279,7 @@ function conductor_ui_add_css() {
 }
 
 /**
- * Implements hook_conductor_default_workflows().
+ * Implements hook_default_conductor_default_workflows().
  */
 function conductor_ui_default_conductor_workflows() {
   $workflows = array();
@@ -296,7 +296,8 @@ function conductor_ui_default_conductor_workflows() {
   $activity->name = 'start';
   $activity->title = 'Start';
   $activity->outputs = array(
-    'activity_2'
+    'activity_2',
+    'activity_3'
   );
   $activity->inputs = array();
   $activity = $workflow->newActivity('activity');
@@ -310,13 +311,25 @@ function conductor_ui_default_conductor_workflows() {
   $activity->outputs = array(
     'end'
   );
+  $activity = $workflow->newActivity('activity');
+  $activity->x = 180;
+  $activity->y = 100;
+  $activity->name = 'activity_3';
+  $activity->title = 'Activity 3';
+  $activity->inputs = array(
+    'start',
+  );
+  $activity->outputs = array(
+    'end'
+  );
   $activity = $workflow->newActivity('end');
   $activity->x = 380;
   $activity->y = 200;
   $activity->name = 'end';
   $activity->title = 'End';
   $activity->inputs = array(
-    'activity_2'
+    'activity_2',
+    'activity_3'
   );
   $activity->outputs = array();
   $workflows[$workflow->name] = $workflow;
