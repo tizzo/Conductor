@@ -319,6 +319,7 @@ class ConductorWorkflow {
    */
   function getState() {
     if (!$this->state) {
+      // TODO: State pretty much requires a persistence capability.
       $this->setState(new ConductorState);
     }
     return $this->state;
@@ -341,6 +342,28 @@ class ConductorWorkflow {
     //    - depending on the output
     //      - mark the activity finished activate the appropriate other activities
     //      - ask the activity to generate a reference to itself (a string for the persistence layer)
+    // 5. We will need to track activities in the following states:
+    //    - ACTIVE
+    //      activated but not yet run.
+    //    - FAILED
+    //      threw an error or failed in some recoverable way that should be logged but not repeated.
+    //    - SUSPENDED
+    //      the activity is awaiting further input, suspended until that input may be provided
+    //    - RUN_AGAIN
+    //      this may be deprecated, I'm not sure what I thought it was for...
+    //    - COMPLETED
+    //      the activity has been successfully completed and we're done
+    // 6. Depending on the number of each of the previous categories, the workflow stat can be derived.
+    ///    - ACTIVE
+    //      activated but not yet run.
+    //    - FAILED
+    //      If we have > 0 FAILED and the workflow ends, this worklow did not complete successfully.  Results should be logged.
+    //    - SUSPENDED
+    //      If we have > 0 suspended activities, we need to suspend the workflow after processsing the active activities.
+    //      each activity will be given the opportunity to create pointers back to itself so that messages may be passed to
+    //      that activity upon resume.
+    //    - COMPLETED
+    //      when an activity with the machine name "end" is completed, we're done. TODO: Should we have COMPLETED-SUCCESSFULLY?
 
     // ## Thoughts on resuming:
     //
@@ -349,7 +372,6 @@ class ConductorWorkflow {
     //   eligible for processing, does each one need to be resumed externally or can
     //   that each be evaluated and asked if they'd like to resume?
     // 2. That activity can have new data passed to it (new input occured)
-    // 3. Integrating modules are responsible for handing new data into paused activities.
 
 
     // Ensure that we have an instantiated state object.
@@ -398,8 +420,8 @@ class ConductorWorkflow {
                   $this->state->completeActivity($activity, $activityState);
                   // TODO: is this how this should work?
                   // TODO: The workflow should be marked complete when:
-                  //   A: there are no remaining active or suspended activities
-                  //   B: the workflow has expired (TODO: Implement workflow expiry)
+                  //   - there are no active or suspended activities
+                  //   - the workflow has expired (TODO: Implement workflow expiry)
                   if ($activity->plugin_info['name'] == 'end') {
                     $this->state->workflowComplete();
                   }
