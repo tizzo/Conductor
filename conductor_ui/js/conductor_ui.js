@@ -76,7 +76,6 @@ Drupal.Conductor.workflow = {
     }
     // Make activities draggable
     // Loop through each activity for processing.
-    console.log(this.inputs);
     for (activity in this.inputs) {
       // Loop through inputs associated with this activity.
       for (input in this.inputs[activity]) {
