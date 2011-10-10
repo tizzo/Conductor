@@ -53,9 +53,9 @@ Drupal.Conductor.setup = function (context, settings) {
       workflow.activities[info.name].domElement = activity;
       // Stow the js object for easy access.
       workflow.activities[info.name].activityInfo = info;
-      workflow.initLines();
-      Drupal.Conductor.setupHasRun = true;
     }
+    workflow.initLines();
+    Drupal.Conductor.setupHasRun = true;
   }
 }
 
@@ -68,7 +68,6 @@ Drupal.Conductor.workflow = {
   inputs: {},
   outputs: {},
   // Initialize the lines between activity nodes.
-  // TODO: This sometimes run more times than it should.
   initLines: function() {
     for (i in this.activities) {
       var info = this.activities[i].activityInfo;
