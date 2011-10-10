@@ -84,7 +84,7 @@ class ConductorActivity extends ConductorObject {
    */
   public function run() {
     if ($this->process()) {
-      $this->activityState->markFinished();
+      $this->activityState->markCompeted();
     }
     return $this->activityState;
   }
@@ -107,7 +107,8 @@ class ConductorActivity extends ConductorObject {
    * TODO:
    */
   public function configureForm(&$form) {
-    // TODO: Once testing is finished, this should be the default.
+    // TODO: Once testing is competed, this should be the default form.
+    // TODO: Add an option here to specify whether we should wait for all inputs to be completed or allow for any one to move processing forward.
     //return FALSE;
     $form['human_name'] = array(
       '#type' => 'textfield',
