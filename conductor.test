@@ -66,26 +66,13 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $observer->history = &$history;
     $workflow->state->registerObserver($observer);
     $workflow->run();
-    if ($workflow->state->getStatus() == ConductorState::FINISHED) {
-      $this->pass(t('The workflow was marked successfully complete.'));
-    }
-    else {
-      $this->fail(t('The workflow was not marked complete.'));
-    }
-    // TODO: Perform some introspection on the activityState objects.
-    // TODO: Verify we got passthrough of our context to the end.
-
-    if (count($history['activateActivity']) == 3) {
-      $this->pass(t('The appropriate number of activities were activated'));
-    }
-    else {
-      $this->fail(t('The number of activities activated was not what was expected'));
-    }
-    if (count($history['completeActivity']) == 3) {
-      $this->pass(t('The appropriate number of activities were completed'));
-    }
-    else {
-      $this->fail(t('The number of activities completed was not what was expected'));
+    $this->assertEqual($workflow->state->getStatus(), ConductorState::FINISHED, t('The workflow was marked successfully complete.'));
+    $this->assertEqual(count($history['activateActivity']), 4, t('The appropriate number of activities were activated'));
+    $this->assertEqual(count($history['completeActivity']), 4, t('The appropriate number of activities were completed'));
+    $activityStates = $workflow->state->getActivityState();
+    foreach ($activityStates as $activityState) {
+      $this->assertEqual($activityState->getStatus(), ConductorActivityState::COMPLETED, t('The @name activity was marked complete.', array('@name' => $activityState->name)));
+      $this->assertEqual($activityState->context, array('foo' => 'bar'), t('Context was successfully passed into the @name activity.', array('@name' => $activityState->name)));
     }
   }
 
@@ -109,7 +96,8 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $activity->name = 'start';
     $activity->title = 'Start';
     $activity->outputs = array(
-      'activity_2'
+      'activity_2',
+      'activity_3'
     );
     $activity->inputs = array();
     $activity = $workflow->newActivity('activity');
@@ -123,13 +111,25 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $activity->outputs = array(
       'end'
     );
+    $activity = $workflow->newActivity('activity');
+    $activity->x = 180;
+    $activity->y = 100;
+    $activity->name = 'activity_3';
+    $activity->title = 'Activity 3';
+    $activity->inputs = array(
+      'start',
+    );
+    $activity->outputs = array(
+      'end'
+    );
     $activity = $workflow->newActivity('end');
     $activity->x = 380;
     $activity->y = 200;
     $activity->name = 'end';
     $activity->title = 'End';
     $activity->inputs = array(
-      'activity_2'
+      'activity_2',
+      'activity_3'
     );
     $activity->outputs = array();
     return $workflow;
