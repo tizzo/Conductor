@@ -128,6 +128,24 @@ function conductor_get_activity_handler($activity) {
 }
 
 /**
+ * Load a conductor storage handler.
+ *
+ * @param $name
+ *   A string representing the name of the storage plugin.
+ */
+function conductor_get_storage_handler($name) {
+  ctools_include('plugins');
+  $storage_plugin = ctools_get_plugins('conductor', 'storage', $name);
+  $class_name = ctools_plugin_get_class($storage_plugin, 'handler');
+  $handler = FALSE;
+  if ($class_name != FALSE) {
+    $handler = new $class_name;
+    $handler->plugin_info = $storage_plugin;
+  }
+  return $handler;
+}
+
+/**
  * Menu callback to load a workflow via AJAX.
  */
 function conductor_ajax() {
