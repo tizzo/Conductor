@@ -70,6 +70,9 @@ function conductor_ctools_plugin_type() {
       'process' => 'conductor_activity_process',
       'child plugins' => TRUE,
     ),
+    'state_storage' => array(
+      'child plugins' => TRUE,
+    ),
   );
 }
 
@@ -115,12 +118,13 @@ function conductor_ctools_plugin_directory($owner, $plugin_type) {
  * @param $activity
  *   A string representing the name of the actiivty plugin.
  */
-function conductor_get_activity_handler($activity) {
+function conductor_get_activity_handler($name) {
   ctools_include('plugins');
-  $activity_plugin = ctools_get_plugins('conductor', 'activity', $activity);
+  $activity_plugin = ctools_get_plugins('conductor', 'activity', $name);
   $class_name = ctools_plugin_get_class($activity_plugin, 'handler');
   $handler = FALSE;
   if ($class_name != FALSE) {
+    // TODO: plugin_info should probably be handed in to the constructor as configuration...
     $handler = new $class_name;
     $handler->plugin_info = $activity_plugin;
   }
@@ -128,14 +132,14 @@ function conductor_get_activity_handler($activity) {
 }
 
 /**
- * Load a conductor storage handler.
+ * Load a conductor state storage handler.
  *
  * @param $name
  *   A string representing the name of the storage plugin.
  */
 function conductor_get_storage_handler($name) {
   ctools_include('plugins');
-  $storage_plugin = ctools_get_plugins('conductor', 'storage', $name);
+  $storage_plugin = ctools_get_plugins('conductor', 'state_storage', $name);
   $class_name = ctools_plugin_get_class($storage_plugin, 'handler');
   $handler = FALSE;
   if ($class_name != FALSE) {
