@@ -1,7 +1,11 @@
 # Conductor #
 
-This module is in the very earliest stages of development and at the
-time of writing is not functional.
+Conductor aims to allow you to easily model business processes that contain multiple steps
+in a flexible way.  It is essentially a way of connecting individual components in a user
+configurable way and managing the state of these workflows as they move from step to step.
+This approach should be very good at providing content workflows but may also be used in
+real-time data processing and most business processes that require a series of disconnected
+steps.
 
 The goal is to create a module akin to [maestro](http://drupal.org/project/maestro) but
 built on top of [ctools](http://drupal.org/project/ctools) with an architecture inspired
@@ -19,17 +23,19 @@ allowing them to be loaded by name easily form in memory key-value stores.  Pres
 is optional for workflows that do not need to be resumed.  Workflow state storage has a pluggable
 storage backend allowing it, too, to be persisted to a NoSQL or in memory data store.
 
-
 ## Terminology ##
 
 1. Workflow
 2. Activity
 3. Workflow State
+4. Workflow Activity State
+5. Workflow Storage
 
 ### 1. Workflow ###
 
-A workflow is a process.  These processes have different steps, generically refered to as
-activities, that a particular workflow moves through.
+A workflow is set of connected steps that are performed in a sequence that represents some
+business process.  These processes different steps, generically refered to as activities,
+can branch and merge and suspend themselves while awaiting external input.
 
 #### Storage ####
 
