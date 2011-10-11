@@ -152,6 +152,22 @@ class ConductorState {
   }
 
   /**
+   * TODO: figure out if these are the right 
+   */
+  private function addToBin($bin, ConductorActivity $activity) {
+    // Should we notify observers?
+    //$this->notifyObservers($bin . 'Activity', $activity);
+  }
+
+  private function removeFromBin($bin, ConductorActivity $activity) {
+    
+  }
+
+  private function getBin($bin) {
+
+  }
+
+  /**
    * Activate a specified activity.
    *
    * @param $activity
