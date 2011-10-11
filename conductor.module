@@ -62,16 +62,18 @@ function conductor_ctools_plugin_api($owner, $api) {
 }
 
 /**
- * Implements conductor_ctools_plugin_type().
+ * Implements hook_ctools_plugin_type().
  */
 function conductor_ctools_plugin_type() {
   return array(
     'activity' => array(
       'process' => 'conductor_activity_process',
       'child plugins' => TRUE,
+      'classes' => array('handler'),
     ),
     'state_storage' => array(
       'child plugins' => TRUE,
+      'classes' => array('handler'),
     ),
   );
 }

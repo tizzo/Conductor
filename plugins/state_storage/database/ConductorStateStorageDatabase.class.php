@@ -5,7 +5,7 @@
  *
  * TODO: Should we 
  */
-class ConductorStateStorageDatabase implements CondConductorStateStorage {
+class ConductorStateStorageDatabase implements ConductorStateStorage {
 
   protected $options = array();
 
@@ -19,7 +19,7 @@ class ConductorStateStorageDatabase implements CondConductorStateStorage {
     $this->options = $options;
   }
 
-  public function save($state) {
+  public function save(ConductorState $state) {
     // TODO: How shall we decide whether to do an insert or an update?
   }
 
@@ -47,10 +47,10 @@ class ConductorStateStorageDatabase implements CondConductorStateStorage {
       ->condition('name', $name);
   }
 
-  static function deleteFromNamedReference($name) {
+  static function deletePointer($name) {
     db_query('SELECT sid FROM {conductor_state} cs
       JOIN {conductor_state_references} csr ON cs.sid = csr.sid
-      WHERE csr.name=:name', array('name' => $name), $this->options;
+      WHERE csr.name=:name', array('name' => $name), $this->options);
     db_delete('conductor_state_references')
      ->condition('sid', $sid);
     db_delete('conductor_state')
