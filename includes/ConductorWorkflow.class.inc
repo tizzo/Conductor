@@ -229,6 +229,22 @@ class ConductorWorkflow {
   }
 
   /**
+   * Retrieve the first activity in the workflow.
+   *
+   * Currently the first activity always has the machine name "start".
+   */
+  public function getFirstActivity() {
+    return $this->getActivity('start');
+  }
+
+  /**
+   * Retrieve the last activity in the workflow.
+   */
+  public function getLastActivity() {
+    return $this->getActivity('end');
+  }
+
+  /**
    * Get the array of all activities in this workflow.
    *
    * @return
@@ -320,7 +336,7 @@ class ConductorWorkflow {
   function getState() {
     if (!$this->state) {
       // TODO: State pretty much requires a persistence capability.
-      $this->setState(new ConductorState);
+      $this->setState(new ConductorState());
     }
     return $this->state;
   }

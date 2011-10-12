@@ -105,6 +105,10 @@ class ConductorState {
     $this->activityStates = $activityStates;
   }
 
+  public function setActivityState($activityState) {
+    $this->activityStates[$activityState->name] = $activityState;
+  }
+
   /**
    * Get an activity state.
    */

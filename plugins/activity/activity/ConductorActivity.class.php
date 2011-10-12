@@ -50,11 +50,18 @@ class ConductorActivity extends ConductorObject {
   /**
    * Set the activity state on this activity.
    *
-   * @param $activity_state
+   * @param $activityState
    *   The state of this individual activity.
    */
-  public function setState($activity_state) {
-    $this->activityState = $activity_state;
+  public function setState($activityState) {
+    $this->activityState = $activityState;
+  }
+
+  public function getState() {
+    if (!$this->activityState) {
+      $this->activityState = new ConductorActivityState($this);
+    }
+    return $this->activityState;
   }
 
   public function checkRunnability() {

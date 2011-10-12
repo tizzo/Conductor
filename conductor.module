@@ -268,56 +268,72 @@ function conductor_new_workflow() {
  * @param $name
  *   The name of the workflow to start.
  * @param $options
- *   An array of options that need to be documented :-)
- *   TODO: ^ document this.
+ *   An array of options passed to conductor_create_workflow_instace().
  */
 function conductor_start_workflow($name, $options = array()) {
+  $workflow = conductor_create_workflow_instance($name, $options);
+  return $workflow->run();
+}
+
+/**
+ * Factory function for workflow instances.
+ *
+ * A workflow instance is an
+ *
+ * Dependency injection is expected to keep Conductor flexible
+ * and to allow us to extend it unforseen ways.  This may have
+ * gotten out of control though.
+ *
+ * @param $options
+ *   An array of options used for dependency injection to configure
+ *   a create the desired workflow instance.
+ *   - "context": An associative array of context information handed
+ *     into the first activity.
+ *   - "observers": TODO: document.
+ *   - "state": a ConductorState descended object to be used as the workflow
+ *     state for this instance.
+ *   - "activity_state": TODO: document.
+ */
+function conductor_create_workflow_instance($name, $options = array()) {
+
+  // Get the workflow object.
   $workflow = conductor_get_workflow($name);
-  $workflow->getState();
+
+  // If a state object has been provided, use it.
+  if (isset($options['state'])) {
+    $workflow->setState($options['state']);
+  }
+
+  // If no state object has been created the workflow will instantiate the default.
+  $workflowState = $workflow->getState();
+  $startActivity = $workflow->getFirstActivity();
+
+  // If an activity state object has been provided, use it.
+  if (isset($options['activity_state'])) {
+    $startActivity->setState($options['activity_state']);
+  }
+  $startState = $startActivity->getState();
+
+  // If we have a context with which to start this workflow, set it.
+  if (isset($options['context'])) {
+    $startState->context = $options['context'];
+  }
+
+  // Set the activity state on the workflow.
+  $workflowState->setActivityState($startState);
+
+
+  // Get the first activity, we may need it to set the initial context.
+  // TODO: Decide if workflow state should instantiate the activity state?  how could we inject the dependency?
+  // NOTE: it would prevent the call to setActivityState.
+  //$startState = $workflowState->getActivityState($startActivity->name);
+
+  // Register any necessary observers for workflow processing.
   // TODO: Load the default observers if any are configured when this is blank.
   if (isset($options['observers'])) {
     foreach ($options['observers'] as $observer) {
       $workflow->state->registerObserver($observer);
     }
   }
-  return $workflow->run();
-}
-
-/**
- * Start an instance of a workflow with a given context.
- *
- * Currently context is a simple associative array and it is passed from
- * activity to activity, an array_merge being performed anytime additional
- * context needs to be added.
- *
- * Dependency injection is expected to keep Conductor flexible
- * and to allow us to extend it unforseen ways.  This may have
- * gotten out of control though.  We really need to rejigger
- * the dependencies such that this could be one or two lines
- * not 8.
- *
- * @param $name
- *   The name of the workflow to start.
- * @param $context
- *   An associative array of context information.
- */
-function conductor_start_workflow_with_context($name, $context = array()) {
-  // TODO: Damn this ugly.
-  // TODO: This should probably all be logic that can be triggered
-  // via the options array handed into conductor_start_workflow.
-  $workflow = conductor_get_workflow($name);
-  // Get the first activity, we will need it to set the initial context.
-  $start = $workflow->getActivity('start');
-  // Instantiate the state for this workflow instance.
-  $conductorState = new ConductorState();
-  // Create a state object for the first activity.
-  $startState = new ConductorActivityState($start, $conductorState);
-  // Set the context.
-  $startState->context = $context;
-  // Add the activity's state to the workflow instance state.
-  $conductorState->setActivityStates(array('start' => $startState));
-  // Actually assign the workflow instance state to the workflow.
-  $workflow->setState($conductorState);
-  // Finally, start running this workflow.
-  return $workflow->run();
+  return $workflow;
 }

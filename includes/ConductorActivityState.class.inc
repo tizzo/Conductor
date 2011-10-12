@@ -50,17 +50,13 @@ class ConductorActivityState {
   // the state of the inputs for this activity.
   public $inputStates = array();
 
-  // A container for the state for this entire workflow instance.
-  public $workflowState = NULL;
-
   // An optional context to be passed on the the next item.
   public $context = array();
 
-  public function __construct(ConductorActivity $activity, ConductorState $state) {
+  public function __construct(ConductorActivity $activity) {
     $this->name = $activity->name;
     $this->plugin = $activity->plugin_info['name'];
     $this->status = self::INITIALIZED;
-    $this->workflowState = &$state;
   }
 
   /**
