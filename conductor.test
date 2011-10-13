@@ -171,8 +171,8 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
 class ConductorTestCase extends DrupalWebTestCase {
 
   /**
-  * Implements getInfo().
-  */
+   * Implements getInfo().
+   */
   public static function getInfo() {
     return array (
       'name' => t('Conductor API tests'),
