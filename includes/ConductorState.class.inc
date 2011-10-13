@@ -253,7 +253,7 @@ class ConductorState {
    * @return
    *   A linear array of ConductorActivityState descended objects from the bin.
    */
-  public function getBinItems($binName) {
+  private function getBinItems($binName) {
     $bin = &$this->getBin($binName);
     $activities = array();
     foreach ($bin as $activity_name) {
