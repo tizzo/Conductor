@@ -57,7 +57,7 @@ class ConductorActivity extends ConductorObject {
     $this->activityState = $activityState;
   }
 
-  public function getState() {
+  public function &getState() {
     if (!$this->activityState) {
       $this->activityState = new ConductorActivityState($this);
     }

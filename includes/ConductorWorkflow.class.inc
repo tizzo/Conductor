@@ -215,7 +215,7 @@ class ConductorWorkflow {
    * @return
    *   If found, the ConductorActivity descended activity, else FALSE.
    */
-  public function getActivity($activityName) {
+  public function &getActivity($activityName) {
     $activity = FALSE;
     // If we can't find an activity by that name we may need to reindex activities.
     if (!isset($this->activities[$activityName])) {

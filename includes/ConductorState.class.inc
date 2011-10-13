@@ -36,14 +36,17 @@ class ConductorState {
   protected $activityStates = array();
 
   /**
-   * An array of active activities.
+   * Bins are groupings of activities.
+   *
+   * This is used to track what activities are in different states
+   * including active, completed, suspended, etc.  It is used to ensure
+   * that we can easily serialize state without having references that
+   * become duplicate objects upon unserialization.
+   *
+   * This multidimensional array is keyed by the state name (e.g.
+   * active) and contains a linear array of activities.
    */
-  protected $activeActivities = array();
-
-  /**
-   * An array of completed activities.
-   */
-  protected $completedActivities = array();
+  protected $activityBins = array();
 
   /**
    * A reference to the parent workflow.
@@ -51,7 +54,7 @@ class ConductorState {
   public $workflow = NULL;
 
   /**
-   * 
+   * An array of ConductorObserver objects registered to this instance.
    */
   protected $observers = array();
 
@@ -81,7 +84,7 @@ class ConductorState {
    *   An associative array of ConductorActivityState objects keyed by $activity->name.
    */
   public function __construct(array $activityStates = array()) {
-    $this->activityStates = $activityStates;
+    $this->setActivityStates($activityStates);
   }
 
   /**
@@ -105,12 +108,21 @@ class ConductorState {
     $this->activityStates = $activityStates;
   }
 
-  public function setActivityState($activityState) {
+  /**
+   * Set an individual activity state.
+   */
+  public function setActivityState(ConductorActivityState $activityState) {
     $this->activityStates[$activityState->name] = $activityState;
   }
 
   /**
    * Get an activity state.
+   *
+   * @param $name
+   *   The name of the activity in the workflow.
+   *
+   * @return
+   *   A ConductorActivityState descended object.
    */
   public function getActivityState($name = NULL) {
     $return = FALSE;
@@ -125,10 +137,12 @@ class ConductorState {
     return $return;
   }
 
+  /**
+   *
+   */
   public function getIntanceID() {
     // TODO: we need to generate unique ID's here.  The specifics will vary
-    // depending on the state class.  Perhaps we do need plugins for this
-    // object?
+    // depending on the storage hanlder, it needs to be called to get this...
     return drupal_hash_base64(drupal_random_bytes(55));
   }
 
@@ -137,38 +151,117 @@ class ConductorState {
    *
    * @return
    *   A linear array of active activities.
-   *   
    */
   public function getActiveActivities() {
-    // If we do not yet have any activeActivities and we do not yet have any completed
-    // activites, we must be starting a workflow.  Run the `start` activity.
-    if (!count($this->activeActivities) && !count($this->completedActivities)) {
-      $activity = $this->workflow->getActivity('start');
-      if (!isset($this->activityStates['start'])) {
-        $state = $this->getActivityStateHandler($activity);
-      }
-      else {
-        $state = $this->getActivityState('start');
-      }
-      $this->activateActivity($activity, $state);
+    // If we have neither active nor completed activities, activate the first
+    // activities.
+    // TODO: Should this happen automatically? or should this always be
+    // explicitly called on by the activity starter?
+    if (!$this->countBin('active') && !$this->countBin('complete')) {
+      $this->activateActivity($this->workflow->getFirstActivity());
     }
-    return $this->activeActivities;
+    return $this->getBinItems('active');
   }
 
   /**
-   * TODO: figure out if these are the right 
+   * Get a reference to an array holding a bin of related activity names.
+   *
+   * @param $binName
+   *   A string representing this logical set of activity states.
+   * @return
+   *   A linear array of activity names.
    */
-  private function addToBin($bin, ConductorActivity $activity) {
+  private function &getBin($binName) {
+    if (!isset($this->activityBins[$binName])) {
+      $this->activityBins[$binName] = array();
+    }
+    return $this->activityBins[$binName];
+  }
+
+
+  /**
+   * Get the number of items in a bin.
+   *
+   * @param $binName
+   *   A string representing this logical set of activity states.
+   * @param $activity
+   *   A ConductorActivity descended object.
+   */
+  private function addToBin($binName, ConductorActivity $activity) {
+    $bin = &$this->getBin($binName);
+    if (!in_array($activity->name, $bin)) {
+      $bin[] = $activity->name;
+    }
     // Should we notify observers?
-    //$this->notifyObservers($bin . 'Activity', $activity);
+    $this->notifyObservers($binName . 'Activity', $activity);
   }
 
-  private function removeFromBin($bin, ConductorActivity $activity) {
-    
+  /**
+   * Check to see whether an activity is in a bin.
+   *
+   * @param $binName
+   *   A string representing this logical set of activity states.
+   * @param $activity
+   *   A ConductorActivity descended object.
+   * @return
+   *   Boolean.
+   */
+  private function checkInBin($binName, ConductorActivity $activity) {
+    $bin = &$this->getBin($binName);
+    return in_array($activity->name, $bin);
   }
 
-  private function getBin($bin) {
+  /**
+   * Get the number of items in a bin.
+   *
+   * @param $binName
+   *   A string representing this logical set of activity states.
+   * @return
+   *   An integer representing the number of items in a bin.
+   */
+  private function countBin($binName) {
+    return count($this->getBin($binName));
+  }
 
+  /**
+   * Remove an activity from a bin.
+   *
+   * @param $binName
+   *   A string representing this logical set of activity states.
+   * @param $activity
+   *   A ConductorActivity descended object.
+   * @return
+   *   Boolean, true if it was removed from the bin, false if it wasn't in the
+   *   bin to begin with.
+   */
+  private function removeFromBin($binName, ConductorActivity $activity) {
+    $bin = &$this->getBin($binName);
+    $position = array_search($activity->name, $bin);
+    if ($position === FALSE) {
+      return FALSE;
+    }
+    $this->notifyObservers('dis' . $bin . 'Activity', $activity);
+    unset($bin[$position]);
+    return TRUE;
+  }
+
+  /**
+   * Get the state objects from the activities in a bin.
+   *
+   * @param $binName
+   *   A string representing this logical set of activity states.
+   * @return
+   *   A linear array of ConductorActivityState descended objects from the bin.
+   */
+  public function getBinItems($binName) {
+    $bin = &$this->getBin($binName);
+    $activities = array();
+    foreach ($bin as $activity_name) {
+      if (isset($this->activityStates[$activity_name])) {
+        $activities[$activity_name] = &$this->activityStates[$activity_name];
+      }
+    }
+    return $activities;
   }
 
   /**
@@ -178,15 +271,29 @@ class ConductorState {
    *   The ConductorActivity that has successfully been activated.
    * @param $state
    *   An ConductorActivityState object represeting the state of the present activity.
+   *
+   *  TODO: Obviously this second parameter has been removed raising the
+   *  question, how do you use the non-default activity state?  Each activity
+   *  can override the state getter method to use a different one, but should we
+   *  allow dependency injection for different ones? for different ones for
+   *  different types?  For different ones for different instances?
    */
-  public function activateActivity(ConductorActivity $activity, ConductorActivityState $state) {
-    if (!isset($this->activeActivities[$activity->name])) {
-      $this->notifyObservers('activateActivity', $activity);
+  public function activateActivity(ConductorActivity $activity) {
+    if (!$this->checkInBin('active', $activity)) {
       // Instantiate the appropriate state handler if we do not already have one.
       if (!isset($this->activityStates[$activity->name])) {
-        $this->activityStates[$activity->name] = $this->getActivityStateHandler($activity);
+        $activityState = &$activity->getState();
+        $this->activityStates[$activity->name] = &$activityState;
       }
-      $this->activeActivities[$activity->name] = &$this->activityStates[$activity->name];
+      // Currently an activity needs to have the state object of for its inputs.
+      foreach ($activity->inputs as $activityName) {
+        if (isset($this->activityStates[$activityName])) {
+          $activityState->setInputActivityState($this->activityStates[$activityName]);
+        }
+      }
+      // TODO: This event is deprecated but still used in our tests.
+      $this->notifyObservers('activateActivity', $activity);
+      $this->addToBin('active', $activity);
     }
   }
 
@@ -199,30 +306,12 @@ class ConductorState {
    *   An ConductorActivityState object represeting the state of the present activity.
    */
   public function completeActivity(ConductorActivity $activity, ConductorActivityState $state) {
-    $this->notifyObservers('completeActivity', $activity);
-    $this->completedActivities[$activity->name] = &$state;
+    $this->removeFromBin('active', $activity);
+    $this->addToBin('complete', $activity);
     foreach ($activity->outputs as $activity_name) {
-      $activateActivity = $this->workflow->getActivity($activity_name);
-      $this->activateActivity($activateActivity, $this->getActivityStateHandler($activateActivity));
+      $activateActivity = &$this->workflow->getActivity($activity_name);
+      $this->activateActivity($activateActivity);
     }
-    $activeActivities = &$this->activeActivities;
-    unset($this->activeActivities[$activity->name]);
-  }
-
-  /**
-   * Factory method for ConductorActivityState descended objects.
-   */
-  public function getActivityStateHandler(ConductorActivity $activity) {
-    // TODO: Figure out what we need to do to get the Conductor Activity State handler.
-    // The actual state handler should probably be instantiated by the activity allowing
-    // it to specify a different state handler.
-    $activityState = new ConductorActivityState($activity, $this);
-    foreach ($activity->inputs as $activityName) {
-      if (isset($this->activityStates[$activityName])) {
-        $activityState->setInputActivityState($this->activityStates[$activityName]);
-      }
-    }
-    return $activityState;
   }
 
   /**
@@ -233,7 +322,7 @@ class ConductorState {
   }
 
   /**
-   * Register a new observer.
+   * Register an observer.
    *
    * @param $observer
    *   A new ConductorObserver descended object.
