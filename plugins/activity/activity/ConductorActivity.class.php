@@ -93,7 +93,9 @@ class ConductorActivity extends ConductorObject {
     if ($this->process()) {
       $this->activityState->markCompeted();
     }
-    return $this->activityState;
+    else {
+      $this->activityState->markFailed();
+    }
   }
 
   /**

@@ -28,6 +28,16 @@ class ConductorState {
   const FINISHED = 2;
 
   /**
+   *
+   */
+  const FAILED = 3;
+
+  /**
+   *
+   */
+  const SUSPENDED = 4;
+
+  /**
    * An array of CondcutorActivityState descended object.
    *
    * Each of these objects tracks the state for a specific activity in the
@@ -163,6 +173,13 @@ class ConductorState {
     return $this->getBinItems('active');
   }
 
+  public function getFailedActivities() {
+    return $this->getBinItems('failed');
+  }
+  public function getSuspendedActivities() {
+    return $this->getBinItems('suspended');
+  }
+
   /**
    * Get a reference to an array holding a bin of related activity names.
    *
@@ -279,7 +296,7 @@ class ConductorState {
    *  different types?  For different ones for different instances?
    */
   public function activateActivity(ConductorActivity $activity) {
-    if (!$this->checkInBin('active', $activity)) {
+    if (!$this->checkInBin('active', $activity) && !$this->checkInBin('failed', $activity)) {
       // Instantiate the appropriate state handler if we do not already have one.
       if (!isset($this->activityStates[$activity->name])) {
         $activityState = &$activity->getState();
@@ -297,15 +314,32 @@ class ConductorState {
     }
   }
 
+  public function deactivateActivity(ConductorActivity $activity) {
+    $this->removeFromBin('active', $activity);
+  }
+
+  public function suspendActivity(ConductorActivity $activity) {
+    if (!$this->checkInBin('suspended', $activity)) {
+      $this->addToBin('suspended', $activity);
+      $this->removeFromBin('active', $activity);
+    }
+  }
+
+  public function failActivity(ConductorActivity $activity) {
+    $this->removeFromBin('active', $activity);
+    $this->addToBin('failed', $activity);
+  }
+
+  public function getCompletedActivities() {
+  }
+
   /**
    * Complete a specified activity.
    *
    * @param $activity
    *   The ConductorActivity that has successfully been run and reported finished and should be marked complete.
-   * @param $state
-   *   An ConductorActivityState object represeting the state of the present activity.
    */
-  public function completeActivity(ConductorActivity $activity, ConductorActivityState $state) {
+  public function completeActivity(ConductorActivity $activity) {
     $this->removeFromBin('active', $activity);
     $this->addToBin('complete', $activity);
     foreach ($activity->outputs as $activity_name) {
@@ -317,9 +351,23 @@ class ConductorState {
   /**
    * This workflow is complete.
    */
+  public function workflowSuspended() {
+    $this->status = self::SUSPENDED;
+  }
+  /**
+   * This workflow is complete.
+   */
   public function workflowComplete() {
     $this->status = self::FINISHED;
   }
+
+  /**
+   * This workflow is complete.
+   */
+  public function workflowFailed() {
+    $this->status = self::FAILED;
+  }
+
 
   /**
    * Register an observer.

@@ -79,6 +79,10 @@ class ConductorActivityState {
     $this->status = self::COMPLETED;
   }
 
+  public function markFailed() {
+    $this->status = self::FAILED;
+  }
+
   public function markRunAgain() {
     $this->status = self::RUN_AGAIN;
   }

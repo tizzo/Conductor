@@ -336,131 +336,67 @@ class ConductorWorkflow {
   function getState() {
     if (!$this->state) {
       // TODO: State pretty much requires a persistence capability.
+      // TODO: How do I let others set a different state?
       $this->setState(new ConductorState());
     }
     return $this->state;
   }
 
-  /**
-   * Run this workflow.
-   */
   function run() {
-    // TODO: Here we should be doing some things differently. Rough plan:
-    //
-    // ## Thoughts on worklfow processing:
-    //
-    // 1. Do some evaluation of our our state.
-    // 2. Notify observers of what action we're about to perform (resuming, starting, etc.)
-    // 3. Call the appropriate method on the state object (getActiveActivities?)
-    // 4. Call a mehtod on this object to start processing activities.
-    //    - the activity should return it's status constant, that's it.
-    //    - check the status actviityState object for actual deeper state information
-    //    - depending on the output
-    //      - mark the activity finished activate the appropriate other activities
-    //      - ask the activity to generate a reference to itself (a string for the persistence layer)
-    // 5. We will need to track activities in the following states:
-    //    - ACTIVE
-    //      activated but not yet run.
-    //    - FAILED
-    //      threw an error or failed in some recoverable way that should be logged but not repeated.
-    //    - SUSPENDED
-    //      the activity is awaiting further input, suspended until that input may be provided
-    //    - RUN_AGAIN
-    //      this may be deprecated, I'm not sure what I thought it was for...
-    //    - COMPLETED
-    //      the activity has been successfully completed and we're done
-    // 6. Depending on the number of each of the previous categories, the workflow stat can be derived.
-    ///    - ACTIVE
-    //      activated but not yet run.
-    //    - FAILED
-    //      If we have > 0 FAILED and the workflow ends, this worklow did not complete successfully.  Results should be logged.
-    //    - SUSPENDED
-    //      If we have > 0 suspended activities, we need to suspend the workflow after processsing the active activities.
-    //      each activity will be given the opportunity to create pointers back to itself so that messages may be passed to
-    //      that activity upon resume.
-    //    - COMPLETED
-    //      when an activity with the machine name "end" is completed, we're done. TODO: Should we have COMPLETED-SUCCESSFULLY?
+    // Ensure the activities are properly indexed.
+    $this->indexActivities();
+    $state = &$this->getState();
+    if ($state->getStatus = ConductorState::INITIALIZED) {
+    }
+    else {
 
-    // ## Thoughts on resuming:
-    //
-    // 1. A workflow is always resumed by reference to a specific activity.
-    //   Caveat: if we have branched there may be multiple items that have become
-    //   eligible for processing, does each one need to be resumed externally or can
-    //   that each be evaluated and asked if they'd like to resume?
-    // 2. That activity can have new data passed to it (new input occured)
-
-
-    // Ensure that we have an instantiated state object.
-    $this->getState();
-    // Get an ID for this instance.
-    // TODO: This does *not* belong here.  No instance information
-    // should bleed into the workflow object.
-    //$this->instanceID = $this->state->getIntanceID();
-    // Acquire a lock for this instance, ensuring 2 processes do not run this
-    // workflow simultaneously.
-
-    // TODO: This prevents us from running in DrupalUnitTestCase.
-    // Locking should  happen elsewhere
-    $tries = 0;
-    //if (lock_acquire($this->instanceID)) {
-
-      // Ensure that activities are indexed.
-      $this->indexActivities();
-      // TODO: Create a record for this instance in the appropriate place.
-
-      // Loop through all active Activities processing them until we
-      // stop getting a current set of activeActivities that are different
-      // from the ones we already have (indicating that all active activities
-      // can't yet run and are blocked on some external process).
-      $activeActivities = array();
-
-      // Get the active activities from the state.
-      $newActiveActivities = $this->state->getActiveActivities();
-      if (is_array($newActiveActivities)) {
-        // Verify that we still have activities to run and all are not stalled.
-        // TODO: This might be faster if we don't array_diff it.  Perhaps we
-        // could just check if these are identical?
-        while (count(array_diff(array_keys($newActiveActivities), array_keys($activeActivities)))) {
-          $activeActivities = $newActiveActivities;
-          foreach ($activeActivities as $name => &$activityState) {
-            $activity = $this->activities[$name];
-            $activity->setState($activityState);
-            if ($activity->checkRunnability()) {
-              $activityState = $activity->run();
-              // TODO: deal with other states.
-              // TODO: What marks this workflow itself complete?  Does end have to do that or can any activity?
-              // hint: prolly any activity...
-              switch ($activityState->getStatus()) {
-                // If the activity has been completed, mark it as such.
-                case ConductorActivityState::COMPLETED:
-                  $this->state->completeActivity($activity, $activityState);
-                  // TODO: is this how this should work?
-                  // TODO: The workflow should be marked complete when:
-                  //   - there are no active or suspended activities
-                  //   - the workflow has expired (TODO: Implement workflow expiry)
-                  if ($activity->plugin_info['name'] == 'end') {
-                    $this->state->workflowComplete();
-                  }
-                  break;
-              }
-            }
+    }
+    $activeActivities = $state->getActiveActivities();
+    while (count($activeActivities)) {
+      foreach ($activeActivities as $name => &$activityState) {
+        // Ensure we don't edit the global activity itself.
+        $activity = clone $this->activities[$name];
+        // Set the activityState for this activity.
+        $activity->setState($activityState);
+        if ($activity->checkRunnability()) {
+          try {
+            $activity->run();
           }
-          // Retrieve any newly eligible activities to process.
-          $newActiveActivities = $this->state->getActiveActivities();
+          catch (Exception $e) {
+            $state->failActivity($activity);
+            $state->notifyObservers('activityFailed', $activity);
+          }
         }
-        return TRUE;
+        else {
+          $state->deactivateActivity();
+        }
+        switch ($activityState->getStatus()) {
+          // If the activity has been completed, mark it as such.
+          case ConductorActivityState::COMPLETED:
+            $state->completeActivity($activity);
+            break;
+          case ConductorActivityState::SUSPENDED:
+            $state->suspendActivity($activity);
+            break;
+          case ConductorActivityState::FAILED:
+            $state->failActivity($activity);
+            $state->notifyObservers('activityFailed', $activity);
+            break;
+        }
       }
-    //}
-    // else if ($tries < 5) {
-    //   $tries++;
-    //   $this->run();
-    // }
-    // else {
-    //   return FALSE;
-    // }
-  }
-
-  protected function executeActiveActivities() {
+      $activeActivities = $state->getActiveActivities();
+    }
+    // If even one activity failed
+    if (count($state->getFailedActivities())) {
+      $state->workflowFailed();
+      $state->notifyObservers('workflowFailed', $this);
+    }
+    else if (count($state->getSuspendedActivities())) {
+      $state->workflowSuspended();
+    }
+    else if (!count($state->getActiveActivities()) && !count($state->getSuspendedActivities())) {
+      $state->workflowComplete();
+    }
   }
 
 }
