@@ -384,6 +384,18 @@ class ConductorState {
     $this->status = self::FAILED;
   }
 
+  /**
+   *
+   */
+  public function suspend() {
+    $pointers = array();
+    foreach ($this->getSuspendedActivities() as $name => $suspendedActivity) {
+      $pointers[$name] = &$this->workflow->getActviity($name)->getSuspendPointers();
+    }
+    // Save the workflow to our datastore (basically just the activities?)
+    // Save $activityBins.
+    // Save $activityBins.
+  }
 
   /**
    * Register an observer.

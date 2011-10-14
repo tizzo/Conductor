@@ -393,6 +393,8 @@ class ConductorWorkflow {
     }
     else if (count($state->getSuspendedActivities())) {
       $state->workflowSuspended();
+      // TODO: Actually suspend workflow.
+      $state->suspend();
     }
     else if (!count($state->getActiveActivities()) && !count($state->getSuspendedActivities())) {
       $state->workflowComplete();
