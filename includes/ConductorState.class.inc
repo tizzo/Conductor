@@ -120,6 +120,9 @@ class ConductorState {
 
   /**
    * Set an individual activity state.
+   *
+   * @param $activityState
+   *   A single active activity state object.
    */
   public function setActivityState(ConductorActivityState $activityState) {
     $this->activityStates[$activityState->name] = $activityState;
@@ -173,9 +176,22 @@ class ConductorState {
     return $this->getBinItems('active');
   }
 
+  /**
+   * Retrieve the current failed activities.
+   *
+   * @return
+   *   A linear array of failed activities.
+   */
   public function getFailedActivities() {
     return $this->getBinItems('failed');
   }
+
+  /**
+   * Retrieve the current suspended activities.
+   *
+   * @return
+   *   A linear array of suspended activities.
+   */
   public function getSuspendedActivities() {
     return $this->getBinItems('suspended');
   }
@@ -257,13 +273,13 @@ class ConductorState {
     if ($position === FALSE) {
       return FALSE;
     }
-    $this->notifyObservers('dis' . $bin . 'Activity', $activity);
+    $this->notifyObservers('dis' . $binName . 'Activity', $activity);
     unset($bin[$position]);
     return TRUE;
   }
 
   /**
-   * Get the state objects from the activities in a bin.
+   * Get state objects associated with the activities listed in a bin.
    *
    * @param $binName
    *   A string representing this logical set of activity states.
@@ -290,7 +306,7 @@ class ConductorState {
    *   An ConductorActivityState object represeting the state of the present activity.
    *
    *  TODO: Obviously this second parameter has been removed raising the
-   *  question, how do you use the non-default activity state?  Each activity
+   *  question; how do you use the non-default activity state?  Each activity
    *  can override the state getter method to use a different one, but should we
    *  allow dependency injection for different ones? for different ones for
    *  different types?  For different ones for different instances?
@@ -302,7 +318,7 @@ class ConductorState {
         $activityState = &$activity->getState();
         $this->activityStates[$activity->name] = &$activityState;
       }
-      // Currently an activity needs to have the state object of for its inputs.
+      // Currently an activity needs to have the state object for each of its inputs.
       foreach ($activity->inputs as $activityName) {
         if (isset($this->activityStates[$activityName])) {
           $activityState->setInputActivityState($this->activityStates[$activityName]);
@@ -378,7 +394,6 @@ class ConductorState {
   public function registerObserver($observer) {
     $this->observers[] = $observer;
   }
-
 
   /**
    * Notify all registered observers of an event that occured.

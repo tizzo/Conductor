@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Provides a generic logging capability for Conductor Workflow processing.
+ *
+ * Objects implementing the ConductorObserver interface can be registered with
+ * a workflow's state object to oberve events happening in the processing of that
+ * workflow.  This abstract class generates log messages from the events such that
+ * an extending class may implement a logEvent() method for logging to some specific
+ * output.
+ */
 abstract class  ConductorLog implements ConductorObserver {
 
   public $logThreshold;

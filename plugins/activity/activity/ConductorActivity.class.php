@@ -57,6 +57,12 @@ class ConductorActivity extends ConductorObject {
     $this->activityState = $activityState;
   }
 
+  /**
+   * Get the activity state for this object (creating one if it does not exist).
+   *
+   * @return ConductorActivityState
+   *   A ConductorActivityState object.
+   */
   public function &getState() {
     if (!$this->activityState) {
       $this->activityState = new ConductorActivityState($this);
@@ -110,6 +116,28 @@ class ConductorActivity extends ConductorObject {
    */
   public function process() {
     return TRUE;
+  }
+
+  /**
+   * Generate a unique pointer that identifies this activity in this workflow.
+   *
+   * When workflows are suspended it is usually because some step in
+   * the workflow requires external input.  The storage interface was
+   * designed to work with easily shardable key-value stores relying
+   * on serialized PHP to flexibly persist arbitrary state information
+   * in a unified way.  The pointer generated here will need to be
+   * predictable to external code (prefered) or, itself, be persisted
+   * somewhere such that this instance can be found.
+   *
+   * @param $workflow
+   *   A lot of context may be required to properly create the unique ID.
+   *   Handing in the workflow is the best way to make sure everything is
+   *   available.
+   * @return
+   *   Mixed.  A linear array of pointers or FALSE if there are none.
+   */
+  public function getSuspendPointers(ConductorWorkflow $workflow) {
+    return FALSE;
   }
 
   /**
