@@ -3,11 +3,11 @@
 /**
  * This class maintains the state of a Conductor workflow.
  *
- * ConductorState is handed into a ConductorWorkflow to track the state of a specific
+ * ConductorInstance is handed into a ConductorWorkflow to track the state of a specific
  * instance of that workflow.  It delegates saving to a member object stored in the
  * $storageHandler attribute, which must implement the ConductorStorage interface.
  *
- * ConductorState is comprised of ConductorActivityState descended objects.
+ * ConductorInstance is comprised of ConductorActivityState descended objects.
  * Each of these maintains the state of an individual activity.
  */
 class ConductorInstance {
@@ -84,7 +84,7 @@ class ConductorInstance {
 
 
   /**
-   * Constructor for ConductorState.
+   * Constructor for ConductorInstance.
    *
    * TODO: Right now this constructor can't be used practically but it
    * should make resuming working processing dead simple when loading
