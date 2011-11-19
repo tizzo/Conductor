@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Provides the default handler for Conductor State Storage using the dabase.
+ * Provides the default handler for Conductor Storage using the dabase.
  *
  * TODO: Should we 
  */
-class ConductorStateStorageDatabase implements ConductorStateStorage {
+class ConductorStorageDatabase implements ConductorStorage {
 
   protected $options = array();
 
@@ -19,7 +19,7 @@ class ConductorStateStorageDatabase implements ConductorStateStorage {
     $this->options = $options;
   }
 
-  public function save(ConductorState $state) {
+  public function save(ConductorInstance $state) {
     // TODO: How shall we decide whether to do an insert or an update?
   }
 

@@ -71,7 +71,7 @@ function conductor_ctools_plugin_type() {
       'child plugins' => TRUE,
       'classes' => array('handler'),
     ),
-    'state_storage' => array(
+    'storage' => array(
       'child plugins' => TRUE,
       'classes' => array('handler'),
     ),
@@ -141,7 +141,7 @@ function conductor_get_activity_handler($name) {
  */
 function conductor_get_storage_handler($name) {
   ctools_include('plugins');
-  $storage_plugin = ctools_get_plugins('conductor', 'state_storage', $name);
+  $storage_plugin = ctools_get_plugins('conductor', 'storage', $name);
   $class_name = ctools_plugin_get_class($storage_plugin, 'handler');
   $handler = FALSE;
   if ($class_name != FALSE) {

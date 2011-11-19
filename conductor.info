@@ -7,7 +7,7 @@ core = 7.x
 files[] = conductor.test
 
 ; Interfaces
-files[] = includes/ConductorStateStorage.interface.inc
+files[] = includes/ConductorStorage.interface.php
 files[] = includes/ConductorObserver.interface.inc
 
 ; Conductor core classes
