@@ -1,13 +1,13 @@
 <?php
 
-interface ConductorStateStorage {
+interface ConductorStorage {
 
   /**
    *
    * @param $state
    *   The ConductorState state object to be saved.
    */
-  public function save(ConductorState $state);
+  public function save(ConductorInstance $state);
 
   /**
    *
