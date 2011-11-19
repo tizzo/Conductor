@@ -13,6 +13,7 @@ files[] = includes/ConductorObserver.interface.inc
 ; Conductor core classes
 files[] = includes/ConductorBase.inc
 files[] = includes/ConductorWorkflow.class.inc
+files[] = includes/ConductorInstance.class.php
 files[] = includes/ConductorState.class.inc
 files[] = includes/ConductorActivityState.class.inc
 files[] = includes/ConductorLog.class.inc

@@ -46,7 +46,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
       'plugins/activity/start/ConductorActivityStart.class.php',
       'plugins/activity/end/ConductorActivityEnd.class.php',
       'plugins/activity/conditional/ConductorActivityConditional.class.php',
-      'plugins/state_storage/database/ConductorStateStorageDatabase.class.php',
+      'plugins/state_storage/database/ConductorInstanceStorageDatabase.class.php',
     );
     $files = array_merge($info['files'], $test_files);
     foreach ($files as $file) {
@@ -72,7 +72,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $observer->history = &$history;
     $workflow->state->registerObserver($observer);
     $workflow->run();
-    $this->assertEqual($workflow->state->getStatus(), ConductorState::FINISHED, t('The workflow was marked successfully complete.'));
+    $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
     $this->assertEqual(count($history['activateActivity']), 4, t('The appropriate number of activities were activated'));
     $this->assertEqual(count($history['completeActivity']), 4, t('The appropriate number of activities were completed'));
     $activityStates = $workflow->state->getActivityState();
@@ -151,7 +151,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     // Get the first activity, we will need it to set the initial context.
     $start = $workflow->getActivity('start');
     // Instantiate the state for this workflow instance.
-    $conductorState = new ConductorState();
+    $conductorState = new ConductorInstance();
     // Create a state object for the first activity.
     $startState = new ConductorActivityState($start, $conductorState);
     // Set the context.

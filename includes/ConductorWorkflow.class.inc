@@ -22,7 +22,7 @@ class ConductorWorkflow {
   // The human readable title of this workflow.
   public $title = '';
 
-  // A ConductorState object containing state for a workflow instance.
+  // A ConductorInstance object containing state for a workflow instance.
   public $state = NULL;
 
   /**
@@ -316,9 +316,9 @@ class ConductorWorkflow {
    * subject to change.
    *
    * @param $state
-   *   A ConductorState descended object to use for this workflow.
+   *   A ConductorInstance descended object to use for this workflow.
    */
-  function setState(ConductorState $state) {
+  function setState(ConductorInstance $state) {
     // Pass a copy of this workflow into the state object.
     $state->workflow = &$this;
     $this->state = &$state;
@@ -331,13 +331,13 @@ class ConductorWorkflow {
    * be instantiated and used.
    *
    * @return
-   *   The ConductorState descended object that manages state for this workflow.
+   *   The ConductorInstance descended object that manages state for this workflow.
    */
   function getState() {
     if (!$this->state) {
       // TODO: State pretty much requires a persistence capability.
       // TODO: How do I let others set a different state?
-      $this->setState(new ConductorState());
+      $this->setState(new ConductorInstance());
     }
     return $this->state;
   }
@@ -346,7 +346,7 @@ class ConductorWorkflow {
     // Ensure the activities are properly indexed.
     $this->indexActivities();
     $state = &$this->getState();
-    if ($state->getStatus = ConductorState::INITIALIZED) {
+    if ($state->getStatus = ConductorInstance::INITIALIZED) {
     }
     else {
 
