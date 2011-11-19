@@ -151,15 +151,15 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     // Get the first activity, we will need it to set the initial context.
     $start = $workflow->getActivity('start');
     // Instantiate the state for this workflow instance.
-    $conductorState = new ConductorInstance();
+    $instance = new ConductorInstance();
     // Create a state object for the first activity.
-    $startState = new ConductorActivityState($start, $conductorState);
+    $startState = new ConductorActivityState($start, $instance);
     // Set the context.
     $startState->context = $context;
     // Add the activity's state to the workflow instance state.
-    $conductorState->setActivityStates(array('start' => $startState));
+    $instance->setActivityStates(array('start' => $startState));
     // Actually assign the workflow instance state to the workflow.
-    $workflow->setState($conductorState);
+    $workflow->setState($instance);
     // Finally, start running this workflow.
     return $workflow;
   }

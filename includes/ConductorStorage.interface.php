@@ -5,14 +5,14 @@ interface ConductorStorage {
   /**
    *
    * @param $state
-   *   The ConductorState state object to be saved.
+   *   The ConductorInstance state object to be saved.
    */
   public function save(ConductorInstance $state);
 
   /**
    *
    * @return
-   *   A loaded ConductorState object.
+   *   A loaded ConductorInstance object.
    */
   static function load($unique_id);
 
