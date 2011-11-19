@@ -128,6 +128,10 @@ class ConductorInstance {
     $this->activityStates[$activityState->name] = $activityState;
   }
 
+  public function setStorage(ConductorStorage $storageHandler) {
+    $this->storageHandler = $storageHandler;
+  }
+
   /**
    * Get an activity state.
    *
@@ -365,7 +369,7 @@ class ConductorInstance {
   }
 
   /**
-   * This workflow is complete.
+   * This workflow could not be completed at this time and has been suspended for later resuming.
    */
   public function workflowSuspended() {
     $this->status = self::SUSPENDED;

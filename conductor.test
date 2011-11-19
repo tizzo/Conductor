@@ -20,6 +20,11 @@
 class ConductorUnitTestCase extends DrupalUnitTestCase {
 
   /**
+   * An array to be used as our data store in our mock storage object.
+   */
+  protected $database = array();
+
+  /**
    * Implements getInfo().
    */
   public static function getInfo() {
@@ -39,9 +44,11 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     // loads all files specified in conductor's .info file to premptively load
     // all of the files we're likely to need.
     $info = drupal_parse_info_file(drupal_get_path('module', 'conductor') . '/conductor.info');
-    // Include all files not already in the info file (because they're added by ctools).
+    // Include all files not already in the info file (because they're added by
+    // ctools).
     $test_files = array(
       'tests/includes/ConductorObserverTest.inc',
+      'tests/plugins/storage/test/ConductorStorageTest.class.php',
       'plugins/activity/activity/ConductorActivity.class.php',
       'plugins/activity/start/ConductorActivityStart.class.php',
       'plugins/activity/end/ConductorActivityEnd.class.php',
@@ -59,7 +66,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
    * Test that a workflow successfully runs and completes.
    */
   public function testWorkflowRun() {
-    $workflow = $this->instantiateWorkflowWithState();
+    $workflow = $this->instantiateWorkflowInstance();
     if (get_class($workflow->getActivity('start')) == 'ConductorActivityStart') {
       $this->pass(t('Simple workflow instantiation is successful.'));
     }
@@ -144,14 +151,21 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
   /**
    * Instantiate a workflow and populate it with state and context.
    */
-  private function instantiateWorkflowWithState() {
+  private function instantiateWorkflowInstance() {
     $workflow = $this->instantiateWorkflow();
     // Create the context
     $context = array('foo' => 'bar');
     // Get the first activity, we will need it to set the initial context.
     $start = $workflow->getActivity('start');
-    // Instantiate the state for this workflow instance.
+    // Instantiate the workflow instance for processing.
     $instance = new ConductorInstance();
+    // Instantiate our mock storage handler.
+    $storage = new conductorStorageTest;
+    // Provide our mock storage handler with an array to use as a persistent
+    // data store.
+    $storage->setDatabase($this->database);
+    // Set the storage handler for this instance.
+    $instance->setStorage($storage);
     // Create a state object for the first activity.
     $startState = new ConductorActivityState($start, $instance);
     // Set the context.
