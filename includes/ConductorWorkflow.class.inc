@@ -199,12 +199,13 @@ class ConductorWorkflow {
    * @return
    *   If successfully created, the new ConductorActivity descended object, else FALSE.
    */
-  public function newActivity($activityHandlerName) {
-    if ($new_activity = conductor_get_activity_handler($activityHandlerName)) {
-      $new_activity->workflow = &$this;
-      $this->activities[] = $new_activity;
+  public function newActivity($activityHandlerName, $handler = FALSE) {
+    if (!$activity = $handler) {
+      $activity = conductor_get_activity_handler($activityHandlerName);
     }
-    return $new_activity;
+    $activity->workflow = &$this;
+    $this->activities[] = $activity;
+    return $activity;
   }
 
   /**

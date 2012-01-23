@@ -22,7 +22,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
   /**
    * An array to be used as our data store in our mock storage object.
    */
-  protected $database = array();
+  protected $dataStore = array();
 
   /**
    * Implements getInfo().
@@ -49,6 +49,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $test_files = array(
       'tests/includes/ConductorObserverTest.inc',
       'tests/plugins/storage/test/ConductorStorageTest.class.php',
+      'tests/plugins/activity/pause_test/ConductorActivityPauseTest.class.php',
       'plugins/activity/activity/ConductorActivity.class.php',
       'plugins/activity/start/ConductorActivityStart.class.php',
       'plugins/activity/end/ConductorActivityEnd.class.php',
@@ -113,7 +114,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
       'activity_3'
     );
     $activity->inputs = array();
-    $activity = $workflow->newActivity('activity');
+    $activity = $workflow->newActivity('pauseTest', $this->getActivity('tests/plugins/activity/pause_test/pause_test.inc'));
     $activity->x = 180;
     $activity->y = 100;
     $activity->name = 'activity_2';
@@ -163,7 +164,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $storage = new conductorStorageTest;
     // Provide our mock storage handler with an array to use as a persistent
     // data store.
-    $storage->setDatabase($this->database);
+    $storage->setDatabase($this->dataStore);
     // Set the storage handler for this instance.
     $instance->setStorage($storage);
     // Create a state object for the first activity.
@@ -176,6 +177,27 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $workflow->setState($instance);
     // Finally, start running this workflow.
     return $workflow;
+  }
+
+  /**
+   * Method for testing plugins that are not provided by this module
+   * because ctools can't load any plugin provided by a module that
+   * isn't already present.
+   */
+  private function getActivity($path) {
+    $static = drupal_static(__FUNCTION__, array());
+    if (!isset($static[$path])) {
+      require_once($path);
+      if (isset($plugin['handler']['class'])) {
+        $handler = new $plugin['handler']['class'];
+        $handler->plugin_info = $plugin;
+        $static[$path] = $handler;
+      }
+      else {
+        $static[$path] = FALSE;
+      }
+    }
+    return $static[$path];
   }
 }
 

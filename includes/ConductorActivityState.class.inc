@@ -79,6 +79,10 @@ class ConductorActivityState {
     $this->status = self::COMPLETED;
   }
 
+  public function markSuspended() {
+    $this->status = self::SUSPENDED;
+  }
+
   public function markFailed() {
     $this->status = self::FAILED;
   }
