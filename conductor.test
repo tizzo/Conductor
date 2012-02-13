@@ -79,6 +79,8 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $history = array();
     $observer->history = &$history;
     $workflow->state->registerObserver($observer);
+    $observer = new ConductorLogDrush;
+    $workflow->state->registerObserver($observer);
     $workflow->run();
     $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
     $this->assertEqual(count($history['activateActivity']), 4, t('The appropriate number of activities were activated'));

@@ -393,8 +393,9 @@ class ConductorInstance {
    */
   public function suspend() {
     $pointers = array();
+    drush_print('we\'re trying to suspend!');
     foreach ($this->getSuspendedActivities() as $name => $suspendedActivity) {
-      $pointers[$name] = &$this->workflow->getActviity($name)->getSuspendPointers();
+      //$pointers[$name] = &$this->workflow->getActviity($name)->getSuspendPointers();
     }
     // Save the workflow to our datastore (basically just the activities?)
     // Save $activityBins.
