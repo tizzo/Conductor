@@ -47,14 +47,14 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     // Include all files not already in the info file (because they're added by
     // ctools).
     $test_files = array(
-      'tests/includes/ConductorObserverTest.inc',
-      'tests/plugins/storage/test/ConductorStorageTest.class.php',
-      'tests/plugins/activity/pause_test/ConductorActivityPauseTest.class.php',
       'plugins/activity/activity/ConductorActivity.class.php',
       'plugins/activity/start/ConductorActivityStart.class.php',
       'plugins/activity/end/ConductorActivityEnd.class.php',
       'plugins/activity/conditional/ConductorActivityConditional.class.php',
       'plugins/storage/database/ConductorStorageDatabase.class.php',
+      'tests/includes/ConductorObserverTest.inc',
+      'tests/plugins/storage/test/ConductorStorageTest.class.php',
+      'tests/plugins/activity/pause_test/ConductorActivityPauseTest.class.php',
     );
     $files = array_merge($info['files'], $test_files);
     foreach ($files as $file) {
