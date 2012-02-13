@@ -230,7 +230,7 @@ class ConductorInstance {
       $bin[] = $activity->name;
     }
     // Should we notify observers?
-    $this->notifyObservers($binName . 'Activity', $activity);
+    $this->notifyObservers('binAdd', $activity);
   }
 
   /**
@@ -277,7 +277,7 @@ class ConductorInstance {
     if ($position === FALSE) {
       return FALSE;
     }
-    $this->notifyObservers('dis' . $binName . 'Activity', $activity);
+    $this->notifyObservers('binRemove', $activity);
     unset($bin[$position]);
     return TRUE;
   }

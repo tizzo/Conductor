@@ -62,6 +62,10 @@ abstract class  ConductorLog implements ConductorObserver {
         $string = 'Event @event was successfullly completed.';
         $args = array('@event' => $object->title);
         break;
+      case 'binAdd':
+        $string = 'Activity @activity just became ';
+        $args = array('@activity' => $object->getName());
+        break;
       default:
         $string = t('Conductor just @evented.');
         $args = array('@event' => $event);
