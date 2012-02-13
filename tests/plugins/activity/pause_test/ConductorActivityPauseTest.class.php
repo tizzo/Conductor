@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This is the first activity in any workflow.
+ * This is a test activity to perform different actions depending on the context data.
  */
 class ConductorActivityPauseTest extends ConductorActivity {
 
