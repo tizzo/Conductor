@@ -54,17 +54,29 @@ abstract class  ConductorLog implements ConductorObserver {
    */
   public function generateHumanMessage($event, $object) {
     switch ($event) {
-      case 'activateActivity':
+      case 'activityActivate':
         $string = 'Event @event was activated';
         $args = array('@event' => $object->title);
         break;
-      case 'completeActivity':
+      case 'activityDeactivate':
+        $string = 'Event @event was activated';
+        $args = array('@event' => $object->title);
+        break;
+      case 'activityComplete':
         $string = 'Event @event was successfullly completed.';
         $args = array('@event' => $object->title);
         break;
-      case 'binAdd':
-        $string = 'Activity @activity just became ';
-        $args = array('@activity' => $object->getName());
+      case 'activitySuspend':
+        $string = 'Event @event was suspended, awaiting further action.';
+        $args = array('@event' => $object->title);
+        break;
+      case 'activityResume':
+        $string = 'Event @event has been resumed.';
+        $args = array('@event' => $object->title);
+        break;
+      case 'activityFail':
+        $string = 'Event @event has failed.';
+        $args = array('@event' => $object->title);
         break;
       default:
         $string = t('Conductor just @evented.');

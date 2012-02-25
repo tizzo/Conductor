@@ -48,13 +48,13 @@ class ConductorInstance {
   /**
    * Bins are groupings of activities.
    *
-   * This is used to track what activities are in different states
-   * including active, completed, suspended, etc.  It is used to ensure
-   * that we can easily serialize state without having references that
-   * become duplicate objects upon unserialization.
+   * This is used internally to track what activities are in different
+   * states including active, completed, suspended, etc.  It is used to
+   * ensure that we can easily serialize state without having references
+   * that become duplicate objects upon unserialization.
    *
-   * This multidimensional array is keyed by the state name (e.g.
-   * active) and contains a linear array of activities.
+   * This multidimensional array is keyed by the bin name corresponding
+   * to the state (e.g. active) and contains a linear array of activities.
    */
   protected $activityBins = array();
 
@@ -229,8 +229,6 @@ class ConductorInstance {
     if (!in_array($activity->name, $bin)) {
       $bin[] = $activity->name;
     }
-    // Should we notify observers?
-    $this->notifyObservers('binAdd', $activity);
   }
 
   /**
@@ -277,7 +275,6 @@ class ConductorInstance {
     if ($position === FALSE) {
       return FALSE;
     }
-    $this->notifyObservers('binRemove', $activity);
     unset($bin[$position]);
     return TRUE;
   }
@@ -329,25 +326,39 @@ class ConductorInstance {
         }
       }
       // TODO: This event is deprecated but still used in our tests.
-      $this->notifyObservers('activateActivity', $activity);
+      $this->notifyObservers('activityActivate', $activity);
       $this->addToBin('active', $activity);
     }
   }
 
+  /**
+   * Deactivate an activity in the workflow.
+   *
+   * This removes the activity from the list of candidates for execution.
+   */
   public function deactivateActivity(ConductorActivity $activity) {
     $this->removeFromBin('active', $activity);
+    $this->notifyObservers('activityDeactivate', $activity);
   }
 
+  /**
+   * Activate an activity
+   */
   public function suspendActivity(ConductorActivity $activity) {
     if (!$this->checkInBin('suspended', $activity)) {
       $this->addToBin('suspended', $activity);
       $this->removeFromBin('active', $activity);
+      $this->notifyObservers('activitySuspend', $activity);
     }
   }
 
+  /**
+   *
+   */
   public function failActivity(ConductorActivity $activity) {
     $this->removeFromBin('active', $activity);
     $this->addToBin('failed', $activity);
+    $this->notifyObservers('activityFailed', $activity);
   }
 
   public function getCompletedActivities() {

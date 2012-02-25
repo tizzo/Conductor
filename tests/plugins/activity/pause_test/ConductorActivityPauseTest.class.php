@@ -11,7 +11,7 @@ class ConductorActivityPauseTest extends ConductorActivity {
   public function run() {
 
     //if ($this->state->getContext('pauseTest') === TRUE) {
-//      $this->activityState->markSuspended();
+      $this->activityState->markSuspended();
     //}
   }
 

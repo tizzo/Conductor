@@ -374,14 +374,16 @@ class ConductorWorkflow {
         switch ($activityState->getStatus()) {
           // If the activity has been completed, mark it as such.
           case ConductorActivityState::COMPLETED:
+            $state->notifyObservers('activityComplete', $activity);
             $state->completeActivity($activity);
             break;
           case ConductorActivityState::SUSPENDED:
+            $state->notifyObservers('activitySuspend', $activity);
             $state->suspendActivity($activity);
             break;
           case ConductorActivityState::FAILED:
             $state->failActivity($activity);
-            $state->notifyObservers('activityFailed', $activity);
+            $state->notifyObservers('activityFail', $activity);
             break;
         }
       }
@@ -390,7 +392,7 @@ class ConductorWorkflow {
     // If even one activity failed
     if (count($state->getFailedActivities())) {
       $state->workflowFailed();
-      $state->notifyObservers('workflowFailed', $this);
+      $state->notifyObservers('workflowFail', $this);
     }
     else if (count($state->getSuspendedActivities())) {
       $state->workflowSuspended();

@@ -112,14 +112,15 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $activity->name = 'start';
     $activity->title = 'Start';
     $activity->outputs = array(
-      'activity_2',
+      'pause_test',
       'activity_3'
     );
     $activity->inputs = array();
-    $activity = $workflow->newActivity('pauseTest', $this->getActivity('tests/plugins/activity/pause_test/pause_test.inc'));
+    //$activity = $workflow->newActivity('pauseTest', $this->getActivity('tests/plugins/activity/pause_test/pause_test.inc'));
+    $activity = $workflow->newActivity('activity');
     $activity->x = 180;
     $activity->y = 100;
-    $activity->name = 'activity_2';
+    $activity->name = 'pause_test';
     $activity->title = 'Activity 2';
     $activity->inputs = array(
       'start',
@@ -144,7 +145,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $activity->name = 'end';
     $activity->title = 'End';
     $activity->inputs = array(
-      'activity_2',
+      'pause_test',
       'activity_3'
     );
     $activity->outputs = array();
