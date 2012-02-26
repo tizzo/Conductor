@@ -22,11 +22,6 @@ class ConductorObserverTest implements ConductorObserver {
   public function notify($event, $object) {
     if (!is_object($object)) {
       $backtrace = debug_backtrace();
-      $output = array();
-      foreach ($backtrace as $item) {
-        $output[] = $item['file'] . '(' . $item['line'] . '): ' . $item['function'];
-      }
-      //drush_print_r($output);
       throw new Exception('Non-object passed to observers.');
     }
     $non_reference_copy = clone $object;
