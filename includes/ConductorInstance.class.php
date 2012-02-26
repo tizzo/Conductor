@@ -28,12 +28,12 @@ class ConductorInstance {
   const FINISHED = 2;
 
   /**
-   *
+   * The workflow failed during the run.
    */
   const FAILED = 3;
 
   /**
-   *
+   * The workflow has been suspended to be resumed later.
    */
   const SUSPENDED = 4;
 

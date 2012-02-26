@@ -204,6 +204,8 @@ class ConductorWorkflow {
       $activity = conductor_get_activity_handler($activityHandlerName);
     }
     $activity->workflow = &$this;
+    // Add the activity with an empty name because the name has probably not been set yet.
+    // The name key will get into the activities array with ConductorWorkflow::indexActivities() is called.
     $this->activities[] = $activity;
     return $activity;
   }

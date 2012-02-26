@@ -60,7 +60,6 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     foreach ($files as $file) {
       require_once($file);
     }
-
   }
 
   /**
@@ -106,7 +105,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $history = array();
     // Ensure we are working with a clean storage array.
     $this->storage = array();
-    $workflow = $this->instantiateWorkflowInstance('simple_parallel_activity_test', $history);
+    $workflow = $this->instantiateWorkflowInstance('simple_suspend_resume_test', $history);
     $workflow->getActivity('activity_2')->getState()->setContext('activity_2:suspend', TRUE);
     $workflow->run();
     $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
@@ -143,10 +142,13 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     if (drupal_is_cli() && function_exists('drush_command') && drush_get_option('verbose')) {
       $workflow->state->registerObserver(new ConductorLogDrush);
     }
+    $workflow->indexActivities();
     return $workflow;
   }
 
   /**
+   * Load an activity handler from its plugin file.
+   *
    * Method for testing plugins that are not provided by this module
    * because ctools can't load any plugin provided by a module that
    * isn't already present.
@@ -154,18 +156,31 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
   private function getActivity($path) {
     $static = drupal_static(__FUNCTION__, array());
     if (!isset($static[$path])) {
-      require_once($path);
+      include($path);
       if (isset($plugin['handler']['class'])) {
         $handler = new $plugin['handler']['class'];
         $handler->plugin_info = $plugin;
+        // Set the plugin_info name for the name of the plugin.
+        $handler->plugin_info['name'] = substr(array_pop(explode('/', $path)), 0, -4);
         $static[$path] = $handler;
       }
       else {
         $static[$path] = FALSE;
       }
     }
-    return $static[$path];
+    if ($static[$path]) {
+      return clone $static[$path];
+    }
+    else {
+      return FALSE;
+    }
   }
+
+  /**
+   * Get a unit test workflow by machine name.
+   *
+   * The exported 
+   */
   private function getWorkflow($name) {
     $workflows = array();
     $workflow = new ConductorWorkflow;
@@ -221,9 +236,10 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $workflows[$workflow->name] = $workflow;
     $workflow = new ConductorWorkflow;
     $workflow->wid = 'new';
-    $workflow->name = 'simple_pause_resume_test';
-    $workflow->title = 'Simple pause and resume test';
-    $workflow->description = 'A simple workflow that pauses and then resumes an activity.';
+
+    $workflow->name = 'simple_suspend_resume_test';
+    $workflow->title = 'Simple suspend and resume test';
+    $workflow->description = 'A simple workflow that suspends and then resumes an activity.';
     $workflow->api_version = '1.0';
     // Add and configure workflow activities.
     $activity = $workflow->newActivity('start');
