@@ -108,4 +108,47 @@ class ConductorActivityState {
     }
     return $state;
   }
+
+  /**
+   * Set context for this activity.
+   *
+   * If one parameter is given and it is an array, reset the context to that array.
+   * if two parameters are given, set them as a key => value pair to the existing
+   * context array.
+   *
+   * @param $one
+   *   If two is present the key of the context value to set, if two is not
+   *   present then an array to set this context to.
+   * @param $two
+   *   The value of the context value to set.
+   */
+  public function setContext($one, $two = FALSE) {
+    if ($two) {
+      $this->context[$one] = $two;
+    }
+    else if (is_array($one)) {
+      $this->context = $one;
+    }
+    else {
+      throw new Exception('Invalid context provided to activity state, must be an array.');
+    }
+  }
+
+  /**
+   * Get the context for this activity.
+   */
+  public function getContext($name = FALSE) {
+    if (!$name) {
+      $return = $this->context;
+    }
+    else {
+      if (isset($this->context[$name])) {
+        $return = $this->context[$name];
+      }
+      else {
+        $return  = FALSE;
+      }
+    }
+    return $return;
+  }
 }
