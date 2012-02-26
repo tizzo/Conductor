@@ -101,16 +101,13 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
    * when we run the workflow
    * each action should be activated and properly complete.
    */
-  public function testWorkSuspend() {
+  public function testWorkflowSuspend() {
     // Create an array for tracking event history via our test observer.
     $history = array();
+    // Ensure we are working with a clean storage array.
+    $this->storage = array();
     $workflow = $this->instantiateWorkflowInstance('simple_parallel_activity_test', $history);
-    if (get_class($workflow->getActivity('start')) == 'ConductorActivityStart') {
-      $this->pass(t('Simple workflow instantiation is successful.'));
-    }
-    else {
-      $this->fail(t('Something prevented workflow instantiation.'));
-    }
+    $workflow->getActivity('activity_2')->getState()->setContext('activity_2:suspend', TRUE);
     $workflow->run();
     $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
     $this->assertEqual(count($history['activityActivate']), 4, t('The appropriate number of activities were activated'));
@@ -118,7 +115,6 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $activityStates = $workflow->state->getActivityState();
     foreach ($activityStates as $activityState) {
       $this->assertEqual($activityState->getStatus(), ConductorActivityState::COMPLETED, t('The @name activity was marked complete.', array('@name' => $activityState->name)));
-      $this->assertEqual($activityState->context, array('foo' => 'bar'), t('Context was successfully passed into the @name activity.', array('@name' => $activityState->name)));
     }
   }
 
