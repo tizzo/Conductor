@@ -81,6 +81,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     else {
       $this->fail(t('Something prevented workflow instantiation.'));
     }
+    $workflow->getActivity('start')->getState()->setContext('foo', 'bar');
     $workflow->run();
     $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
     $this->assertEqual(count($history['activityActivate']), 4, t('The appropriate number of activities were activated'));
@@ -88,7 +89,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $activityStates = $workflow->state->getActivityState();
     foreach ($activityStates as $activityState) {
       $this->assertEqual($activityState->getStatus(), ConductorActivityState::COMPLETED, t('The @name activity was marked complete.', array('@name' => $activityState->name)));
-      $this->assertEqual($activityState->context, array('foo' => 'bar'), t('Context was successfully passed into the @name activity.', array('@name' => $activityState->name)));
+      $this->assertEqual($activityState->getContext('foo'), 'bar', t('Context was successfully passed into the @name activity.', array('@name' => $activityState->name)));
     }
   }
 
@@ -126,10 +127,6 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
    */
   private function instantiateWorkflowInstance($name, array &$history) {
     $workflow = $this->getWorkflow($name);
-    // Create the context
-    $context = array('foo' => 'bar');
-    // Get the first activity, we will need it to set the initial context.
-    $start = $workflow->getActivity('start');
     // Instantiate the workflow instance for processing.
     $instance = new ConductorInstance();
     // Instantiate our mock storage handler.
@@ -139,12 +136,6 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $storage->setDatabase($this->dataStore);
     // Set the storage handler for this instance.
     $instance->setStorage($storage);
-    // Create a state object for the first activity.
-    $startState = new ConductorActivityState($start, $instance);
-    // Set the context.
-    $startState->context = $context;
-    // Add the activity's state to the workflow instance state.
-    $instance->setActivityStates(array('start' => $startState));
     // Actually assign the workflow instance state to the workflow.
     $workflow->setState($instance);
     // Set up the observer for tracking workflow history in tests.
@@ -199,7 +190,6 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     );
     $activity->inputs = array();
     // Implement a new test for pausing, we shouldn't reuse the current test.
-    //$activity = $workflow->newActivity('pauseTest', $this->getActivity('tests/plugins/activity/pause_test/pause_test.inc'));
     $activity = $workflow->newActivity('activity');
     $activity->x = 180;
     $activity->y = 100;
@@ -252,7 +242,6 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $activity->inputs = array();
     // Implement a new test for pausing, we shouldn't reuse the current test.
     $activity = $workflow->newActivity('test', $this->getActivity('tests/plugins/activity/test/test.inc'));
-    $activity = $workflow->newActivity('activity');
     $activity->x = 180;
     $activity->y = 100;
     $activity->name = 'activity_2';
@@ -263,7 +252,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $activity->outputs = array(
       'end'
     );
-    $activity = $workflow->newActivity('activity');
+    $activity = $workflow->newActivity('test', $this->getActivity('tests/plugins/activity/test/test.inc'));
     $activity->x = 180;
     $activity->y = 100;
     $activity->name = 'activity_3';
