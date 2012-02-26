@@ -55,7 +55,6 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
       'tests/includes/ConductorObserverTest.inc',
       'tests/plugins/storage/test/ConductorStorageTest.class.php',
       'tests/plugins/activity/test/ConductorActivityTest.class.php',
-      'tests/conductor_tests.conductor_workflows.inc',
     );
     $files = array_merge($info['files'], $test_files);
     foreach ($files as $file) {
@@ -126,8 +125,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
    * Instantiate a workflow and populate it with state and context.
    */
   private function instantiateWorkflowInstance($name, array &$history) {
-    $workflows = conductor_test_default_conductor_workflows();
-    $workflow = $workflows[$name];
+    $workflow = $this->getWorkflow($name);
     // Create the context
     $context = array('foo' => 'bar');
     // Get the first activity, we will need it to set the initial context.
@@ -180,6 +178,115 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
       }
     }
     return $static[$path];
+  }
+  private function getWorkflow($name) {
+    $workflows = array();
+    $workflow = new ConductorWorkflow;
+    $workflow->wid = 'new';
+    $workflow->name = 'simple_parallel_activity_test';
+    $workflow->title = 'Simple Parallel Workflow';
+    $workflow->description = 'A simple Workflow that executes 2 activities in parallel.';
+    $workflow->api_version = '1.0';
+    // Add and configure workflow activities.
+    $activity = $workflow->newActivity('start');
+    $activity->x = 280;
+    $activity->y = 200;
+    $activity->name = 'start';
+    $activity->title = 'Start';
+    $activity->outputs = array(
+      'activity_2',
+      'activity_3'
+    );
+    $activity->inputs = array();
+    // Implement a new test for pausing, we shouldn't reuse the current test.
+    //$activity = $workflow->newActivity('pauseTest', $this->getActivity('tests/plugins/activity/pause_test/pause_test.inc'));
+    $activity = $workflow->newActivity('activity');
+    $activity->x = 180;
+    $activity->y = 100;
+    $activity->name = 'activity_2';
+    $activity->title = 'Activity 2';
+    $activity->inputs = array(
+      'start',
+    );
+    $activity->outputs = array(
+      'end'
+    );
+    $activity = $workflow->newActivity('activity');
+    $activity->x = 180;
+    $activity->y = 100;
+    $activity->name = 'activity_3';
+    $activity->title = 'Activity 3';
+    $activity->inputs = array(
+      'start',
+    );
+    $activity->outputs = array(
+      'end'
+    );
+    $activity = $workflow->newActivity('end');
+    $activity->x = 380;
+    $activity->y = 200;
+    $activity->name = 'end';
+    $activity->title = 'End';
+    $activity->inputs = array(
+      'activity_2',
+      'activity_3'
+    );
+    $activity->outputs = array();
+    $workflows[$workflow->name] = $workflow;
+    $workflow = new ConductorWorkflow;
+    $workflow->wid = 'new';
+    $workflow->name = 'simple_pause_resume_test';
+    $workflow->title = 'Simple pause and resume test';
+    $workflow->description = 'A simple workflow that pauses and then resumes an activity.';
+    $workflow->api_version = '1.0';
+    // Add and configure workflow activities.
+    $activity = $workflow->newActivity('start');
+    $activity->x = 280;
+    $activity->y = 200;
+    $activity->name = 'start';
+    $activity->title = 'Start';
+    $activity->outputs = array(
+      'activity_2',
+      'activity_3'
+    );
+    $activity->inputs = array();
+    // Implement a new test for pausing, we shouldn't reuse the current test.
+    $activity = $workflow->newActivity('test', $this->getActivity('tests/plugins/activity/test/test.inc'));
+    $activity = $workflow->newActivity('activity');
+    $activity->x = 180;
+    $activity->y = 100;
+    $activity->name = 'activity_2';
+    $activity->title = 'Activity 2';
+    $activity->inputs = array(
+      'start',
+    );
+    $activity->outputs = array(
+      'end'
+    );
+    $activity = $workflow->newActivity('activity');
+    $activity->x = 180;
+    $activity->y = 100;
+    $activity->name = 'activity_3';
+    $activity->title = 'Activity 3';
+    $activity->inputs = array(
+      'start',
+    );
+    $activity->outputs = array(
+      'end'
+    );
+    $activity = $workflow->newActivity('end');
+    $activity->x = 380;
+    $activity->y = 200;
+    $activity->name = 'end';
+    $activity->title = 'End';
+    $activity->inputs = array(
+      'activity_2',
+      'activity_3'
+    );
+    $activity->outputs = array();
+    $workflows[$workflow->name] = $workflow;
+
+    return $workflows[$name];
   }
 }
 
