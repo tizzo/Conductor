@@ -22,7 +22,7 @@ class ConductorLogDrush extends ConductorLog {
       $level = 'error';
     }
 
-    // If the log threshold is less than what is specified, don't bother logging at all.
+    // If the log threshold is less than what is specified, do not log.
     if ($level >= $this->logThreshold) {
       list($string, $args) = $this->generateHumanMessage($event, $object);
       drush_log(t($string, $args), $level);

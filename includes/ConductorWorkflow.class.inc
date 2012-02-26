@@ -369,7 +369,7 @@ class ConductorWorkflow {
           }
         }
         else {
-          $state->deactivateActivity();
+          $state->deactivateActivity($activity);
         }
         switch ($activityState->getStatus()) {
           // If the activity has been completed, mark it as such.
