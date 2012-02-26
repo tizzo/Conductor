@@ -66,6 +66,11 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
 
   /**
    * Test that a workflow successfully runs and completes.
+   *
+   * Given that we have a simple wokflow with two parallel actions
+   * and neither of the actions has a blocker
+   * when we run the workflow
+   * each action should be activated and properly complete.
    */
   public function testWorkflowRun() {
     // Create an array for tracking event history via our test observer.
@@ -79,8 +84,8 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     }
     $workflow->run();
     $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
-    $this->assertEqual(count($history['activateActivity']), 4, t('The appropriate number of activities were activated'));
-    $this->assertEqual(count($history['completeActivity']), 4, t('The appropriate number of activities were completed'));
+    $this->assertEqual(count($history['activityActivate']), 4, t('The appropriate number of activities were activated'));
+    $this->assertEqual(count($history['activityComplete']), 4, t('The appropriate number of activities were completed'));
     $activityStates = $workflow->state->getActivityState();
     foreach ($activityStates as $activityState) {
       $this->assertEqual($activityState->getStatus(), ConductorActivityState::COMPLETED, t('The @name activity was marked complete.', array('@name' => $activityState->name)));
