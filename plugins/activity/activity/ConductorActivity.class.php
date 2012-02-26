@@ -82,10 +82,6 @@ class ConductorActivity extends ConductorObject {
       // by default or if we should have a different default.
 
       // Ensure we have state for every configured input.
-      drush_print($this->name);
-      if ($this->name == 'end') {
-        $runnable = FALSE;
-      }
       if (!$inputState = $this->activityState->getInputActivityState($input) || $inputState->getStatus() == ConductorActivityState::COMPLETED) {
         $runnable = FALSE;
       }
