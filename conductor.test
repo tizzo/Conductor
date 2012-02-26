@@ -54,7 +54,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
       'plugins/storage/database/ConductorStorageDatabase.class.php',
       'tests/includes/ConductorObserverTest.inc',
       'tests/plugins/storage/test/ConductorStorageTest.class.php',
-      'tests/plugins/activity/pause_test/ConductorActivityPauseTest.class.php',
+      'tests/plugins/activity/test/ConductorActivityTest.class.php',
       'tests/conductor_tests.conductor_workflows.inc',
     );
     $files = array_merge($info['files'], $test_files);
