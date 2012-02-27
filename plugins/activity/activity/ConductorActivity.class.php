@@ -29,7 +29,7 @@ class ConductorActivity extends ConductorObject {
   public $plugin = '';
 
   // The ConductorActivityState object tracking the state of this activity.
-  public $activityState = NULL;
+  public $activityState = FALSE;
 
   public function option_definition() {
     $options['name'] = array('default' => '');

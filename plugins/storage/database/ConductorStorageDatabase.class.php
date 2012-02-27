@@ -21,38 +21,61 @@ class ConductorStorageDatabase implements ConductorStorage {
 
   public function save(stdClass $data) {
     // TODO: How shall we decide whether to do an insert or an update?
+    $record = new stdClass;
+    // todo store workflow name
+    $record->data = $data;
+    $keys = array();
+    if (isset($data->uniqueId) && is_numeric($data->uniqueId)) {
+      unset($data->uniqueId);
+      $keys[] = 'id';
+      $record->id = $data->uniqueId;
+    }
+    drupal_write_record('conductor_instance', $record, $keys);
+    return $record->id;
   }
 
   public function load($uniqueId) {
-    $result = db_query('SELECT * FROM {conductor_state} WHERE sid=:sid', array('sid' => $uniqueId), $options)->fetchObject();
-    
+    $result = db_query('SELECT * FROM {conductor_instance} WHERE id=:id', array('id' => $uniqueId), $this->options)->fetchObject();
+    $return = unserialize($result->data);
+    $return->uniqueId = $result->id;
+    dpm($return);
+    return $return;
   }
 
   public function loadPointer($pointerKey) {
-    $unique_id = db_query('SELECT sid FROM {conductor_state_references} WHERE name = :name', array('name' => $name), $options)
-      ->fetchField();
-    return self::load($unique_id);
+    $pointer = db_query('SELECT * FROM {conductor_instance_pointer} WHERE pointer_key = :pointer_key', array('pointer_key' => $pointerKey), $this->options)
+      ->fetchObject();
+    if (is_object($pointer)) {
+      return array(
+        'workflowName' => $pointer->workflow_name,
+        'instanceId' => $pointer->sid,
+        'activityName' => $pointer->activity_name,
+      );
+    }
+    else {
+      return FALSE;
+    }
   }
 
   public function delete($uniqueId) {
-    db_delete('conductor_state_references', $this->options)
-     ->join()
-     ->condition('');
-    db_delete('conductor_state', $this->options)
-      ->condition('');
+    db_delete('conductor_instance')
+     ->condition('id', $uniqueId)
+     ->execute();
   }
 
   public function savePointer($workflowName, $instanceId, $activityName, $pointerKey) {
+    $record = new stdClass;
+    $record->workflow_name = $workflowName;
+    $record->sid = $instanceId;
+    $record->activity_name = $activityName;
+    $record->pointer_key = $pointerKey;
+    drupal_write_record('conductor_instance_pointer', $record);
   }
 
   public function deletePointer($pointerKey) {
-    db_query('SELECT sid FROM {conductor_state} cs
-      JOIN {conductor_state_references} csr ON cs.sid = csr.sid
-      WHERE csr.name=:name', array('name' => $name), $this->options);
-    db_delete('conductor_state_references')
-     ->condition('sid', $sid);
-    db_delete('conductor_state')
-     ->condition('sid', $sid);
+    db_delete('conductor_instance_pointer')
+     ->condition('pointer_key', $pointerKey)
+     ->execute();
   }
 
 }
