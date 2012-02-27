@@ -23,18 +23,18 @@ class ConductorStorageDatabase implements ConductorStorage {
     // TODO: How shall we decide whether to do an insert or an update?
   }
 
-  static function load($unique_id) {
+  public function load($unique_id) {
     $result = db_query('SELECT * FROM {conductor_state} WHERE sid=:sid', array('sid' => $unique_id), $options)->fetchObject();
     
   }
 
-  static function loadFromPointer($name) {
+  public function loadFromPointer($name) {
     $unique_id = db_query('SELECT sid FROM {conductor_state_references} WHERE name = :name', array('name' => $name), $options)
       ->fetchField();
     return self::load($unique_id);
   }
 
-  static function delete($unique_id) {
+  public function delete($unique_id) {
     db_delete('conductor_state_references', $this->options)
      ->join()
      ->condition('');
@@ -42,12 +42,12 @@ class ConductorStorageDatabase implements ConductorStorage {
       ->condition('');
   }
 
-  static function deleteReference($name) {
+  public function deleteReference($name) {
     db_delete('conductor_state_references', $this->options)
       ->condition('name', $name);
   }
 
-  static function deletePointer($name) {
+  public function deletePointer($name) {
     db_query('SELECT sid FROM {conductor_state} cs
       JOIN {conductor_state_references} csr ON cs.sid = csr.sid
       WHERE csr.name=:name', array('name' => $name), $this->options);
