@@ -360,7 +360,7 @@ class ConductorWorkflow {
         $activity->setState($activityState);
         if ($activity->checkRunnability()) {
           try {
-            $activity->run();
+            $activity->run($this);
           }
           catch (Exception $e) {
             $state->failActivity($activity);
