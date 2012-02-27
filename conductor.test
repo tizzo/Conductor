@@ -113,6 +113,8 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $this->assertEqual(count($history['activityComplete']), 2, t('The appropriate number of activities were completed.'));
     $this->assertEqual(count($history['activitySuspend']), 1, t('The appropriate number of activities were suspended.'));
     $this->assertEqual($history['activitySuspend'][0]->name, 'activity_2', t('The appropriate activity was suspended.'));
+    $this->assertEqual(count($this->dataStore['instances']), 1, t('The appropriate number of workflow instances were stored.'));
+    $this->assertEqual(count($this->dataStore['pointers']), 1, t('The appropriate number of activity pointers were stored.'));
 
     // Reset our history array to track only events that happen after the
     // workflow is resumed.

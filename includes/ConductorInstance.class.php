@@ -419,7 +419,7 @@ class ConductorInstance {
     foreach ($this->getSuspendedActivities() as $name => $suspendedActivity) {
       if ($pointerSet = $this->workflow->getActivity($name)->getSuspendPointers()) {
         foreach ($pointerSet as $pointerKey) {
-          $this->storageHandler->savePointer($instanceId, $name, $pointerKey);
+          $this->storageHandler->savePointer($this->workflow->name, $instanceId, $name, $pointerKey);
         }
       }
     }
@@ -446,6 +446,9 @@ class ConductorInstance {
       $this->activateActivity($activity);
       foreach ($context as $name => $value) {
         $activity->getState()->setContext($name, $value);
+      }
+      if ($activity->checkRunnability()) {
+        $this->storageHandler->deletePointer($pointerKey);
       }
     }
     $workflow->run();

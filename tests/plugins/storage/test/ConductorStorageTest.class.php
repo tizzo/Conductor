@@ -69,9 +69,10 @@ class ConductorStorageTest implements ConductorStorage {
   /**
    * Save pointers associated with an activity and this workflow.
    */
-  public function savePointer($instanceId, $activityName, $pointerKey) {
+  public function savePointer($workflowName, $instanceId, $activityName, $pointerKey) {
     if (!isset($this->storage['pointers'])) {
       $this->storage['pointers'][$pointerKey] = array(
+        'workflowName' => $workflowName,
         'instanceId' => $instanceId,
         'activityName' => $activityName,
       );
@@ -81,7 +82,7 @@ class ConductorStorageTest implements ConductorStorage {
   /**
    * Implements ConductorStorage::deletePointer().
    */
-  public function deletePointer($name) {
+  public function deletePointer($pointerKey) {
     unset($this->storage['pointers'][$pointerKey]);
   }
 }
