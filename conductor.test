@@ -136,7 +136,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
   /**
    * Instantiate a workflow and populate it with state and context.
    */
-  private function instantiateWorkflowInstance($name, array &$history) {
+  public function instantiateWorkflowInstance($name, array &$history) {
     $workflow = $this->getWorkflow($name);
     // Instantiate the workflow instance for processing.
     $instance = new ConductorInstance();
@@ -250,9 +250,9 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     );
     $activity->outputs = array();
     $workflows[$workflow->name] = $workflow;
+
     $workflow = new ConductorWorkflow;
     $workflow->wid = 'new';
-
     $workflow->name = 'simple_suspend_resume_test';
     $workflow->title = 'Simple suspend and resume test';
     $workflow->description = 'A simple workflow that suspends and then resumes an activity.';
@@ -328,9 +328,76 @@ class ConductorTestCase extends DrupalWebTestCase {
    */
   public function setUp() {
     // Enable any module that you will need in your tests.
-    parent::setUp('conductor');
+    parent::setUp('conductor', 'conductor_test');
   }
 
-  public function testWorkflowRun() {
+
+  /**
+   * Test that a workflow may successfully be suspended and resumed.
+   *
+   * Given that we have a simple wokflow with two parallel actions
+   *   and one action requires input
+   * when the workflow is run
+   * then the workflow should suspend.
+   */
+  public function testWorkflowSuspend() {
+    // Create an array for tracking event history via our test observer.
+    $history = array();
+    // Ensure we are working with a clean storage array.
+    $this->storage = array();
+    $workflow = $this->instantiateWorkflowInstance('simple_suspend_resume_test', $history);
+    $workflow->getActivity('activity_2')->getState()->setContext('activity_2:suspend', TRUE);
+    $workflow->run();
+    $this->assertEqual($workflow->state->getStatus(), ConductorInstance::SUSPENDED, t('The workflow was marked suspended.'));
+    $this->assertEqual(count($history['activityActivate']), 3, t('The appropriate number of activities were activated.'));
+    $this->assertEqual(count($history['activityComplete']), 2, t('The appropriate number of activities were completed.'));
+    $this->assertEqual(count($history['activitySuspend']), 1, t('The appropriate number of activities were suspended.'));
+    $this->assertEqual($history['activitySuspend'][0]->name, 'activity_2', t('The appropriate activity was suspended.'));
+    /*
+    $this->assertEqual(count($this->dataStore['instances']), 1, t('The appropriate number of workflow instances were stored.'));
+    $this->assertEqual(count($this->dataStore['pointers']), 1, t('The appropriate number of activity pointers were stored.'));
+    */
+
+
+    // Reset our history array to track only events that happen after the
+    // workflow is resumed.
+    $history = array();
+    unset($workflow);
+    $workflow = $this->instantiateWorkflowInstance('simple_suspend_resume_test', $history);
+    $resume_context = array('activity_2:suspended' => array('activity_2:resume' => TRUE));
+    $workflow->getState()->resume($resume_context);
+    $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
+    $this->assertEqual(count($history['activityActivate']), 2, t('The appropriate number of activities were activated'));
+    $this->assertEqual(count($history['activityComplete']), 2, t('The appropriate number of activities were completed'));
+    //$this->assertEqual(count($this->dataStore['pointers']), 0, t('The pointer was successfully deleted.'));
+    $activityStates = $workflow->state->getActivityState();
+    foreach ($activityStates as $activityState) {
+      $this->assertEqual($activityState->getStatus(), ConductorActivityState::COMPLETED, t('The @name activity was marked complete.', array('@name' => $activityState->name)));
+    }
+  }
+
+  /**
+   * Instantiate a workflow and populate it with state and context.
+   */
+  private function instantiateWorkflowInstance($name, array &$history) {
+    $workflow = $this->getWorkflow($name);
+    $observer = new ConductorObserverTest;
+    $observer->history = &$history;
+    $workflow->state->registerObserver($observer);
+    // If this test is run from drush and the verbose flag is set,
+    // log helpful messages.
+    if (drupal_is_cli() && function_exists('drush_command') && drush_get_option('verbose')) {
+      $workflow->state->registerObserver(new ConductorLogDrush);
+    }
+    $workflow->indexActivities();
+    return $workflow;
+  }
+
+  /**
+   * Load a workflow by name.
+   */
+  public function getWorkflow($name) {
+    $unitTest = new ConductorUnitTestCase;
+    return $unitTest->getWorkflow($name);
   }
 }
