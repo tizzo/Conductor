@@ -390,14 +390,16 @@ class ConductorWorkflow {
     // If even one activity failed
     if (count($state->getFailedActivities())) {
       $state->workflowFailed();
-      $state->notifyObservers('workflowFail', $this);
+      $state->notifyObservers('workflowFailed', $this);
     }
     else if (count($state->getSuspendedActivities())) {
       $state->workflowSuspended();
       $state->suspend();
+      $state->notifyObservers('workflowSuspended', $this);
     }
     else if (!count($state->getActiveActivities()) && !count($state->getSuspendedActivities())) {
       $state->workflowComplete();
+      $state->notifyObservers('workflowCompleted', $this);
     }
   }
 
