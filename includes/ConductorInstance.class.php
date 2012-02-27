@@ -313,12 +313,12 @@ class ConductorInstance {
    *  different types?  For different ones for different instances?
    */
   public function activateActivity(ConductorActivity $activity) {
-    if (!$this->checkInBin('active', $activity) && !$this->checkInBin('failed', $activity)) {
+    if (!$this->checkInBin('active', $activity) && !$this->checkInBin('failed', $activity) && !$this->checkInBin('completed', $activity)) {
       // Instantiate the appropriate state handler if we do not already have one.
       if (!isset($this->activityStates[$activity->name])) {
-        $activityState = &$activity->getState();
         $this->activityStates[$activity->name] = &$activityState;
       }
+      $activityState = $activity->getState();
       // Currently an activity needs to have the state object for each of its inputs.
       foreach ($activity->inputs as $activityName) {
         if (isset($this->activityStates[$activityName])) {
@@ -327,6 +327,7 @@ class ConductorInstance {
       }
       if ($activity->checkRunnability()) {
         $this->notifyObservers('activityActivate', $activity);
+        $this->removeFromBin('suspended', $activity);
         $this->addToBin('active', $activity);
         return TRUE;
       }
@@ -347,7 +348,7 @@ class ConductorInstance {
   }
 
   /**
-   * Activate an activity
+   * Suspend an activity.
    */
   public function suspendActivity(ConductorActivity $activity) {
     if (!$this->checkInBin('suspended', $activity)) {
@@ -429,7 +430,8 @@ class ConductorInstance {
     $workflow = $this->workflow;
     foreach ($context as $activityName => $context) {
       $activity = $workflow->getActivity($activityName);
-      $workflow->getState()->activateActivity($activity);
+      $this->activateActivity($activity);
+      $this->activateActivity($activity);
       foreach ($context as $name => $value) {
         $activity->getState()->setContext($name, $value);
       }

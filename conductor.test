@@ -113,19 +113,20 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $this->assertEqual(count($history['activityComplete']), 2, t('The appropriate number of activities were completed.'));
     $this->assertEqual(count($history['activitySuspend']), 1, t('The appropriate number of activities were suspended.'));
     $this->assertEqual($history['activitySuspend'][0]->name, 'activity_2', t('The appropriate activity was suspended.'));
+
+    // Reset our history array to track only events that happen after the
+    // workflow is resumed.
+    $history = array();
     //$resume_context = array('activity_2:suspended' => array('activity_2:resume' => TRUE));
     $resume_context = array('activity_2' => array('activity_2:resume' => TRUE));
-    /*
     $workflow->getState()->resume($resume_context);
     $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
-    /*
-    $this->assertEqual(count($history['activityActivate']), 4, t('The appropriate number of activities were activated'));
-    $this->assertEqual(count($history['activityComplete']), 4, t('The appropriate number of activities were completed'));
+    $this->assertEqual(count($history['activityActivate']), 2, t('The appropriate number of activities were activated'));
+    $this->assertEqual(count($history['activityComplete']), 2, t('The appropriate number of activities were completed'));
     $activityStates = $workflow->state->getActivityState();
     foreach ($activityStates as $activityState) {
       $this->assertEqual($activityState->getStatus(), ConductorActivityState::COMPLETED, t('The @name activity was marked complete.', array('@name' => $activityState->name)));
     }
-    */
   }
 
   /**
