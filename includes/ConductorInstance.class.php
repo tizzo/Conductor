@@ -82,6 +82,11 @@ class ConductorInstance {
    */
   protected $status = self::INITIALIZED;
 
+  /**
+   * If this instance has been persisted, the unique id of the instance.
+   */
+  protected $uniqueId = FALSE;
+
 
   /**
    * Constructor for ConductorInstance.
@@ -413,6 +418,9 @@ class ConductorInstance {
   public function suspend() {
     $pointers = array();
     $state = new stdClass;
+    if ($this->uniqueId !== FALSE) {
+      $state->uniqueId = $this->uniqueId;
+    }
     $state->activityBins = $this->activityBins;
     $state->activityStates = $this->getActivityState();
     $instanceId = $this->storageHandler->save($state);
@@ -438,6 +446,7 @@ class ConductorInstance {
       $state = $this->storageHandler->load($pointer['instanceId']);
       $this->activityBins = $state->activityBins;
       $this->activityStates = $state->activityStates;
+      $this->uniqueId = $state->uniqueId;
       // Reference each activity in the workflow to the state retrieved from storage.
       foreach ($this->activityStates as $activityState) {
         $workflow->getActivity($activityState->name)->setState($activityState);

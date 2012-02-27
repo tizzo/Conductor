@@ -29,6 +29,7 @@ class ConductorStorageTest implements ConductorStorage {
       $this->storage['instances'] = array();
     }
     // Note we serialize our data here to more closely simulate actual storage.
+    $data->uniqueId = count($this->storage['instances']) + 1;
     return (array_push($this->storage['instances'], serialize($data)) - 1);
   }
 
