@@ -8,7 +8,7 @@ class ConductorStorageTest implements ConductorStorage {
   /**
    * A multidimensional array of values 
    */
-  private $storage;
+  private $storage = array();
 
   /**
    *
@@ -23,9 +23,12 @@ class ConductorStorageTest implements ConductorStorage {
    * @param $state
    *   The ConductorInstance state object to be saved.
    */
-  public function save(ConductorInstance $instance) {
-    $this->storage[] = array(
-    );
+  public function save(stdClass $data) {
+    $instances = &$this->storage['instances'];
+    if (!isset($this->storage['instances'])) {
+      $this->storage['instances'] = array();
+    }
+    return (array_push($this->storage['instances'], $data) - 1);
   }
 
   /**
@@ -34,7 +37,10 @@ class ConductorStorageTest implements ConductorStorage {
    * @return
    *   A loaded ConductorInstance object.
    */
-  static function load($unique_id) {
+  public function load($unique_id) {
+    if (isset($this->storage['instances'][$unique_id])) {
+      return $this->storage['instances'][$unique_id];
+    }
   }
 
   /**
@@ -43,18 +49,38 @@ class ConductorStorageTest implements ConductorStorage {
    * @param $name
    *   The name of the pointer.
    */
-  static function loadFromPointer($name) {
+  public function loadPointer($pointerKey) {
+    if (isset($this->storage['pointers'][$pointerKey])) {
+      return $this->storage['pointers'][$pointerKey];
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /**
    * Implements ConductorStorage::delete().
    */
-  static function delete($unique_id) {
+  public function delete($unique_id) {
+  }
+
+  /**
+   * Save pointers associated with an activity and this workflow.
+   */
+  public function savePointer($instanceId, $activityName, $pointerKey) {
+    if (!isset($this->storage['pointers'])) {
+      $this->storage['pointers'][$pointerKey] = array(
+        'instanceId' => $instanceId,
+        'activityName' => $activityName,
+      );
+    }
   }
 
   /**
    * Implements ConductorStorage::deletePointer().
    */
-  static function deletePointer($name) {
+  public function deletePointer($name) {
   }
+
+
 }
