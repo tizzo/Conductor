@@ -7,28 +7,28 @@ interface ConductorStorage {
    * @param $state
    *   The ConductorInstance state object to be saved.
    */
-  public function save(ConductorInstance $state);
+  //public function save(ConductorInstance $state);
 
   /**
    *
    * @return
    *   A loaded ConductorInstance object.
    */
-  static function load($unique_id);
+  //public function load($unique_id);
 
   /**
    * @param $name
    *   The name of the pointer.
    */
-  static function loadFromPointer($name);
+  //public function loadFromPointer($name);
 
   /**
    *
    */
-  static function delete($unique_id);
+  //public function delete($unique_id);
 
   /**
    *
    */
-  static function deletePointer($name);
+  //public function deletePointer($name);
 }
