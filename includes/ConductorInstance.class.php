@@ -411,6 +411,9 @@ class ConductorInstance {
    */
   public function workflowComplete() {
     $this->status = self::FINISHED;
+    if ($this->uniqueId) {
+      $this->getStorage()->delete($this->uniqueId);
+    }
   }
 
   /**
