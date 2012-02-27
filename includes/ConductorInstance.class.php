@@ -138,6 +138,16 @@ class ConductorInstance {
   }
 
   /**
+   * Get the storageHandler for this instance (instantiating the configured default if none is set).
+   */
+  public function getStorage() {
+    if (is_null($this->storageHandler)) {
+      $this->storageHandler = conductor_get_storage_handler(variable_get('conductor_default_storage_handler', 'database'));
+    }
+    return $this->storageHandler;
+  }
+
+  /**
    * Get an activity state.
    *
    * @param $name
@@ -423,11 +433,11 @@ class ConductorInstance {
     }
     $state->activityBins = $this->activityBins;
     $state->activityStates = $this->getActivityState();
-    $instanceId = $this->storageHandler->save($state);
+    $instanceId = $this->getStorage()->save($state);
     foreach ($this->getSuspendedActivities() as $name => $suspendedActivity) {
       if ($pointerSet = $this->workflow->getActivity($name)->getSuspendPointers()) {
         foreach ($pointerSet as $pointerKey) {
-          $this->storageHandler->savePointer($this->workflow->name, $instanceId, $name, $pointerKey);
+          $this->getStorage()->savePointer($this->workflow->name, $instanceId, $name, $pointerKey);
         }
       }
     }
@@ -437,13 +447,12 @@ class ConductorInstance {
    * Resume a suspended workflow.
    */
   public function resume(array $context = array()) {
-    //$this->storageHandler->loadFromPointer();
     $this->notifyObservers('workflowResumed', $this);
     $this->status = self::RUNNING;
     $workflow = $this->workflow;
     foreach ($context as $pointerKey => $context) {
-      $pointer = $this->storageHandler->loadPointer($pointerKey);
-      $state = $this->storageHandler->load($pointer['instanceId']);
+      $pointer = $this->getStorage()->loadPointer($pointerKey);
+      $state = $this->getStorage()->load($pointer['instanceId']);
       $this->activityBins = $state->activityBins;
       $this->activityStates = $state->activityStates;
       $this->uniqueId = $state->uniqueId;
@@ -457,7 +466,7 @@ class ConductorInstance {
         $activity->getState()->setContext($name, $value);
       }
       if ($activity->checkRunnability()) {
-        $this->storageHandler->deletePointer($pointerKey);
+        $this->getStorage()->deletePointer($pointerKey);
       }
     }
     $workflow->run();

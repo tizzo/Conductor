@@ -25,13 +25,13 @@ class ConductorWorkflow {
   public $title = '';
 
   // A ConductorInstance object containing state for a workflow instance.
-  public $state = NULL;
+  public $state = FALSE;
 
   /**
    * Allow the workflow to be populated with state on load.
    */
-  public function __construct($state = NULL) {
-    if (!is_null($state)) {
+  public function __construct($state = FALSE) {
+    if ($state) {
       $this->setState($state);
     }
   }
