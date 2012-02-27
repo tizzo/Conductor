@@ -36,10 +36,14 @@ class ConductorStorageDatabase implements ConductorStorage {
 
   public function load($uniqueId) {
     $result = db_query('SELECT * FROM {conductor_instance} WHERE id=:id', array('id' => $uniqueId), $this->options)->fetchObject();
-    $return = unserialize($result->data);
-    $return->uniqueId = $result->id;
-    dpm($return);
-    return $return;
+    if ($result) {
+      $return = unserialize($result->data);
+      $return->uniqueId = $result->id;
+      return $return;
+    }
+    else {
+      return FALSE;
+    }
   }
 
   public function loadPointer($pointerKey) {
