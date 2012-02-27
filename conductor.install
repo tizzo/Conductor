@@ -85,6 +85,13 @@ function conductor_schema() {
   $schema['conductor_instance'] = array(
     'description' => t('Stores conductor for workflows currently being processed.'),
     'fields' => array(
+      'sid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The workflow instance state ID of the field, defined by the database.',
+        'no export' => TRUE,
+      ),
       'workflow_name' => array(
         'type' => 'varchar',
         'length' => '32',
@@ -99,41 +106,30 @@ function conductor_schema() {
         'serialize' => TRUE,
         'serialized default' => 'a:0:{}',
       ),
-      'sid' => array(
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'description' => 'The workflow instance state ID of the field, defined by the database.',
-        'no export' => TRUE,
-      ),
     ),
-    'activities' => array(
-      'description' => 'A serialized representation of this workflow\'s entities at the time this workflow was started.',
-      'type' => 'text',
-      'size' => 'big',
-      'serialize' => TRUE,
-      'serialized default' => 'a:0:{}',
-      'no export' => TRUE,
-    ),
-
     'primary key' => array('sid'),
   );
-  $schema['conductor_state_references'] = array(
-    'description' => 'A conductor state item is a record of the machine name of an individual activity in a workflow state to allow for easy resuming.',
+  $schema['conductor_instance_pointer'] = array(
+    'description' => 'A conductor instance pointer is a record of the machine name of an individual activity in a workflow state to allow for easy resuming.',
     'fields' => array(
-      'siid' => array(
+      'pid' => array(
+        'description' => 'A unique id for this table.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'description' => '',
         'no export' => TRUE,
       ),
-      'wid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
+      'pointer_key' => array(
+        'description' => 'The unique name of the state. This is the primary field workflow states are loaded from, and is used so that workflows may be found easily when they need to be resumed.',
+        'type' => 'varchar',
+        'length' => '255',
         'not null' => TRUE,
-        'description' => 'The {conductor_workflow}.wid of the workflow this state is an instance of.',
-        'no export' => TRUE,
+      ),
+      'workflow_name' => array(
+        'description' => 'The workflow machine name of the workflow this state is an instance of.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
       ),
       'sid' => array(
         'type' => 'int',
@@ -141,12 +137,6 @@ function conductor_schema() {
         'not null' => TRUE,
         'description' => 'The {conductor_state}.sid of the workflow this state item belongs to.',
         'no export' => TRUE,
-      ),
-      'name' => array(
-        'description' => 'The unique name of the state. This is the primary field workflow states are loaded from, and is used so that workflows may be found easily when they need to be resumed.',
-        'type' => 'varchar',
-        'length' => '255',
-        'not null' => TRUE,
       ),
       'activity' => array(
         'description' => 'The unique name of the activity this reference points to allowing processes needing to resume a running workflow to pass new data to the appropriate activity upon resume.',
@@ -165,7 +155,7 @@ function conductor_schema() {
     ),
     'primary key' => array('siid'),
     'indexes' => array(
-      'name' => array('name'),
+      'pointer_key' => array('pointer_key'),
     ),
   );
   return $schema;
