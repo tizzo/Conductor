@@ -325,9 +325,14 @@ class ConductorInstance {
           $activityState->setInputActivityState($this->activityStates[$activityName]);
         }
       }
-      // TODO: This event is deprecated but still used in our tests.
-      $this->notifyObservers('activityActivate', $activity);
-      $this->addToBin('active', $activity);
+      if ($activity->checkRunnability()) {
+        $this->notifyObservers('activityActivate', $activity);
+        $this->addToBin('active', $activity);
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
     }
   }
 
@@ -374,8 +379,8 @@ class ConductorInstance {
     $this->removeFromBin('active', $activity);
     $this->addToBin('complete', $activity);
     foreach ($activity->outputs as $activity_name) {
-      $activateActivity = &$this->workflow->getActivity($activity_name);
-      $this->activateActivity($activateActivity);
+      $output = &$this->workflow->getActivity($activity_name);
+      $this->activateActivity($output);
     }
   }
 
@@ -400,13 +405,16 @@ class ConductorInstance {
   }
 
   /**
+   * Suspend this workflow because it is awaiting some other input.
    *
+   * This method will persist the database using this object's storage handler.
    */
   public function suspend() {
     $pointers = array();
-    drush_print('we\'re trying to suspend!');
     foreach ($this->getSuspendedActivities() as $name => $suspendedActivity) {
-      //$pointers[$name] = &$this->workflow->getActviity($name)->getSuspendPointers();
+      if ($pointerSet = $this->workflow->getActivity($name)->getSuspendPointers()) {
+        $pointers[$name] = $pointerSet;
+      }
     }
     // Save the workflow to our datastore (basically just the activities?)
     // Save $activityBins.

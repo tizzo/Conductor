@@ -7,6 +7,8 @@
 /**
  * An object to contain all of the data for a workflow, plus the member
  * functions to process the workflow.
+ *
+ * TODO: Rename getState to getInstance.
  */
 class ConductorWorkflow {
 
@@ -349,11 +351,6 @@ class ConductorWorkflow {
     // Ensure the activities are properly indexed.
     $this->indexActivities();
     $state = &$this->getState();
-    if ($state->getStatus = ConductorInstance::INITIALIZED) {
-    }
-    else {
-
-    }
     $activeActivities = $state->getActiveActivities();
     while (count($activeActivities)) {
       foreach ($activeActivities as $name => &$activityState) {
@@ -380,7 +377,6 @@ class ConductorWorkflow {
             $state->completeActivity($activity);
             break;
           case ConductorActivityState::SUSPENDED:
-            $state->notifyObservers('activitySuspend', $activity);
             $state->suspendActivity($activity);
             break;
           case ConductorActivityState::FAILED:
@@ -398,7 +394,6 @@ class ConductorWorkflow {
     }
     else if (count($state->getSuspendedActivities())) {
       $state->workflowSuspended();
-      // TODO: Actually suspend workflow.
       $state->suspend();
     }
     else if (!count($state->getActiveActivities()) && !count($state->getSuspendedActivities())) {

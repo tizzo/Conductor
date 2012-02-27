@@ -83,8 +83,8 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $workflow->getActivity('start')->getState()->setContext('foo', 'bar');
     $workflow->run();
     $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
-    $this->assertEqual(count($history['activityActivate']), 4, t('The appropriate number of activities were activated'));
-    $this->assertEqual(count($history['activityComplete']), 4, t('The appropriate number of activities were completed'));
+    $this->assertEqual(count($history['activityActivate']), 4, t('The appropriate number of activities were activated.'));
+    $this->assertEqual(count($history['activityComplete']), 4, t('The appropriate number of activities were completed.'));
     $activityStates = $workflow->state->getActivityState();
     foreach ($activityStates as $activityState) {
       $this->assertEqual($activityState->getStatus(), ConductorActivityState::COMPLETED, t('The @name activity was marked complete.', array('@name' => $activityState->name)));
@@ -96,9 +96,9 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
    * Test that a workflow may successfully be suspended and resumed.
    *
    * Given that we have a simple wokflow with two parallel actions
-   * and neither of the actions has a blocker
-   * when we run the workflow
-   * each action should be activated and properly complete.
+   *   and one action requires input
+   * when the workflow is run
+   * then the workflow should suspend.
    */
   public function testWorkflowSuspend() {
     // Create an array for tracking event history via our test observer.
@@ -108,13 +108,24 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     $workflow = $this->instantiateWorkflowInstance('simple_suspend_resume_test', $history);
     $workflow->getActivity('activity_2')->getState()->setContext('activity_2:suspend', TRUE);
     $workflow->run();
+    $this->assertEqual($workflow->state->getStatus(), ConductorInstance::SUSPENDED, t('The workflow was marked suspended.'));
+    $this->assertEqual(count($history['activityActivate']), 3, t('The appropriate number of activities were activated.'));
+    $this->assertEqual(count($history['activityComplete']), 2, t('The appropriate number of activities were completed.'));
+    $this->assertEqual(count($history['activitySuspend']), 1, t('The appropriate number of activities were suspended.'));
+    $this->assertEqual($history['activitySuspend'][0]->name, 'activity_2', t('The appropriate activity was suspended.'));
+    //$resume_context = array('activity_2:suspended' => array('activity_2:resume' => TRUE));
+    $resume_context = array('activity_2' => array('activity_2:resume' => TRUE));
+    $workflow->getState()->resume($resume_context);
+    /*
     $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
+    /*
     $this->assertEqual(count($history['activityActivate']), 4, t('The appropriate number of activities were activated'));
     $this->assertEqual(count($history['activityComplete']), 4, t('The appropriate number of activities were completed'));
     $activityStates = $workflow->state->getActivityState();
     foreach ($activityStates as $activityState) {
       $this->assertEqual($activityState->getStatus(), ConductorActivityState::COMPLETED, t('The @name activity was marked complete.', array('@name' => $activityState->name)));
     }
+    */
   }
 
   /**
