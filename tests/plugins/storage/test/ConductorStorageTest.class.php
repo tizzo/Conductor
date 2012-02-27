@@ -28,7 +28,8 @@ class ConductorStorageTest implements ConductorStorage {
     if (!isset($this->storage['instances'])) {
       $this->storage['instances'] = array();
     }
-    return (array_push($this->storage['instances'], $data) - 1);
+    // Note we serialize our data here to more closely simulate actual storage.
+    return (array_push($this->storage['instances'], serialize($data)) - 1);
   }
 
   /**
@@ -39,7 +40,7 @@ class ConductorStorageTest implements ConductorStorage {
    */
   public function load($unique_id) {
     if (isset($this->storage['instances'][$unique_id])) {
-      return $this->storage['instances'][$unique_id];
+      return unserialize($this->storage['instances'][$unique_id]);
     }
   }
 

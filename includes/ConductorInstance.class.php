@@ -438,8 +438,11 @@ class ConductorInstance {
       $state = $this->storageHandler->load($pointer['instanceId']);
       $this->activityBins = $state->activityBins;
       $this->activityStates = $state->activityStates;
+      // Reference each activity in the workflow to the state retrieved from storage.
+      foreach ($this->activityStates as $activityState) {
+        $workflow->getActivity($activityState->name)->setState($activityState);
+      }
       $activity = $workflow->getActivity($pointer['activityName']);
-      $this->activateActivity($activity);
       $this->activateActivity($activity);
       foreach ($context as $name => $value) {
         $activity->getState()->setContext($name, $value);
