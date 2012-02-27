@@ -117,8 +117,8 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     // Reset our history array to track only events that happen after the
     // workflow is resumed.
     $history = array();
-    //$resume_context = array('activity_2:suspended' => array('activity_2:resume' => TRUE));
-    $resume_context = array('activity_2' => array('activity_2:resume' => TRUE));
+    //$workflow = $this->instantiateWorkflowInstance('simple_suspend_resume_test', $history);
+    $resume_context = array('activity_2:suspended' => array('activity_2:resume' => TRUE));
     $workflow->getState()->resume($resume_context);
     $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
     $this->assertEqual(count($history['activityActivate']), 2, t('The appropriate number of activities were activated'));

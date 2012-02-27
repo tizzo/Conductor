@@ -412,24 +412,33 @@ class ConductorInstance {
    */
   public function suspend() {
     $pointers = array();
+    $state = new stdClass;
+    $state->activityBins = $this->activityBins;
+    $state->activityStates = $this->getActivityState();
+    $instanceId = $this->storageHandler->save($state);
     foreach ($this->getSuspendedActivities() as $name => $suspendedActivity) {
       if ($pointerSet = $this->workflow->getActivity($name)->getSuspendPointers()) {
-        $pointers[$name] = $pointerSet;
+        foreach ($pointerSet as $pointerKey) {
+          $this->storageHandler->savePointer($instanceId, $name, $pointerKey);
+        }
       }
     }
-    // Save the workflow to our datastore (basically just the activities?)
-    // Save $activityBins.
-    // Save $activityBins.
   }
 
   /**
    * Resume a suspended workflow.
    */
   public function resume(array $context = array()) {
+    //$this->storageHandler->loadFromPointer();
+    $this->notifyObservers('workflowResumed', $this);
     $this->status = self::RUNNING;
     $workflow = $this->workflow;
-    foreach ($context as $activityName => $context) {
-      $activity = $workflow->getActivity($activityName);
+    foreach ($context as $pointerKey => $context) {
+      $pointer = $this->storageHandler->loadPointer($pointerKey);
+      $state = $this->storageHandler->load($pointer['instanceId']);
+      $this->activityBins = $state->activityBins;
+      $this->activityStates = $state->activityStates;
+      $activity = $workflow->getActivity($pointer['activityName']);
       $this->activateActivity($activity);
       $this->activateActivity($activity);
       foreach ($context as $name => $value) {
