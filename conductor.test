@@ -202,7 +202,7 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
    *
    * The exported 
    */
-  private function getWorkflow($name) {
+  public function getWorkflow($name) {
     $workflows = array();
     $workflow = new ConductorWorkflow;
     $workflow->wid = 'new';
@@ -333,7 +333,7 @@ class ConductorTestCase extends DrupalWebTestCase {
    */
   public function setUp() {
     // Enable any module that you will need in your tests.
-    parent::setUp('conductor', 'conductor_test');
+    parent::setUp('ctools', 'conductor', 'conductor_test');
   }
 
 
@@ -348,8 +348,6 @@ class ConductorTestCase extends DrupalWebTestCase {
   public function testWorkflowSuspend() {
     // Create an array for tracking event history via our test observer.
     $history = array();
-    // Ensure we are working with a clean storage array.
-    $this->storage = array();
     $workflow = $this->instantiateWorkflowInstance('simple_suspend_resume_test', $history);
     $workflow->getActivity('activity_2')->getState()->setContext('activity_2:suspend', TRUE);
     $workflow->run();
@@ -362,7 +360,6 @@ class ConductorTestCase extends DrupalWebTestCase {
     $this->assertEqual(count($this->dataStore['instances']), 1, t('The appropriate number of workflow instances were stored.'));
     $this->assertEqual(count($this->dataStore['pointers']), 1, t('The appropriate number of activity pointers were stored.'));
     */
-
 
     // Reset our history array to track only events that happen after the
     // workflow is resumed.
@@ -402,7 +399,9 @@ class ConductorTestCase extends DrupalWebTestCase {
    * Load a workflow by name.
    */
   public function getWorkflow($name) {
+    // TODO: This shouldn't be necessary, our files hsould load but don't seem to.
     $unitTest = new ConductorUnitTestCase;
+    $unitTest->setUp();
     return $unitTest->getWorkflow($name);
   }
 }
