@@ -313,7 +313,7 @@ class ConductorInstance {
    *  different types?  For different ones for different instances?
    */
   public function activateActivity(ConductorActivity $activity) {
-    if (!$this->checkInBin('active', $activity) && !$this->checkInBin('failed', $activity) && !$this->checkInBin('completed', $activity)) {
+    if (!$this->checkInBin('active', $activity) && !$this->checkInBin('failed', $activity) && !$this->checkInBin('complete', $activity)) {
       // Instantiate the appropriate state handler if we do not already have one.
       if (!isset($this->activityStates[$activity->name])) {
         $this->activityStates[$activity->name] = &$activityState;
