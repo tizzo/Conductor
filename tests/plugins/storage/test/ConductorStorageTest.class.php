@@ -39,9 +39,9 @@ class ConductorStorageTest implements ConductorStorage {
    * @return
    *   A loaded ConductorInstance object.
    */
-  public function load($unique_id) {
-    if (isset($this->storage['instances'][$unique_id])) {
-      return unserialize($this->storage['instances'][$unique_id]);
+  public function load($uniqueId) {
+    if (isset($this->storage['instances'][$uniqueId])) {
+      return unserialize($this->storage['instances'][$uniqueId]);
     }
   }
 

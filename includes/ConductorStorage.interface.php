@@ -16,7 +16,7 @@ interface ConductorStorage {
    * @return
    *   A loaded ConductorInstance object.
    */
-  public function load($unique_id);
+  public function load($uniqueId);
 
   /**
    * Implements ConductorStorage::loadFromPointer().
