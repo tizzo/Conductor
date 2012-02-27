@@ -20,14 +20,14 @@ without reinventing the wheel.
 Conductor is aiming at being highly performant and scalable with capabilities built in, from the
 beginning, to run without hitting the database any more than it needs to.  Workflows are cached
 allowing them to be loaded by name easily form in memory key-value stores.  Presistence of state
-is optional for workflows that do not need to be resumed.  Workflow state storage has a pluggable
+is optional for workflows that do not need to be resumed.  Workflow instance storage has a pluggable
 storage backend allowing it, too, to be persisted to a NoSQL or in memory data store.
 
 ## Terminology ##
 
 1. Workflow
 2. Activity
-3. Workflow State
+3. Workflow Instance
 4. Workflow Activity State
 5. Workflow Storage
 
@@ -60,13 +60,13 @@ format inside the workflow itself.  There is no external storage of activities b
 workflow that a given activity is a member of.
 
 
-### 3. Workflow State ###
+### 3. Workflow Instance ###
 
-Workflow state represents a single instance of a workflow.
+Workflow instance represents a single instance of a workflow as it is processed.
 
-####Storage ####
+#### Storage ####
 
-Workflow state is stored using another ctools plugin and so storage can be swapped out.
+Workflow instance is stored using another ctools plugin and so storage can be swapped out.
 The activities on a workflow are stored with the workflow state in their configuration
 at the time that workflow is stored.  This is important because without this otherwise
 changing the workflow while a particular instance is in the process of completion could
@@ -76,7 +76,7 @@ result in stranded workflow items with inconsistent state.
 
 Conductor workflows are currently started off by some module other than conductor which
 hands in whatever context is necessary for processing.  This becomes the bases for the
-workflow state which is passed from activity to activity.  The activity can then ask
+workflow instance which is passed from activity to activity.  The activity can then ask
 questions of the WorkflowActivityState descended object and use the context present to perform
 its own activities.
 
