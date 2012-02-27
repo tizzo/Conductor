@@ -199,6 +199,7 @@ function conductor_get_workflow($name, $reset = FALSE) {
   if ($workflow) {
     cache_set('conductor_workflow_' . $name, $workflow);
   }
+  $workflow->indexActivities();
   return $workflow;
 }
 
