@@ -120,8 +120,13 @@ class ConductorUnitTestCase extends DrupalUnitTestCase {
     // workflow is resumed.
     $history = array();
     unset($workflow);
-    $workflow = $this->instantiateWorkflowInstance('simple_suspend_resume_test', $history);
-    $resume_context = array('activity_2:suspended' => array('activity_2:resume' => TRUE));
+    $storage = new conductorStorageTest;
+    $storage->setDatabase($this->dataStore);
+    // Load a pointer from storage in order to find the workflow and activity to
+    // resume.
+    $pointer = $storage->loadPointer('activity_2:suspended');
+    $workflow = $this->instantiateWorkflowInstance($pointer['workflowName'], $history);
+    $resume_context = array('activity_2:suspended' => array($pointer['activityName'] . ':resume' => TRUE));
     $workflow->getState()->resume($resume_context);
     $this->assertEqual($workflow->state->getStatus(), ConductorInstance::FINISHED, t('The workflow was marked successfully complete.'));
     $this->assertEqual(count($history['activityActivate']), 2, t('The appropriate number of activities were activated'));
