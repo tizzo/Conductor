@@ -82,8 +82,8 @@ function conductor_schema() {
   $schema['cache_conductor_data'] = drupal_get_schema_unprocessed('system', 'cache');
   $schema['cache_conductor_data']['description'] = 'Cache table for conductor to store pre-rendered queries, results, and display output.';
   $schema['cache_conductor_data']['fields']['serialized']['default'] = 1;
-  $schema['conductor_state'] = array(
-    'description' => '',
+  $schema['conductor_instance'] = array(
+    'description' => t('Stores conductor for workflows currently being processed.'),
     'fields' => array(
       'workflow_name' => array(
         'type' => 'varchar',
