@@ -17,4 +17,13 @@ class ConductorActivityTest extends ConductorActivity {
     }
   }
 
+  /**
+   * Implements ConductorActivity::getSuspendPointers().
+   */
+  public function getSuspendPointers() {
+    return array(
+      $this->name . ':suspended',
+    );
+  }
+
 }
