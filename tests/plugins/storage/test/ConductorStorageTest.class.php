@@ -14,7 +14,7 @@ class ConductorStorageTest implements ConductorStorage {
    *
    */
   public function setDatabase(array &$storage) {
-    $this->storage = $storage;
+    $this->storage = &$storage;
   }
 
   /**
