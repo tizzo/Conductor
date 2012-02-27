@@ -3,32 +3,42 @@
 interface ConductorStorage {
 
   /**
+   * Implements ConductorStorage::save().
    *
    * @param $state
    *   The ConductorInstance state object to be saved.
    */
-  //public function save(ConductorInstance $state);
+  public function save(stdClass $data);
 
   /**
+   * Implements ConductorStorage::load().
    *
    * @return
    *   A loaded ConductorInstance object.
    */
-  //public function load($unique_id);
+  public function load($unique_id);
 
   /**
+   * Implements ConductorStorage::loadFromPointer().
+   *
    * @param $name
    *   The name of the pointer.
    */
-  //public function loadFromPointer($name);
+  public function loadPointer($pointerKey);
 
   /**
-   *
+   * Implements ConductorStorage::delete().
    */
-  //public function delete($unique_id);
+  public function delete($unique_id);
 
   /**
-   *
+   * Save pointers associated with an activity and this workflow.
    */
-  //public function deletePointer($name);
+  public function savePointer($workflowName, $instanceId, $activityName, $pointerKey);
+
+  /**
+   * Implements ConductorStorage::deletePointer().
+   */
+  public function deletePointer($pointerKey);
+
 }
