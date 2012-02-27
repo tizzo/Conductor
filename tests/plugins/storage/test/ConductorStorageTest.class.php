@@ -63,6 +63,7 @@ class ConductorStorageTest implements ConductorStorage {
    * Implements ConductorStorage::delete().
    */
   public function delete($unique_id) {
+    unset($this->storage['instances'][$unique_id]);
   }
 
   /**
@@ -81,7 +82,6 @@ class ConductorStorageTest implements ConductorStorage {
    * Implements ConductorStorage::deletePointer().
    */
   public function deletePointer($name) {
+    unset($this->storage['pointers'][$pointerKey]);
   }
-
-
 }
