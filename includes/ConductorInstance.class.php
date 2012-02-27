@@ -422,6 +422,22 @@ class ConductorInstance {
   }
 
   /**
+   * Resume a suspended workflow.
+   */
+  public function resume(array $context = array()) {
+    $this->status = self::RUNNING;
+    $workflow = $this->workflow;
+    foreach ($context as $activityName => $context) {
+      $activity = $workflow->getActivity($activityName);
+      $workflow->getState()->activateActivity($activity);
+      foreach ($context as $name => $value) {
+        $activity->getState()->setContext($name, $value);
+      }
+    }
+    $workflow->run();
+  }
+
+  /**
    * Register an observer.
    *
    * @param $observer

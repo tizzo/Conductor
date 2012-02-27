@@ -82,7 +82,7 @@ class ConductorActivity extends ConductorObject {
       // by default or if we should have a different default.
 
       // Ensure we have state for every configured input.
-      if (!$inputState = $this->activityState->getInputActivityState($input) || $inputState->getStatus() == ConductorActivityState::COMPLETED) {
+      if (!($inputState = $this->getState()->getInputActivityState($input)) || $inputState->getStatus() != ConductorActivityState::COMPLETED) {
         $runnable = FALSE;
       }
     }
