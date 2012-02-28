@@ -450,19 +450,15 @@ class ConductorInstance {
    * Resume a suspended workflow.
    */
   public function resume(array $context = array()) {
+    // TODO: This is some fugly program flow and what if I want to
+    // resume a workflow but not run it just yet?
     $this->notifyObservers('workflowResumed', $this);
     $this->status = self::RUNNING;
     $workflow = $this->workflow;
     foreach ($context as $pointerKey => $context) {
       $pointer = $this->getStorage()->loadPointer($pointerKey);
-      $state = $this->getStorage()->load($pointer['instanceId']);
-      $this->activityBins = $state->activityBins;
-      $this->activityStates = $state->activityStates;
-      $this->uniqueId = $state->uniqueId;
-      // Reference each activity in the workflow to the state retrieved from storage.
-      foreach ($this->activityStates as $activityState) {
-        $workflow->getActivity($activityState->name)->setState($activityState);
-      }
+      // TODO: fix inconsistency between unique id and instance id.
+      $this->loadFromUniqueId($pointer['instanceId']);
       $activity = $workflow->getActivity($pointer['activityName']);
       $this->activateActivity($activity);
       foreach ($context as $name => $value) {
@@ -474,6 +470,21 @@ class ConductorInstance {
     }
     $workflow->run();
   }
+
+  /**
+   *
+   */
+  public function loadFromUniqueId($instanceId) {
+    $state = $this->getStorage()->load($instanceId);
+    $this->activityBins = $state->activityBins;
+    $this->activityStates = $state->activityStates;
+    $this->uniqueId = $state->uniqueId;
+    // Reference each activity in the workflow to the state retrieved from storage.
+    foreach ($this->activityStates as $activityState) {
+      $this->workflow->getActivity($activityState->name)->setState($activityState);
+    }
+  }
+
 
   /**
    * Register an observer.

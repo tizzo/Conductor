@@ -20,9 +20,8 @@ class ConductorStorageDatabase implements ConductorStorage {
   }
 
   public function save(stdClass $data) {
-    // TODO: How shall we decide whether to do an insert or an update?
     $record = new stdClass;
-    // todo store workflow name
+    // TODO: store workflow name
     $record->data = $data;
     $keys = array();
     if (isset($data->uniqueId) && is_numeric($data->uniqueId)) {
