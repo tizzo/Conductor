@@ -342,7 +342,7 @@ function conductor_create_workflow_instance($name, $options = array()) {
 /**
  * TODO: recieve context here?
  */
-function conductor_load_workflow_instaance_from_pointer($pointer_key) {
+function conductor_load_workflow_instance_from_pointer($pointer_key) {
   // TODO: Allow this to be overridden with options.
   $storage = conductor_get_storage_handler(variable_get('conductor_default_storage_handler', 'database'));
   $pointer = $storage->loadPointer($pointer_key);
