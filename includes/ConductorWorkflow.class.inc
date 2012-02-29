@@ -380,7 +380,7 @@ class ConductorWorkflow {
           $state->deactivateActivity($activity);
         }
         // For easy access to the workflow's context as a whole, merge in a global context.
-        $state->context = array_merge($state->context, $activityState->getContext());
+        $state->setContext(array_merge($state->getContext(), $activityState->getContext()));
         switch ($activityState->getStatus()) {
           // If the activity has been completed, mark it as such.
           case ConductorActivityState::COMPLETED:
