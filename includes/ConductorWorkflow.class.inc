@@ -270,6 +270,16 @@ class ConductorWorkflow {
     }
   }
 
+  /**
+   *
+   */
+  function __clone() {
+    $this->state = FALSE;
+    foreach ($this->activities as $id => $activity) {
+      $this->activities[$id]->activityState = FALSE;
+    }
+  }
+
 
   /**
    * Safely clone a workflow.
@@ -354,8 +364,7 @@ class ConductorWorkflow {
     $activeActivities = $state->getActiveActivities();
     while (count($activeActivities)) {
       foreach ($activeActivities as $name => &$activityState) {
-        // Ensure we don't edit the global activity itself.
-        $activity = clone $this->activities[$name];
+        $activity = $this->activities[$name];
         // Set the activityState for this activity.
         $activity->setState($activityState);
         if ($activity->checkRunnability()) {
@@ -370,6 +379,8 @@ class ConductorWorkflow {
         else {
           $state->deactivateActivity($activity);
         }
+        // For easy access to the workflow's context as a whole, merge in a global context.
+        $state->context = array_merge($state->context, $activityState->getContext());
         switch ($activityState->getStatus()) {
           // If the activity has been completed, mark it as such.
           case ConductorActivityState::COMPLETED:

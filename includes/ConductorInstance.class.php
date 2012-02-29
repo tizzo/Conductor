@@ -87,6 +87,11 @@ class ConductorInstance {
    */
   protected $uniqueId = FALSE;
 
+  /**
+   * TODO: Make this protected?
+   */
+  public $context = array();
+
 
   /**
    * Constructor for ConductorInstance.
@@ -436,11 +441,11 @@ class ConductorInstance {
     }
     $state->activityBins = $this->activityBins;
     $state->activityStates = $this->getActivityState();
-    $instanceId = $this->getStorage()->save($state);
+    $state->uniqueId = $this->getStorage()->save($state);
     foreach ($this->getSuspendedActivities() as $name => $suspendedActivity) {
       if ($pointerSet = $this->workflow->getActivity($name)->getSuspendPointers()) {
         foreach ($pointerSet as $pointerKey) {
-          $this->getStorage()->savePointer($this->workflow->name, $instanceId, $name, $pointerKey);
+          $this->getStorage()->savePointer($this->workflow->name, $state->uniqueId, $name, $pointerKey);
         }
       }
     }
@@ -476,12 +481,17 @@ class ConductorInstance {
    */
   public function loadFromUniqueId($instanceId) {
     $state = $this->getStorage()->load($instanceId);
-    $this->activityBins = $state->activityBins;
-    $this->activityStates = $state->activityStates;
-    $this->uniqueId = $state->uniqueId;
-    // Reference each activity in the workflow to the state retrieved from storage.
-    foreach ($this->activityStates as $activityState) {
-      $this->workflow->getActivity($activityState->name)->setState($activityState);
+    if ($state) {
+      $this->activityBins = $state->activityBins;
+      $this->activityStates = $state->activityStates;
+      $this->uniqueId = $state->uniqueId;
+      // Reference each activity in the workflow to the state retrieved from storage.
+      foreach ($this->activityStates as $activityState) {
+        $this->workflow->getActivity($activityState->name)->setState($activityState);
+      }
+    }
+    else {
+      throw new Exception(t('Workflow instance ID @id not found.', array('@id' => $instanceId)));
     }
   }
 

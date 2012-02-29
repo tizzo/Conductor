@@ -193,14 +193,12 @@ function conductor_get_workflow($name, $reset = FALSE) {
     ctools_include('export');
     $workflow = ctools_export_crud_load('conductor_workflow', $name);
     if ($workflow) {
-      $workflow = $workflow->cloneWorkflow();
+      cache_set('conductor_workflow_' . $name, $workflow);
+      $workflow->indexActivities();
     }
   }
-  if ($workflow) {
-    cache_set('conductor_workflow_' . $name, $workflow);
-  }
-  $workflow->indexActivities();
-  return $workflow;
+  // Return a clone of the workflow to ensure that we never inadvertantly cache a
+  return clone $workflow;
 }
 
 /**
@@ -345,9 +343,13 @@ function conductor_create_workflow_instance($name, $options = array()) {
 function conductor_load_workflow_instance_from_pointer($pointer_key) {
   // TODO: Allow this to be overridden with options.
   $storage = conductor_get_storage_handler(variable_get('conductor_default_storage_handler', 'database'));
-  $pointer = $storage->loadPointer($pointer_key);
-  $workflow = conductor_get_workflow($pointer['workflowName']);
-  $state = $workflow->getState()->loadFromUniqueId($pointer['instanceId']);
+  if ($pointer = $storage->loadPointer($pointer_key)) {
+    $workflow = conductor_get_workflow($pointer['workflowName']);
+    $state = $workflow->getState()->loadFromUniqueId($pointer['instanceId']);
+  }
+  else {
+    $workflow = FALSE;
+  }
   return $workflow;
 }
 

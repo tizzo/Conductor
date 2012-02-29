@@ -25,9 +25,9 @@ class ConductorStorageDatabase implements ConductorStorage {
     $record->data = $data;
     $keys = array();
     if (isset($data->uniqueId) && is_numeric($data->uniqueId)) {
-      unset($data->uniqueId);
       $keys[] = 'id';
       $record->id = $data->uniqueId;
+      unset($record->data->uniqueId);
     }
     drupal_write_record('conductor_instance', $record, $keys);
     return $record->id;
