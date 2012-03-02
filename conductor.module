@@ -197,8 +197,11 @@ function conductor_get_workflow($name, $reset = FALSE) {
       $workflow->indexActivities();
     }
   }
+  if ($workflow) {
+    $workflow = clone $workflow;
+  }
   // Return a clone of the workflow to ensure that we never inadvertantly cache a
-  return clone $workflow;
+  return $workflow;
 }
 
 /**
