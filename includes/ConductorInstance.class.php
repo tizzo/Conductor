@@ -442,6 +442,7 @@ class ConductorInstance {
     }
     $state->activityBins = $this->activityBins;
     $state->activityStates = $this->getActivityState();
+    $state->status = $this->status;
     $state->uniqueId = $this->getStorage()->save($state);
     foreach ($this->getSuspendedActivities() as $name => $suspendedActivity) {
       if ($pointerSet = $this->workflow->getActivity($name)->getSuspendPointers()) {
@@ -478,13 +479,14 @@ class ConductorInstance {
   }
 
   /**
-   *
+   * Load a suspended workflow instance from its unique id.
    */
   public function loadFromUniqueId($instanceId) {
     $state = $this->getStorage()->load($instanceId);
     if ($state) {
       $this->activityBins = $state->activityBins;
       $this->activityStates = $state->activityStates;
+      $this->status = $state->status;
       $this->uniqueId = $state->uniqueId;
       // Reference each activity in the workflow to the state retrieved from storage.
       foreach ($this->activityStates as $activityState) {
