@@ -134,7 +134,7 @@ function conductor_schema() {
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'description' => 'The {conductor_state}.sid of the workflow this state item belongs to.',
+        'description' => 'The {conductor_instance}.sid of the workflow this state item belongs to.',
         'no export' => TRUE,
       ),
       'activity_name' => array(
