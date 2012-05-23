@@ -195,7 +195,7 @@ class ConductorInstance {
     // activities.
     // TODO: Should this happen automatically? or should this always be
     // explicitly called on by the activity starter?
-    if (!$this->countBin('active') && !$this->countBin('complete')) {
+    if (!$this->countBin('active') && !$this->countBin('complete') && !$this->countBin('failed')) {
       $this->activateActivity($this->workflow->getFirstActivity());
     }
     return $this->getBinItems('active');
@@ -383,12 +383,17 @@ class ConductorInstance {
    *
    */
   public function failActivity(ConductorActivity $activity) {
+    $activity->getState()->setStatus(ConductorActivityState::FAILED);
     $this->removeFromBin('active', $activity);
     $this->addToBin('failed', $activity);
     $this->notifyObservers('activityFailed', $activity);
   }
 
+  /**
+   * Get a list of the completed activities.
+   */
   public function getCompletedActivities() {
+    return $this->getBinItems('complete');
   }
 
   /**
@@ -538,15 +543,16 @@ class ConductorInstance {
    * @param $two
    *   The value of the context value to set.
    */
-  public function setContext($one, $two = FALSE) {
-    if ($two) {
+  public function setContext($one, $two = NULL) {
+    $args = func_get_args();
+    if (count($args) == 2) {
       $this->context[$one] = $two;
     }
-    else if (is_array($one)) {
+    else if (count($args) == 1 && is_array($one)) {
       $this->context = $one;
     }
     else {
-      throw new Exception('Invalid context provided to workflow instance, must be an array.');
+      throw new Exception('Invalid context provided to workflow instance in method `setContext`.');
     }
   }
 

@@ -372,6 +372,7 @@ class ConductorWorkflow {
             $activity->run($this);
           }
           catch (Exception $e) {
+            $activityState->setContext('failException', $e);
             $state->failActivity($activity);
             $state->notifyObservers('activityFailed', $activity);
           }
@@ -398,7 +399,7 @@ class ConductorWorkflow {
       }
       $activeActivities = $state->getActiveActivities();
     }
-    // If even one activity failed
+    // If even one activity failed...
     if (count($state->getFailedActivities())) {
       $state->workflowFailed();
       $state->notifyObservers('workflowFailed', $this);
