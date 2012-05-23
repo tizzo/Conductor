@@ -122,15 +122,16 @@ class ConductorActivityState {
    * @param $two
    *   The value of the context value to set.
    */
-  public function setContext($one, $two = FALSE) {
-    if ($two) {
+  public function setContext($one, $two = NULL) {
+    $args = func_get_args();
+    if (count($args) == 2) {
       $this->context[$one] = $two;
     }
-    else if (is_array($one)) {
+    else if (count($args) == 1 && is_array($one)) {
       $this->context = $one;
     }
     else {
-      throw new Exception('Invalid context provided to activity state, must be an array.');
+      throw new Exception('Invalid context provided to workflow instance in method `setContext`.');
     }
   }
 
