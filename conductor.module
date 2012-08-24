@@ -211,7 +211,7 @@ function conductor_load_workflow($name) {
   ctools_include('export');
   $result = ctools_export_load_object('conductor_workflow', 'names', array($name));
   if (isset($result[$name])) {
-    return $result[$name];
+    return $result[$name]->cloneWorkflow();
   }
 }
 
